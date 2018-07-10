@@ -1,0 +1,16 @@
+[
+{
+  "modid": "auto_third_person",
+  "name": "Auto Third Person",
+  "description": "Automatically puts you in third person mode when you perform certain actions. Configurable!",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["quaternary"],
+  "credits": "ayy lmaoooOOO",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
