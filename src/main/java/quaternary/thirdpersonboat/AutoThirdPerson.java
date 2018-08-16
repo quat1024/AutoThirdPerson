@@ -13,6 +13,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.regex.Pattern;
 
@@ -26,6 +28,7 @@ public class AutoThirdPerson {
 	static int oldCameraMode = 0;
 	static boolean wasElytraFlying = false;
 	static Pattern[] whitelistPatterns = null;
+	static boolean didLog = false;
 	
 	@SubscribeEvent
 	public static void mountEvent(EntityMountEvent e) {
@@ -96,6 +99,14 @@ public class AutoThirdPerson {
 	private static void enterThirdPerson() {
 		oldCameraMode = Minecraft.getMinecraft().gameSettings.thirdPersonView;
 		setCameraMode(1);
+		
+		if(ModConfig.LOG_FIRST_TIME && !didLog) {
+			Logger log = LogManager.getLogger(NAME);
+			log.info("You were automatically put into third person mode!");
+			log.info("If you don't like this behavior, please see the in-game configuration screen.");
+			log.info("This message will only display once. *dissolves*");
+			didLog = true;
+		}
 	}
 	
 	private static void leaveThirdPerson() {
@@ -194,8 +205,20 @@ public class AutoThirdPerson {
 		public static boolean AUTO_RESTORE = true;
 		
 		@Config.Name("CancelAutoRestore")
-		@Config.Comment({"If you manually toggle the camera view while riding, what should happen when you leave your vehicle?", "If true: Nothing, your camera view will be left as-is.", "If false: You will be put back in the camera view you chose before entering the vehicle."})
+		@Config.Comment({
+						"If you manually toggle the camera view while riding, what should happen when you leave your vehicle?",
+						"If true: Nothing, your camera view will be left as-is.",
+						"If false: You will be put back in the camera view you chose before entering the vehicle."
+		})
 		public static boolean CANCEL_AUTO_RESTORE = true;
+		
+		@Config.Name("LogFirstTime")
+		@Config.Comment({
+						"Should Auto Third Person log a prominent message the first time it triggers, per game session?",
+						"This is intended to unobtrusively reduce confusion for mod-developers receiving",
+						"bug reports of the form \"Hmm? I randomly went in to third person?\""
+		})
+		public static boolean LOG_FIRST_TIME = true;
 		
 		@SubscribeEvent
 		public static void configChanged(ConfigChangedEvent.OnConfigChangedEvent e) {
