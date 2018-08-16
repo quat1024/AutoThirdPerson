@@ -22,7 +22,7 @@ compileJava {
 minecraft {
     version = "1.12.2-14.23.4.2705"
     runDir = "run"
-    mappings = "snapshot_20180407"
+    mappings = "stable_39"
     
     replace "GRADLE:VERSION", project.version
 }
