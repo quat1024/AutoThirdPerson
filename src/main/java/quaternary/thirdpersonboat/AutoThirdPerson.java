@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.*;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.EntityMountEvent;
@@ -12,6 +13,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+
+import java.util.regex.Pattern;
 
 @Mod(modid = AutoThirdPerson.MODID, name = AutoThirdPerson.NAME, version = AutoThirdPerson.VERSION, clientSideOnly = true)
 @Mod.EventBusSubscriber
@@ -22,6 +25,7 @@ public class AutoThirdPerson {
 	
 	static int oldCameraMode = 0;
 	static boolean wasElytraFlying = false;
+	static Pattern[] whitelistPatterns = null;
 	
 	@SubscribeEvent
 	public static void mountEvent(EntityMountEvent e) {
@@ -31,12 +35,28 @@ public class AutoThirdPerson {
 			Entity mounting = e.getEntityBeingMounted();
 			boolean doIt = false;
 			
+			if(whitelistPatterns == null) parseConfigPatterns();
+			
 			if(ModConfig.entities.MINECART && mounting instanceof EntityMinecart) {
 				doIt = true;
 			} else if(ModConfig.entities.BOAT && mounting instanceof EntityBoat) {
 				doIt = true;
 			} else if(ModConfig.entities.ANIMAL && mounting instanceof EntityLiving) {
 				doIt = true;
+			} else if(ModConfig.entities.OTHER && whitelistPatterns.length == 0) {
+				doIt = true;
+			}
+			
+			if(ModConfig.entities.OTHER && whitelistPatterns.length > 0) {
+				ResourceLocation entityLocation = EntityList.getKey(mounting);
+				if(entityLocation == null) return;
+				String entityType = entityLocation.toString();
+				for(Pattern p : whitelistPatterns) {
+					if(p.matcher(entityType).matches()) {
+						doIt = true;
+						break;
+					}
+				}
 			}
 			
 			if(doIt) {
@@ -94,28 +114,73 @@ public class AutoThirdPerson {
 		return Minecraft.getMinecraft().gameSettings.thirdPersonView;
 	}
 	
+	private static void parseConfigPatterns() {
+		whitelistPatterns = new Pattern[ModConfig.entities.otherSettings.whitelist.length];
+		for(int i = 0; i < ModConfig.entities.otherSettings.whitelist.length; i++) {
+			whitelistPatterns[i] = Pattern.compile(ModConfig.entities.otherSettings.whitelist[i]);
+		}
+	}
+	
 	@Config(modid = MODID)
 	@Mod.EventBusSubscriber
 	public static class ModConfig {
+		@Config.Comment("Which entities cause automatic third person behavior?")
 		public static Entities entities = new Entities();
+		@Config.Comment("Special bonus settings!")
 		public static Extras extras = new Extras();
 		
-		private static class Entities {
+		public static class Entities {
 			@Config.Name("Minecarts")
-			@Config.Comment("Should Minecraft go into third person when you enter a minecart?")
+			@Config.Comment({
+							"Should Minecraft go into third person when you enter a minecart?",
+							"Technical note: this works on all EntityMinecarts, vanilla or not."
+			})
 			public boolean MINECART = true;
 			
 			@Config.Name("Boats")
-			@Config.Comment("Should Minecraft go into third person when you enter a boat?")
+			@Config.Comment({
+							"Should Minecraft go into third person when you enter a boat?",
+							"Technical note: this works on all EntityBoats, vanilla or not."
+			})
 			public boolean BOAT = true;
 			
 			@Config.Name("Animals")
-			@Config.Comment("Should Minecraft go into third person when you ride an animal?")
+			@Config.Comment({
+							"Should Minecraft go into third person when you ride an animal?",
+							"Technical note: this works on all EntityLivings, vanilla or not."
+			})
 			public boolean ANIMAL = true;
 			
 			@Config.Name("ElytraFlying")
-			@Config.Comment("Should Minecraft go into third person when you fly an elytra?")
+			@Config.Comment({
+							"Should Minecraft go into third person when you fly an elytra?",
+							"Technical note: this works on anything that sets \"player.isElytraFlying\", vanilla or not."
+			})
 			public boolean ELYTRA = true;
+			
+			@Config.Name("Other")
+			@Config.Comment("Should Minecraft go into third person when you start riding something else?")
+			public boolean OTHER = true;
+			
+			@Config.Comment("Settings for the \"Other\" config option. Nothing in here will have any effect if \"Other\" is false.")
+			public OtherSettings otherSettings = new OtherSettings();
+			
+			public static class OtherSettings {
+				@Config.Name("OtherEntitiesWhitelist")
+				@Config.Comment({
+								"If this is blank, every entity that's not a boat, minecart, or animal will cause third-person behavior.",
+								"If it's not blank, only entities that appear in this list will cause third-person behavior.",
+								"This setting will override the general Animals, Boat, Minecart settings, but only if it's not blank.",
+								"",
+								"Please write entries in the \"modid:name\" format, similar to what you would enter into /summon.",
+								"If you are not sure how to find an entity ID, please contact its developers!",
+								"Feel free to use regular expressions to match many entity IDs on one line!"
+				})
+				public String[] whitelist = new String[]{
+								"botania:player_mover",
+								"jurassicraft:.*"
+				};
+			}
 		}
 		
 		private static class Extras {
@@ -136,6 +201,7 @@ public class AutoThirdPerson {
 		public static void configChanged(ConfigChangedEvent.OnConfigChangedEvent e) {
 			if(e.getModID().equals(MODID)) {
 				ConfigManager.sync(MODID, Config.Type.INSTANCE);
+				whitelistPatterns = null;
 			}
 		}
 	}
