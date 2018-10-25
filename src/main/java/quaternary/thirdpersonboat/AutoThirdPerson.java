@@ -34,6 +34,8 @@ public class AutoThirdPerson {
 	static Pattern[] blacklistPatterns = null;
 	static boolean didLog = false;
 	
+	private static Logger LOGGER = LogManager.getLogger(NAME);
+	
 	@SubscribeEvent
 	public static void mountEvent(EntityMountEvent e) {
 		Minecraft mc = Minecraft.getMinecraft();
@@ -59,7 +61,7 @@ public class AutoThirdPerson {
 				if(entityLocation != null) {
 					String entityType = entityLocation.toString();
 					for(Pattern p : whitelistPatterns) {
-						if(p.matcher(entityType).matches()) {
+						if(p != null && p.matcher(entityType).matches()) {
 							doIt = true;
 							break;
 						}
@@ -73,7 +75,7 @@ public class AutoThirdPerson {
 				if(entityLocation != null) {
 					String entityType = entityLocation.toString();
 					for(Pattern p : blacklistPatterns) {
-						if(p.matcher(entityType).matches()) {
+						if(p != null && p.matcher(entityType).matches()) {
 							doIt = false;
 							break;
 						}
@@ -140,10 +142,9 @@ public class AutoThirdPerson {
 		setCameraMode(1);
 		
 		if(ModConfig.LOG_FIRST_TIME && !didLog) {
-			Logger log = LogManager.getLogger(NAME);
-			log.info("You were automatically put into third person mode!");
-			log.info("If you don't like this behavior, please see the in-game configuration screen.");
-			log.info("This message will only display once. *dissolves*");
+			LOGGER.info("You were automatically put into third person mode!");
+			LOGGER.info("If you don't like this behavior, please see the in-game configuration screen.");
+			LOGGER.info("This message will only display once. *dissolves*");
 			didLog = true;
 		}
 	}
@@ -164,7 +165,7 @@ public class AutoThirdPerson {
 		return Minecraft.getMinecraft().gameSettings.thirdPersonView;
 	}
 	
-	private static final String error = "There was a problem parsing a regex in the Auto Third Person %s\nSpecifically, the error was on the %s expression, '%s'.\nHere are more details of the error.";
+	private static final String error = "There was a problem parsing the {} regex in the Auto Third Person {}.\nHere are more details of the error.";
 	
 	private static void parseConfigPatterns() {
 		whitelistPatterns = new Pattern[ModConfig.entities.whitelist.length];
@@ -172,7 +173,8 @@ public class AutoThirdPerson {
 			try {
 				whitelistPatterns[i] = Pattern.compile(ModConfig.entities.whitelist[i]);
 			} catch(PatternSyntaxException e) {
-				throw new RuntimeException(String.format(error, "extra entities whitelist", numberToEnglishOrdinal(i + 1), ModConfig.entities.whitelist[i]));
+				whitelistPatterns[i] = null;
+				LOGGER.error(error, numberToEnglishOrdinal(i + 1), "extra entities whitelist", e);
 			}
 		}
 		
@@ -181,7 +183,8 @@ public class AutoThirdPerson {
 			try {
 				blacklistPatterns[i] = Pattern.compile(ModConfig.entities.blacklist[i]);
 			} catch(PatternSyntaxException e) {
-				throw new RuntimeException(String.format(error, "entity blacklist", numberToEnglishOrdinal(i + 1), ModConfig.entities.blacklist[i]));
+				blacklistPatterns[i] = null;
+				LOGGER.error(error, numberToEnglishOrdinal(i + 1), "entity blacklist", e);
 			}
 		}
 	}
