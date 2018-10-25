@@ -5,6 +5,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -28,7 +29,7 @@ public class AutoThirdPerson {
 	public static final String VERSION = "GRADLE:VERSION";
 	
 	static int oldCameraMode = 0;
-	static boolean wasElytraFlying = false;
+	static int elytraFlyingTicks = 0;
 	static Pattern[] whitelistPatterns = null;
 	static Pattern[] blacklistPatterns = null;
 	static boolean didLog = false;
@@ -88,21 +89,41 @@ public class AutoThirdPerson {
 	}
 	
 	@SubscribeEvent
-	public static void tickEvent(TickEvent.PlayerTickEvent e) {
+	public static void onFrame(TickEvent.RenderTickEvent e) {
+		if(e.phase != TickEvent.Phase.START) return;
+		
+		Minecraft mc = Minecraft.getMinecraft();
+		if(mc.isGamePaused()) return;
+		if(mc.player == null) return;
+		
 		if(ModConfig.extras.SKIP_FRONT_VIEW && getCameraMode() == 2) {
 			setCameraMode(0);
 		}
+	}
+	
+	@SubscribeEvent
+	public static void onTick(TickEvent.ClientTickEvent e) {
+		if(e.phase != TickEvent.Phase.START) return;
+		
+		Minecraft mc = Minecraft.getMinecraft();
+		if(mc.isGamePaused()) return;
+		
+		EntityPlayer player = mc.player;
+		if(player == null) return;
 		
 		if(ModConfig.entities.ELYTRA) {
-			Minecraft mc = Minecraft.getMinecraft();
-			if(e.player == mc.player) {
-				if(!wasElytraFlying && mc.player.isElytraFlying()) {
+			if(player.isElytraFlying()) {
+				if(elytraFlyingTicks == ModConfig.extras.elytraFlyingTickDelay) {
 					enterThirdPerson();
-				} else if(wasElytraFlying && !mc.player.isElytraFlying()) {
+				}
+				
+				elytraFlyingTicks++;
+			} else {
+				if(elytraFlyingTicks != 0) {
 					leaveThirdPerson();
 				}
 				
-				wasElytraFlying = mc.player.isElytraFlying();
+				elytraFlyingTicks = 0;
 			}
 		}
 	}
@@ -229,10 +250,11 @@ public class AutoThirdPerson {
 							"Additional entity IDs that will trigger special third person behavior.",
 							"This option supplements the broader category configuration options, e.g.",
 							"if \"animals\" is false, but you put an animal in here, it will still trigger third person behavior.",
+							"If this is empty, it will have no effect.",
 							"",
 							"Please write entries in the \"modid:name\" format, similar to what you would enter into /summon.",
 							"If you are not sure how to find an entity ID, please contact its developers!",
-							"Feel free to use regular expressions to match many entity IDs on one line!"
+							"Feel free to use regular expressions to match many entity IDs on one line!",
 			})
 			public String[] whitelist = new String[]{
 							"botania:player_mover",
@@ -245,6 +267,7 @@ public class AutoThirdPerson {
 							"Entity IDs that will *never* trigger special third person behavior.",
 							"This option overrides the broader category configuration options,",
 							"and it additionally overrides \"Others\". Blacklisting an entity listed there ultimately blacklists it.",
+							"If this is empty, it will have no effect.",
 							"",
 							"Please write entries in the \"modid:name\" format, similar to what you would enter into /summon.",
 							"If you are not sure how to find an entity ID, please contact its developers!",
@@ -259,6 +282,16 @@ public class AutoThirdPerson {
 			@Config.Name("SkipFrontView")
 			@Config.Comment("Should Minecraft never go into \"first-person reversed\" view?")
 			public boolean SKIP_FRONT_VIEW = false;
+			
+			@Config.Name("ElytraFlyingTickDelay")
+			@Config.Comment({
+							"The sudden third-person perspective shift can be a bit jarring when flying an elytra.",
+							"Increase this number to increase the amount of ticks (20ths of a second)",
+							"you need to fly for before you automagically go into third person.",
+							"(...If you enable the third-person elytra, of course.)"
+			})
+			@Config.RangeInt(min = 0)
+			public int elytraFlyingTickDelay = 0;
 		}
 		
 		@Config.Name("AutoRestoreView")
