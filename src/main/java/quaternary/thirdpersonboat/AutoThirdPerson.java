@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 @Mod(modid = AutoThirdPerson.MODID, name = AutoThirdPerson.NAME, version = AutoThirdPerson.VERSION, clientSideOnly = true)
 @Mod.EventBusSubscriber
@@ -29,6 +30,7 @@ public class AutoThirdPerson {
 	static int oldCameraMode = 0;
 	static boolean wasElytraFlying = false;
 	static Pattern[] whitelistPatterns = null;
+	static Pattern[] blacklistPatterns = null;
 	static boolean didLog = false;
 	
 	@SubscribeEvent
@@ -39,26 +41,41 @@ public class AutoThirdPerson {
 			Entity mounting = e.getEntityBeingMounted();
 			boolean doIt = false;
 			
-			if(whitelistPatterns == null) parseConfigPatterns();
+			if(whitelistPatterns == null || blacklistPatterns == null) parseConfigPatterns();
 			
+			//General categories
 			if(ModConfig.entities.MINECART && mounting instanceof EntityMinecart) {
 				doIt = true;
 			} else if(ModConfig.entities.BOAT && mounting instanceof EntityBoat) {
 				doIt = true;
 			} else if(ModConfig.entities.ANIMAL && mounting instanceof EntityAnimal) {
 				doIt = true;
-			} else if(ModConfig.entities.OTHER && whitelistPatterns.length == 0) {
-				doIt = true;
 			}
 			
-			if(ModConfig.entities.OTHER && whitelistPatterns.length > 0) {
+			//Additional whitelist
+			if(whitelistPatterns.length > 0) {
 				ResourceLocation entityLocation = EntityList.getKey(mounting);
-				if(entityLocation == null) return;
-				String entityType = entityLocation.toString();
-				for(Pattern p : whitelistPatterns) {
-					if(p.matcher(entityType).matches()) {
-						doIt = true;
-						break;
+				if(entityLocation != null) {
+					String entityType = entityLocation.toString();
+					for(Pattern p : whitelistPatterns) {
+						if(p.matcher(entityType).matches()) {
+							doIt = true;
+							break;
+						}
+					}
+				}
+			}
+			
+			//Additional blacklist
+			if(blacklistPatterns.length > 0) {
+				ResourceLocation entityLocation = EntityList.getKey(mounting);
+				if(entityLocation != null) {
+					String entityType = entityLocation.toString();
+					for(Pattern p : blacklistPatterns) {
+						if(p.matcher(entityType).matches()) {
+							doIt = false;
+							break;
+						}
 					}
 				}
 			}
@@ -126,11 +143,48 @@ public class AutoThirdPerson {
 		return Minecraft.getMinecraft().gameSettings.thirdPersonView;
 	}
 	
+	private static final String error = "There was a problem parsing a regex in the Auto Third Person %s\nSpecifically, the error was on the %s expression, '%s'.\nHere are more details of the error.";
+	
 	private static void parseConfigPatterns() {
-		whitelistPatterns = new Pattern[ModConfig.entities.otherSettings.whitelist.length];
-		for(int i = 0; i < ModConfig.entities.otherSettings.whitelist.length; i++) {
-			whitelistPatterns[i] = Pattern.compile(ModConfig.entities.otherSettings.whitelist[i]);
+		whitelistPatterns = new Pattern[ModConfig.entities.whitelist.length];
+		for(int i = 0; i < ModConfig.entities.whitelist.length; i++) {
+			try {
+				whitelistPatterns[i] = Pattern.compile(ModConfig.entities.whitelist[i]);
+			} catch(PatternSyntaxException e) {
+				throw new RuntimeException(String.format(error, "extra entities whitelist", numberToEnglishOrdinal(i + 1), ModConfig.entities.whitelist[i]));
+			}
 		}
+		
+		blacklistPatterns = new Pattern[ModConfig.entities.blacklist.length];
+		for(int i = 0; i < ModConfig.entities.blacklist.length; i++) {
+			try {
+				blacklistPatterns[i] = Pattern.compile(ModConfig.entities.blacklist[i]);
+			} catch(PatternSyntaxException e) {
+				throw new RuntimeException(String.format(error, "entity blacklist", numberToEnglishOrdinal(i + 1), ModConfig.entities.blacklist[i]));
+			}
+		}
+	}
+	
+	private static String numberToEnglishOrdinal(int i) {
+		//numbers ending in 1: "st"
+		//numbers ending in 2: "nd"
+		//numbers ending in 3: "rd"
+		//everything else: "th"
+		//exception: numbers ending in 11, 12, 13 are all "th"
+		String suffix;
+		if(i <= 0 || (i % 100) / 10 == 1 || i % 10 >= 4) {
+			suffix = "th";
+		} else if(i % 10 == 1) {
+			suffix = "st";
+		} else if(i % 10 == 2) {
+			suffix = "nd";
+		} else if(i % 10 == 3){
+			suffix = "rd";
+		} else {
+			suffix = "th"; //Impossible to reach xd
+		}
+		
+		return i + suffix;
 	}
 	
 	@Config(modid = MODID)
@@ -170,29 +224,35 @@ public class AutoThirdPerson {
 			})
 			public boolean ELYTRA = true;
 			
-			@Config.Name("Other")
-			@Config.Comment("Should Minecraft go into third person when you start riding something else?")
-			public boolean OTHER = true;
+			@Config.Name("_Others")
+			@Config.Comment({
+							"Additional entity IDs that will trigger special third person behavior.",
+							"This option supplements the broader category configuration options, e.g.",
+							"if \"animals\" is false, but you put an animal in here, it will still trigger third person behavior.",
+							"",
+							"Please write entries in the \"modid:name\" format, similar to what you would enter into /summon.",
+							"If you are not sure how to find an entity ID, please contact its developers!",
+							"Feel free to use regular expressions to match many entity IDs on one line!"
+			})
+			public String[] whitelist = new String[]{
+							"botania:player_mover",
+							"jurassicraft:.*"
+			};
 			
-			@Config.Comment("Settings for the \"Other\" config option. Nothing in here will have any effect if \"Other\" is false.")
-			public OtherSettings otherSettings = new OtherSettings();
-			
-			public static class OtherSettings {
-				@Config.Name("OtherEntitiesWhitelist")
-				@Config.Comment({
-								"If this is blank, every entity that's not a boat, minecart, or animal will cause third-person behavior.",
-								"If it's not blank, only entities that appear in this list will cause third-person behavior.",
-								"This setting will override the general Animals, Boat, Minecart settings, but only if it's not blank.",
-								"",
-								"Please write entries in the \"modid:name\" format, similar to what you would enter into /summon.",
-								"If you are not sure how to find an entity ID, please contact its developers!",
-								"Feel free to use regular expressions to match many entity IDs on one line!"
-				})
-				public String[] whitelist = new String[]{
-								"botania:player_mover",
-								"jurassicraft:.*"
-				};
-			}
+			//Underscore just makes it sort to the bottom...
+			@Config.Name("_Blacklist")
+			@Config.Comment({
+							"Entity IDs that will *never* trigger special third person behavior.",
+							"This option overrides the broader category configuration options,",
+							"and it additionally overrides \"Others\". Blacklisting an entity listed there ultimately blacklists it.",
+							"",
+							"Please write entries in the \"modid:name\" format, similar to what you would enter into /summon.",
+							"If you are not sure how to find an entity ID, please contact its developers!",
+							"Feel free to use regular expressions to match many entity IDs on one line!"
+			})
+			public String[] blacklist = new String[]{
+							
+			};
 		}
 		
 		private static class Extras {
