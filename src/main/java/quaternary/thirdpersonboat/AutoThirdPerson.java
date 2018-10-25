@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.*;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -44,7 +45,7 @@ public class AutoThirdPerson {
 				doIt = true;
 			} else if(ModConfig.entities.BOAT && mounting instanceof EntityBoat) {
 				doIt = true;
-			} else if(ModConfig.entities.ANIMAL && mounting instanceof EntityLiving) {
+			} else if(ModConfig.entities.ANIMAL && mounting instanceof EntityAnimal) {
 				doIt = true;
 			} else if(ModConfig.entities.OTHER && whitelistPatterns.length == 0) {
 				doIt = true;
@@ -158,7 +159,7 @@ public class AutoThirdPerson {
 			@Config.Name("Animals")
 			@Config.Comment({
 							"Should Minecraft go into third person when you ride an animal?",
-							"Technical note: this works on all EntityLivings, vanilla or not."
+							"Technical note: this works on all EntityAnimals, vanilla or not."
 			})
 			public boolean ANIMAL = true;
 			
