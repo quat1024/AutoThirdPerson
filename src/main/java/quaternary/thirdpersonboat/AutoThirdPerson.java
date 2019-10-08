@@ -11,7 +11,9 @@ import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -35,6 +37,11 @@ public class AutoThirdPerson {
 	static boolean didLog = false;
 	
 	private static Logger LOGGER = LogManager.getLogger(NAME);
+	
+	@Mod.EventHandler
+	public static void preinit(FMLPreInitializationEvent e) {
+		if(Loader.isModLoaded("wings")) WingsCompat.preinit(e);
+	}
 	
 	@SubscribeEvent
 	public static void mountEvent(EntityMountEvent e) {
@@ -137,7 +144,7 @@ public class AutoThirdPerson {
 		}
 	}
 	
-	private static void enterThirdPerson() {
+	public static void enterThirdPerson() {
 		oldCameraMode = Minecraft.getMinecraft().gameSettings.thirdPersonView;
 		setCameraMode(1);
 		
@@ -149,7 +156,7 @@ public class AutoThirdPerson {
 		}
 	}
 	
-	private static void leaveThirdPerson() {
+	public static void leaveThirdPerson() {
 		if(oldCameraMode == -1) {
 			oldCameraMode = 0;
 		} else if(ModConfig.AUTO_RESTORE) {
@@ -218,6 +225,23 @@ public class AutoThirdPerson {
 		public static Entities entities = new Entities();
 		@Config.Comment("Special bonus settings!")
 		public static Extras extras = new Extras();
+		@Config.Comment("Mod compat settings.")
+		public static Compat compat = new Compat();
+		
+		public static class Compat {
+			@Config.Name("Wings")
+			@Config.Comment("Enables compat with the Wings mod if it's present.")
+			public boolean WINGS = true;
+			
+			@Config.Name("WingsFlyingTickDelay")
+			@Config.Comment({
+				"The sudden third-person perspective shift can be a bit jarring when flying with Wings.",
+				"Increase this number to increase the amount of ticks (20ths of a second)",
+				"you need to fly for before you automagically go into third person."
+			})
+			@Config.RangeInt(min = 0)
+			public int wingsFlyingTickDelay = 1;
+		}
 		
 		public static class Entities {
 			@Config.Name("Minecarts")
@@ -281,7 +305,7 @@ public class AutoThirdPerson {
 			};
 		}
 		
-		private static class Extras {
+		public static class Extras {
 			@Config.Name("SkipFrontView")
 			@Config.Comment("Should Minecraft never go into \"first-person reversed\" view?")
 			public boolean SKIP_FRONT_VIEW = false;
