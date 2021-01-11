@@ -12,16 +12,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin({ClientPlayerEntity.class})
 public class ClientPlayerEntityMixin {
 	@Inject(
-		method = {"startRiding"},
-		at = {@At("TAIL")}
+		method = "startRiding",
+		at = @At("TAIL")
 	)
 	private void onStartRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
 		AutoThirdPerson.mountOrDismount(vehicle, true);
 	}
 	
 	@Inject(
-		method = {"method_29239"},
-		at = {@At("HEAD")}
+		method = "method_29239",
+		at = @At("HEAD")
 	)
 	private void onStopRiding(CallbackInfo ci) {
 		@SuppressWarnings("ConstantConditions")

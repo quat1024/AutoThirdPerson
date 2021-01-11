@@ -30,22 +30,23 @@ public class AutoThirdPerson implements ClientModInitializer {
 			}
 			
 			public void apply(ResourceManager manager) {
-				AutoThirdPerson.SETTINGS = Settings.readOrDefault(FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg"));
+				SETTINGS = Settings.readOrDefault(FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg"));
 			}
 		});
 		
-		ClientTickEvents.START_CLIENT_TICK.register((client) -> {
-			if(client.world != null && client.player != null && !client.isPaused()) {
-				if(SETTINGS.elytra && client.player.isFallFlying()) {
-					if(STATE.elytraFlyingTicks == SETTINGS.elytraDelay) enterThirdPerson(client);
-					++STATE.elytraFlyingTicks;
-				} else {
-					if(STATE.elytraFlyingTicks != 0) leaveThirdPerson(client);
-					STATE.elytraFlyingTicks = 0;
-				}
-				
+		ClientTickEvents.START_CLIENT_TICK.register(AutoThirdPerson::clientTick);
+	}
+	
+	public static void clientTick(MinecraftClient client) {
+		if(client.world != null && client.player != null && !client.isPaused()) {
+			if(SETTINGS.elytra && client.player.isFallFlying()) {
+				if(STATE.elytraFlyingTicks == SETTINGS.elytraDelay) enterThirdPerson(client);
+				STATE.elytraFlyingTicks++;
+			} else {
+				if(STATE.elytraFlyingTicks != 0) leaveThirdPerson(client);
+				STATE.elytraFlyingTicks = 0;
 			}
-		});
+		}
 	}
 	
 	public static void mountOrDismount(Entity vehicle, boolean mounting) {
@@ -64,15 +65,13 @@ public class AutoThirdPerson implements ClientModInitializer {
 			if(mounting) enterThirdPerson(client);
 			else leaveThirdPerson(client);
 		}
-		
 	}
 	
 	public static void f5Press() {
 		if(SETTINGS.cancelAutoRestore && !STATE.cancelled) {
 			STATE.cancelled = true;
-			if(SETTINGS.logSpam) {
-				LOGGER.info("Cancelling auto-restore, if it was about to happen");
-			}
+			
+			if(SETTINGS.logSpam) LOGGER.info("Cancelling auto-restore, if it was about to happen");
 		}
 	}
 	
@@ -90,12 +89,11 @@ public class AutoThirdPerson implements ClientModInitializer {
 			
 			if(SETTINGS.logSpam) LOGGER.info("Automatically leaving third person");
 		}
-		
 	}
 	
 	public static class State {
-		public Perspective oldPerspective;
-		public boolean cancelled;
-		public int elytraFlyingTicks;
+		public Perspective oldPerspective = Perspective.FIRST_PERSON;
+		public boolean cancelled = false;
+		public int elytraFlyingTicks = 0;
 	}
 }
