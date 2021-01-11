@@ -53,13 +53,31 @@ public class AutoThirdPerson implements ClientModInitializer {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if(client.world == null || client.player == null) return;
 		
-		Identifier entityId = Registry.ENTITY_TYPE.getId(vehicle.getType());
-		if(SETTINGS.logSpam) LOGGER.info((mounting ? "Mounting " : "Dismounting ") + entityId.toString());
+		String entityId = Registry.ENTITY_TYPE.getId(vehicle.getType()).toString();
+		if(SETTINGS.logSpam) LOGGER.info((mounting ? "Mounting " : "Dismounting ") + entityId);
+		
+		if(SETTINGS.useIgnore && SETTINGS.ignorePattern.matcher(entityId).matches()) {
+			if(SETTINGS.logSpam) LOGGER.info("Ignoring, since it matches the ignore pattern '" + SETTINGS.ignorePattern + "'.");
+			return;
+		}
 		
 		boolean doIt = false;
-		if(SETTINGS.boat && vehicle instanceof BoatEntity) doIt = true;
-		if(SETTINGS.cart && vehicle instanceof MinecartEntity) doIt = true;
-		if(SETTINGS.animal && vehicle instanceof AnimalEntity) doIt = true;
+		if(SETTINGS.boat && vehicle instanceof BoatEntity) {
+			if(SETTINGS.logSpam) LOGGER.info("This is a boat!");
+			doIt = true;
+		}
+		if(SETTINGS.cart && vehicle instanceof MinecartEntity) {
+			if(SETTINGS.logSpam) LOGGER.info("This is a minecart!");
+			doIt = true;
+		}
+		if(SETTINGS.animal && vehicle instanceof AnimalEntity) {
+			if(SETTINGS.logSpam) LOGGER.info("This is an animal!");
+			doIt = true;
+		}
+		if(SETTINGS.custom && SETTINGS.customPattern.matcher(entityId).matches()) {
+			if(SETTINGS.logSpam) LOGGER.info("This matches the pattern '" + SETTINGS.customPattern + "'!");
+			doIt = true;
+		}
 		
 		if(doIt) {
 			if(mounting) enterThirdPerson(client);

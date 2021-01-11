@@ -7,14 +7,17 @@ import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class Settings {
-	@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"}) // >:(
-	private int configVersion = 0;
-	
+	private static final int CURRENT_CONFIG_VERSION = 2;
+	private int configVersion = CURRENT_CONFIG_VERSION;
+	@LineBreak
 	@Section("Scenarios")
 	@Comment("Automatically go into third person when riding a boat?")
 	public boolean boat = true;
@@ -24,10 +27,30 @@ public class Settings {
 	public boolean animal = true;
 	@Comment("Automatically go into third person when flying an elytra?")
 	public boolean elytra = true;
+	@Comment({
+		"If 'true' the customPattern will be used and riding anything",
+		"matching it will toggle third person."
+	})
+	public boolean custom = false;
+	@Comment("If 'true' the ignorePattern will be used and anything matching it will be ignored.")
+	public boolean useIgnore = false;
 	@LineBreak
 	@Section("Scenario Options")
-	@Comment("Ticks of elytra flight required before the camera automatically toggles.")
+	@Comment({
+		"Ticks of elytra flight required before the camera automatically toggles,",
+		"if the 'elytra' option is enabled."
+	})
 	public int elytraDelay = 7;
+	@Comment({
+		"Entity IDs that match this regular expression will be considered,",
+		"if the 'custom' option is enabled."
+	})
+	public Pattern customPattern = Pattern.compile("^minecraft:(cow|chicken)$");
+	@Comment({
+		"Entity IDs that match this regular expression will be ignored,",
+		"if the 'useIgnore' option is enabled."
+	})
+	public Pattern ignorePattern = Pattern.compile("^examplemod:example$");
 	@LineBreak
 	@Section("Restoration")
 	@Comment("Go back into first-person when dismounting?")
@@ -56,10 +79,21 @@ public class Settings {
 			try {
 				AutoThirdPerson.LOGGER.info("File exists, reading...");
 				Settings s = read(path);
-				s.update();
+				
+				boolean needsRewrite = s.update();
+				
+				if(needsRewrite) {
+					AutoThirdPerson.LOGGER.info("Saving over the config file because it is old");
+					try {
+						s.write(path);
+					} catch (IOException e) {
+						AutoThirdPerson.LOGGER.info("Could not write over config file", e);
+					}
+				}
+				
 				return s;
-			} catch (ParseException | IOException var3) {
-				AutoThirdPerson.LOGGER.info("Could not read or parse config file", var3);
+			} catch (ParseException | IOException e) {
+				AutoThirdPerson.LOGGER.info("Could not read or parse config file", e);
 				AutoThirdPerson.LOGGER.info("Using default config");
 				return new Settings();
 			}
@@ -69,18 +103,25 @@ public class Settings {
 			try {
 				AutoThirdPerson.LOGGER.info("Creating default settings...");
 				s.write(path);
-			} catch (IOException var4) {
-				AutoThirdPerson.LOGGER.info("Could not write default config file", var4);
+			} catch (IOException e) {
+				AutoThirdPerson.LOGGER.info("Could not write default config file", e);
 			}
 			
 			return s;
 		}
 	}
 	
-	private void update() {
-		if(configVersion > 0) {
+	//returns 'true' if the config file should be written over
+	//We have DFU at home lol
+	private boolean update() throws ParseException {
+		if(configVersion > CURRENT_CONFIG_VERSION) {
 			throw new ParseException("This config file is from the future!");
 		}
+		
+		boolean isOld = configVersion < CURRENT_CONFIG_VERSION;
+		
+		configVersion = CURRENT_CONFIG_VERSION;
+		return isOld;
 	}
 	
 	public static Settings read(Path path) throws IOException, ParseException {
@@ -94,8 +135,8 @@ public class Settings {
 			if(line.startsWith("#") || line.isEmpty()) continue;
 			
 			String[] split = line.split("=", 2);
-			if(split.length != 2) {
-				continue;
+			if(split.length == 1) {
+				split = new String[] { split[0], "" };
 			}
 			
 			split[0] = split[0].trim();
@@ -111,7 +152,8 @@ public class Settings {
 			
 			if(field.getType() == Boolean.TYPE) yahoo = Boolean.parseBoolean(split[1]);
 			else if(field.getType() == Integer.TYPE) yahoo = parseInt(split[1]);
-			else throw new ParseException("Should be impossible but if you see this quat's a dork and forgot to add a deserializer, go yell at it to add one!!");
+			else if(field.getType() == Pattern.class) yahoo = compilePattern(split[1]);
+			else throw new ParseException("Should be impossible but if you see this quat's a dork and forgot to add a deserializer for " + split[0] + " go yell at it to add one!!");
 			
 			try {
 				field.set(settings, yahoo);
@@ -123,11 +165,19 @@ public class Settings {
 		return settings;
 	}
 	
-	private static int parseInt(String s) {
+	private static int parseInt(String s) throws ParseException {
 		try {
 			return Integer.parseInt(s);
-		} catch (NumberFormatException var2) {
-			throw new Settings.ParseException("Can't parse this integer", var2);
+		} catch (NumberFormatException e) {
+			throw new ParseException("Can't parse this integer", e);
+		}
+	}
+	
+	private static Pattern compilePattern(String s) throws ParseException {
+		try {
+			return Pattern.compile(s);
+		} catch (PatternSyntaxException e) {
+			throw new ParseException("Can't compile this regular expression", e);
 		}
 	}
 	
@@ -135,6 +185,9 @@ public class Settings {
 		BufferedWriter writer = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
 		
 		for(Field f : Settings.class.getDeclaredFields()) {
+			int mod = f.getModifiers();
+			if(Modifier.isStatic(mod) || Modifier.isTransient(mod) || Modifier.isFinal(mod)) continue;
+			
 			if(f.isAnnotationPresent(LineBreak.class)) {
 				writer.newLine();
 			}
@@ -163,6 +216,7 @@ public class Settings {
 			writer.write(" = ");
 			
 			try {
+				//So far this works for ints, booleans, and Patterns
 				writer.write(f.get(this).toString());
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException("Can't read field to serialize to config file, for some reason", e);
@@ -174,7 +228,7 @@ public class Settings {
 		writer.flush();
 	}
 	
-	private static class ParseException extends RuntimeException {
+	private static class ParseException extends Exception {
 		public ParseException(String message) {
 			super(message);
 		}
