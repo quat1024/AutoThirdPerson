@@ -16,6 +16,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class Settings {
 	private static final int CURRENT_CONFIG_VERSION = 2;
+	@Hidden
 	private int configVersion = CURRENT_CONFIG_VERSION;
 	@LineBreak
 	@Section("Scenarios")
@@ -193,11 +194,11 @@ public class Settings {
 			}
 			
 			if(f.isAnnotationPresent(Section.class)) {
-				String header = f.getAnnotation(Section.class).value();
-				String hashes = Strings.repeat("#", header.length() + 4);
+				String sect = f.getAnnotation(Section.class).value();
+				String hashes = Strings.repeat("#", sect.length() + 4);
 				writer.write(hashes);
 				writer.newLine();
-				writer.write("# " + header + " #");
+				writer.write("# " + sect + " #");
 				writer.newLine();
 				writer.write(hashes);
 				writer.newLine();
@@ -239,15 +240,28 @@ public class Settings {
 	}
 	
 	@Retention(RetentionPolicy.RUNTIME)
-	private @interface LineBreak {}
+	public @interface LineBreak {}
 	
 	@Retention(RetentionPolicy.RUNTIME)
-	private @interface Comment {
+	public @interface Comment {
 		String[] value();
 	}
 	
 	@Retention(RetentionPolicy.RUNTIME)
-	private @interface Section {
+	public @interface Section {
 		String value();
+	}
+	
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface Hidden {}
+	
+	private static final Settings DEFAULT_SETTINGS = new Settings();
+	public static <T> T getDefaultValue(Field f) {
+		try {
+			//noinspection unchecked,
+			return (T) f.get(DEFAULT_SETTINGS);
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

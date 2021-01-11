@@ -12,11 +12,14 @@
 		"sources": "https://github.com/quat1024/AutoThirdPerson"
 	},
 	"license": "LGPL-3.0-or-later",
-	"icon": "assets/auto_third_person/icon.png",
+	"icon": "assets/auto_third_person/atp_64x.png",
 	"environment": "*",
 	"entrypoints": {
 		"client": [
 			"agency.highlysuspect.autothirdperson.AutoThirdPerson"
+		],
+		"modmenu": [
+			"agency.highlysuspect.autothirdperson.integration.ModMenuIntegration"
 		]
 	},
 	"mixins": [

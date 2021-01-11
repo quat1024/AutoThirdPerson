@@ -18,19 +18,24 @@ import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.nio.file.Path;
+
 public class AutoThirdPerson implements ClientModInitializer {
 	public static State STATE = new State();
 	public static Settings SETTINGS;
+	public static Path SETTINGS_PATH;
 	public static final Logger LOGGER = LogManager.getLogger("Auto Third Person");
 	
 	public void onInitializeClient() {
+		SETTINGS_PATH = FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg");
+		
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			public Identifier getFabricId() {
 				return new Identifier("auto_third_person", "settings_reloader");
 			}
 			
 			public void apply(ResourceManager manager) {
-				SETTINGS = Settings.load(FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg"));
+				SETTINGS = Settings.load(SETTINGS_PATH);
 			}
 		});
 		
