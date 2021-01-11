@@ -30,7 +30,7 @@ public class AutoThirdPerson implements ClientModInitializer {
 			}
 			
 			public void apply(ResourceManager manager) {
-				SETTINGS = Settings.readOrDefault(FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg"));
+				SETTINGS = Settings.load(FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg"));
 			}
 		});
 		
