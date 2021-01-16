@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class Settings {
-	private static final int CURRENT_CONFIG_VERSION = 2;
+	private static final int CURRENT_CONFIG_VERSION = 3;
 	@Hidden
 	private int configVersion = CURRENT_CONFIG_VERSION;
 	@LineBreak
@@ -28,6 +28,8 @@ public class Settings {
 	public boolean animal = true;
 	@Comment("Automatically go into third person when flying an elytra?")
 	public boolean elytra = true;
+	@Comment("Automatically go into third person when swimming?")
+	public boolean swim = false;
 	@Comment({
 		"If 'true' the customPattern will be used and riding anything",
 		"matching it will toggle third person."
@@ -42,6 +44,16 @@ public class Settings {
 		"if the 'elytra' option is enabled."
 	})
 	public int elytraDelay = 7;
+	@Comment({
+		"Ticks of swimming required before the camera automatically toggles,",
+		"if the 'swim' option is enabled."
+	})
+	public int swimmingDelayStart = 0;
+	@Comment({
+		"Ticks of not swimming required before the camera restores,",
+		"if the 'swim' option is enabled."
+	})
+	public int swimmingDelayEnd = 10;
 	@Comment({
 		"Entity IDs that match this regular expression will be considered,",
 		"if the 'custom' option is enabled."

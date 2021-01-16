@@ -17,8 +17,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.util.Locale;
+import java.util.Objects;
 
 public class AutoThirdPerson implements ClientModInitializer {
 	public static State STATE = new State();
@@ -42,18 +45,35 @@ public class AutoThirdPerson implements ClientModInitializer {
 		ClientTickEvents.START_CLIENT_TICK.register(AutoThirdPerson::clientTick);
 	}
 	
+	//called from the above event
 	public static void clientTick(MinecraftClient client) {
 		if(client.world != null && client.player != null && !client.isPaused()) {
 			if(SETTINGS.elytra && client.player.isFallFlying()) {
-				if(STATE.elytraFlyingTicks == SETTINGS.elytraDelay) enterThirdPerson(client);
+				if(STATE.elytraFlyingTicks == SETTINGS.elytraDelay) enterThirdPerson(Reason.flying());
 				STATE.elytraFlyingTicks++;
 			} else {
-				if(STATE.elytraFlyingTicks != 0) leaveThirdPerson(client);
+				if(STATE.elytraFlyingTicks != 0) leaveThirdPerson(Reason.flying());
 				STATE.elytraFlyingTicks = 0;
+			}
+			
+			boolean swimmingAndFlying = client.player.isFallFlying() && client.player.isSwimming();
+			
+			if(SETTINGS.swim && !(SETTINGS.elytra && swimmingAndFlying)) {
+				boolean isSwimming = client.player.isSwimming();
+				if(STATE.wasSwimming != isSwimming) {
+					STATE.swimTicks = 0;
+					STATE.wasSwimming = isSwimming;
+				}
+				
+				if(isSwimming && STATE.swimTicks == SETTINGS.swimmingDelayStart) enterThirdPerson(Reason.swimming());
+				if(!isSwimming && STATE.swimTicks == SETTINGS.swimmingDelayEnd) leaveThirdPerson(Reason.swimming());
+				
+				STATE.swimTicks++;
 			}
 		}
 	}
 	
+	//called from a mixin
 	public static void mountOrDismount(Entity vehicle, boolean mounting) {
 		MinecraftClient client = MinecraftClient.getInstance();
 		if(client.world == null || client.player == null) return;
@@ -85,38 +105,118 @@ public class AutoThirdPerson implements ClientModInitializer {
 		}
 		
 		if(doIt) {
-			if(mounting) enterThirdPerson(client);
-			else leaveThirdPerson(client);
+			if(mounting) enterThirdPerson(Reason.mounting(vehicle));
+			else leaveThirdPerson(Reason.mounting(vehicle));
 		}
 	}
 	
 	public static void f5Press() {
-		if(SETTINGS.cancelAutoRestore && !STATE.cancelled) {
-			STATE.cancelled = true;
-			
-			if(SETTINGS.logSpam) LOGGER.info("Cancelling auto-restore, if it was about to happen");
+		if(SETTINGS.cancelAutoRestore && STATE.isActive()) {
+			cancel();
 		}
 	}
 	
-	private static void enterThirdPerson(MinecraftClient client) {
-		STATE.oldPerspective = client.options.getPerspective();
-		STATE.cancelled = false;
-		client.options.setPerspective(Perspective.THIRD_PERSON_BACK);
+	public static void enterThirdPerson(Reason reason) {
+		MinecraftClient client = MinecraftClient.getInstance();
 		
-		if(SETTINGS.logSpam) LOGGER.info("Automatically entering third person");
+		//TODO Hey this state machine stuff is kind of a mess
+		// It might also be a good idea to make e.g. "moving from one mount to another" be atomic, and not actually secretly putting you in FP for less than a frame
+		
+		if(STATE.reason == null && client.options.getPerspective().isFirstPerson()) {
+			STATE.oldPerspective = client.options.getPerspective();
+			STATE.reason = reason;
+			client.options.setPerspective(Perspective.THIRD_PERSON_BACK);
+			
+			if(SETTINGS.logSpam) LOGGER.info("Automatically entering third person due to " + reason);
+		} else if(STATE.isActive()) {
+			STATE.reason = reason;
+			if(SETTINGS.logSpam) LOGGER.info("Continuing third person into " + reason + " action");
+		}
 	}
 	
-	private static void leaveThirdPerson(MinecraftClient client) {
-		if(SETTINGS.autoRestore && !STATE.cancelled) {
-			client.options.setPerspective(STATE.oldPerspective);
-			
-			if(SETTINGS.logSpam) LOGGER.info("Automatically leaving third person");
+	public static void leaveThirdPerson(Reason reason) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		
+		if(!SETTINGS.autoRestore) {
+			if(SETTINGS.logSpam) LOGGER.info("Not automatically leaving third person - auto restore is turned off");
+			return;
 		}
+		
+		if(!STATE.isActive()) {
+			if(SETTINGS.logSpam) LOGGER.info("Not automatically leaving third person - cancelled or inactive");
+			return;
+		}
+		
+		if(!reason.equals(STATE.reason)) {
+			LOGGER.info("Not automatically leaving third person - current state is " + STATE.reason + ", requested state is " + reason);
+			return;
+		}
+		
+		if(SETTINGS.logSpam) LOGGER.info("Automatically leaving third person due to " + reason + " ending");
+		client.options.setPerspective(STATE.oldPerspective);
+		STATE.cancel();
+	}
+	
+	public static void cancel() {
+		STATE.cancel();
+		if(SETTINGS.logSpam) LOGGER.info("Cancelling auto-restore, if it was about to happen");
 	}
 	
 	public static class State {
 		public Perspective oldPerspective = Perspective.FIRST_PERSON;
-		public boolean cancelled = false;
+		public @Nullable Reason reason;
+		
 		public int elytraFlyingTicks = 0;
+		public boolean wasSwimming = false;
+		public int swimTicks = 0;
+		
+		public boolean isActive() {
+			return reason != null;
+		}
+		
+		public void cancel() {
+			reason = null;
+		}
+	}
+	
+	public static class Reason {
+		//We have tagged unions at home.
+		private Reason(String magic, Object extra) {
+			this.magic = magic;
+			this.extra = extra;
+		}
+		
+		private final String magic;
+		private final Object extra;
+		
+		public static Reason mounting(Entity vehicle) {
+			return new Reason("mounting", vehicle.getUuid());
+		}
+		
+		public static Reason flying() {
+			return new Reason("flying", null);
+		}
+		
+		public static Reason swimming() {
+			return new Reason("swimming", null);
+		}
+		
+		public String toString() {
+			if("mounting".equals(magic)) {
+				return "mounting entity " + extra.toString();
+			}
+			return magic;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if(this == o) return true;
+			if(o == null || getClass() != o.getClass()) return false;
+			
+			Reason reason = (Reason) o;
+			
+			if(!magic.equals(reason.magic)) return false;
+			return Objects.equals(extra, reason.extra);
+		}
 	}
 }
