@@ -1,18 +1,21 @@
 package agency.highlysuspect.autothirdperson;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.Perspective;
+import net.minecraft.client.option.Perspective;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.entity.vehicle.MinecartEntity;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
@@ -20,10 +23,10 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
-import java.util.Locale;
 import java.util.Objects;
 
 public class AutoThirdPerson implements ClientModInitializer {
+	public static final String MODID = "auto_third_person";
 	public static State STATE = new State();
 	public static Settings SETTINGS;
 	public static Path SETTINGS_PATH;
@@ -33,14 +36,24 @@ public class AutoThirdPerson implements ClientModInitializer {
 		SETTINGS_PATH = FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg");
 		
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+			@Override
 			public Identifier getFabricId() {
 				return new Identifier("auto_third_person", "settings_reloader");
 			}
 			
-			public void apply(ResourceManager manager) {
+			@Override
+			public void reload(ResourceManager manager) {
 				SETTINGS = Settings.load(SETTINGS_PATH);
 			}
 		});
+		
+		ClientCommandManager.DISPATCHER.register(
+			ClientCommandManager.literal(MODID).then(
+				ClientCommandManager.literal("reload").executes(c -> {
+					SETTINGS = Settings.load(SETTINGS_PATH);
+					c.getSource().sendFeedback(new TranslatableText("auto_third_person.reload"));
+					return 0;
+				})));
 		
 		ClientTickEvents.START_CLIENT_TICK.register(AutoThirdPerson::clientTick);
 	}
@@ -76,7 +89,7 @@ public class AutoThirdPerson implements ClientModInitializer {
 	//called from a mixin
 	public static void mountOrDismount(Entity vehicle, boolean mounting) {
 		MinecraftClient client = MinecraftClient.getInstance();
-		if(client.world == null || client.player == null) return;
+		if(client.world == null || client.player == null || vehicle == null) return;
 		
 		String entityId = Registry.ENTITY_TYPE.getId(vehicle.getType()).toString();
 		if(SETTINGS.logSpam) LOGGER.info((mounting ? "Mounting " : "Dismounting ") + entityId);

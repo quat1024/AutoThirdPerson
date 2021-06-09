@@ -20,7 +20,7 @@ public class ClientPlayerEntityMixin {
 	}
 	
 	@Inject(
-		method = "method_29239",
+		method = "dismountVehicle",
 		at = @At("HEAD")
 	)
 	private void onStopRiding(CallbackInfo ci) {

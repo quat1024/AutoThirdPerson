@@ -13,7 +13,7 @@ public class MinecraftClientMixin {
 		method = "handleInputEvents",
 		at = @At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/client/options/GameOptions;setPerspective(Lnet/minecraft/client/options/Perspective;)V"
+			target = "Lnet/minecraft/client/option/GameOptions;setPerspective(Lnet/minecraft/client/option/Perspective;)V"
 		)
 	)
 	private void onPerspectiveToggle(CallbackInfo ci) {
