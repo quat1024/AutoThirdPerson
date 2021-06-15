@@ -12,6 +12,11 @@ group = project.maven_group
 
 repositories {
 	jcenter()
+	mavenLocal()
+	
+	maven {
+		url = "https://maven.terraformersmc.com/releases/"
+	}
 }
 
 dependencies {
@@ -19,8 +24,13 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	//TODO: Re-enable these dependencies in 1.17.
+	
+	modImplementation "agency.highlysuspect.libs:nacl:${project.nacl_version}"
+	include "agency.highlysuspect.libs:nacl:${project.nacl_version}"
+	
+	modRuntime "com.terraformersmc:modmenu:2.0.2"
+	
+	//TODO: Re-enable these dependencies in 1.17. (It'll probably have to go in NaCL though)
 // 	modApi("me.shedaniel.cloth:config-2:4.8.3") {
 //   	exclude(group: "net.fabricmc.fabric-api")
 //   }

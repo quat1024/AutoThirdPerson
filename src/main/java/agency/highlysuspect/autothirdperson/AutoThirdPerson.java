@@ -1,9 +1,9 @@
 package agency.highlysuspect.autothirdperson;
 
+import agency.highlysuspect.libs.nacl.v1.ConfigReader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
@@ -24,38 +24,63 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class AutoThirdPerson implements ClientModInitializer {
 	public static final String MODID = "auto_third_person";
-	public static State STATE = new State();
-	public static Settings SETTINGS;
-	public static Path SETTINGS_PATH;
+	public static final Path SETTINGS_PATH = FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg");
 	public static final Logger LOGGER = LogManager.getLogger("Auto Third Person");
 	
+	//Custom delimiter is used, to keep compat with the old ad-hoc file format before I made NaCL.
+	private static final ConfigReader NACL_CONFIG_READER = new ConfigReader().setDelimiter(" = ");
+	
+	public static Settings SETTINGS;
+	public static State STATE = new State();
+	
 	public void onInitializeClient() {
-		SETTINGS_PATH = FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg");
+		NACL_CONFIG_READER.registerClassyCodon(Pattern.class, Settings.PATTERN_CODON);
+		
+		readConfig();
 		
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
 			public Identifier getFabricId() {
-				return new Identifier("auto_third_person", "settings_reloader");
+				return new Identifier(MODID, "settings_reloader");
 			}
 			
 			@Override
 			public void reload(ResourceManager manager) {
-				SETTINGS = Settings.load(SETTINGS_PATH);
+				readConfig();
 			}
 		});
 		
 		ClientCommandManager.DISPATCHER.register(
 			ClientCommandManager.literal(MODID).then(
 				ClientCommandManager.literal("reload").executes(c -> {
-					SETTINGS = Settings.load(SETTINGS_PATH);
+					readConfig();
 					c.getSource().sendFeedback(new TranslatableText("auto_third_person.reload"));
 					return 0;
 				})));
 		
 		ClientTickEvents.START_CLIENT_TICK.register(AutoThirdPerson::clientTick);
+	}
+	
+	private static void readConfig() {
+		boolean firstRun = SETTINGS == null;
+		
+		Settings oldSettings = SETTINGS;
+		try {
+			SETTINGS = NACL_CONFIG_READER.read(Settings.class, SETTINGS_PATH);
+		} catch (Exception e) {
+			LOGGER.error("Problem reading config file: ", e);
+			if(firstRun) {
+				SETTINGS = new Settings();
+				LOGGER.error("Using default config file.");
+			} else {
+				SETTINGS = oldSettings;
+				LOGGER.error("Config has not changed.");
+			}
+		}
 	}
 	
 	//called from the above event
