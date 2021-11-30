@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.8-SNAPSHOT'
+	id 'fabric-loom' version '0.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -11,33 +11,17 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-	jcenter()
 	mavenLocal()
-	
-	maven {
-		url = "https://maven.terraformersmc.com/releases/"
-	}
 }
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
 	modImplementation "agency.highlysuspect.libs:nacl:${project.nacl_version}"
 	include "agency.highlysuspect.libs:nacl:${project.nacl_version}"
-	
-	modRuntime "com.terraformersmc:modmenu:2.0.2"
-	
-	//TODO: Re-enable these dependencies in 1.17. (It'll probably have to go in NaCL though)
-// 	modApi("me.shedaniel.cloth:config-2:4.8.3") {
-//   	exclude(group: "net.fabricmc.fabric-api")
-//   }
-//   
-//   modApi("io.github.prospector:modmenu:1.14.13+build.22") {
-//   	exclude(group: "net.fabricmc.fabric-api")
-//   }
 }
 
 processResources {

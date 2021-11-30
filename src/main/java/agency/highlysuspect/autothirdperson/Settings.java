@@ -8,12 +8,7 @@ import agency.highlysuspect.libs.nacl.v1.annotation.Section;
 import agency.highlysuspect.libs.nacl.v1.annotation.SkipDefault;
 import agency.highlysuspect.libs.nacl.v1.types.Codon;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 

@@ -17,9 +17,6 @@
 	"entrypoints": {
 		"client": [
 			"agency.highlysuspect.autothirdperson.AutoThirdPerson"
-		],
-		"modmenu-unused-todo-1.17": [
-			"agency.highlysuspect.autothirdperson.integration.ModMenuIntegration"
 		]
 	},
 	"mixins": [

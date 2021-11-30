@@ -5,7 +5,7 @@
 	"compatibilityLevel": "JAVA_8",
 	"mixins": [
 	],
-	"client": ["ClientPlayerEntityMixin", "MinecraftClientMixin", "PerspectiveMixin"],
+	"client": ["LocalPlayerMixin", "MinecraftMixin", "CameraTypeMixin"],
 	"injectors": {
 		"defaultRequire": 1
 	}

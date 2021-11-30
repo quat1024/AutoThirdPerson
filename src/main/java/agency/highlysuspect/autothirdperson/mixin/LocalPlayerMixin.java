@@ -1,16 +1,16 @@
 package agency.highlysuspect.autothirdperson.mixin;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin({ClientPlayerEntity.class})
-public class ClientPlayerEntityMixin {
+@Mixin(LocalPlayer.class)
+public class LocalPlayerMixin {
 	@Inject(
 		method = "startRiding",
 		at = @At("TAIL")
@@ -20,7 +20,7 @@ public class ClientPlayerEntityMixin {
 	}
 	
 	@Inject(
-		method = "dismountVehicle",
+		method = "removeVehicle",
 		at = @At("HEAD")
 	)
 	private void onStopRiding(CallbackInfo ci) {

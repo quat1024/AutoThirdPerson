@@ -7,17 +7,17 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.Perspective;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.vehicle.BoatEntity;
-import net.minecraft.entity.vehicle.MinecartEntity;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.client.CameraType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Registry;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.Minecart;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -42,14 +42,14 @@ public class AutoThirdPerson implements ClientModInitializer {
 		
 		readConfig();
 		
-		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
-			public Identifier getFabricId() {
-				return new Identifier(MODID, "settings_reloader");
+			public ResourceLocation getFabricId() {
+				return new ResourceLocation(MODID, "settings_reloader");
 			}
 			
 			@Override
-			public void reload(ResourceManager manager) {
+			public void onResourceManagerReload(ResourceManager manager) {
 				readConfig();
 			}
 		});
@@ -58,7 +58,7 @@ public class AutoThirdPerson implements ClientModInitializer {
 			ClientCommandManager.literal(MODID).then(
 				ClientCommandManager.literal("reload").executes(c -> {
 					readConfig();
-					c.getSource().sendFeedback(new TranslatableText("auto_third_person.reload"));
+					c.getSource().sendFeedback(new TranslatableComponent("auto_third_person.reload"));
 					return 0;
 				})));
 		
@@ -84,8 +84,8 @@ public class AutoThirdPerson implements ClientModInitializer {
 	}
 	
 	//called from the above event
-	public static void clientTick(MinecraftClient client) {
-		if(client.world != null && client.player != null && !client.isPaused()) {
+	public static void clientTick(Minecraft client) {
+		if(client.level != null && client.player != null && !client.isPaused()) {
 			if(SETTINGS.elytra && client.player.isFallFlying()) {
 				if(STATE.elytraFlyingTicks == SETTINGS.elytraDelay) enterThirdPerson(Reason.flying());
 				STATE.elytraFlyingTicks++;
@@ -113,10 +113,10 @@ public class AutoThirdPerson implements ClientModInitializer {
 	
 	//called from a mixin
 	public static void mountOrDismount(Entity vehicle, boolean mounting) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		if(client.world == null || client.player == null || vehicle == null) return;
+		Minecraft client = Minecraft.getInstance();
+		if(client.level == null || client.player == null || vehicle == null) return;
 		
-		String entityId = Registry.ENTITY_TYPE.getId(vehicle.getType()).toString();
+		String entityId = Registry.ENTITY_TYPE.getKey(vehicle.getType()).toString();
 		if(SETTINGS.logSpam) LOGGER.info((mounting ? "Mounting " : "Dismounting ") + entityId);
 		
 		if(SETTINGS.useIgnore && SETTINGS.ignorePattern.matcher(entityId).matches()) {
@@ -125,15 +125,15 @@ public class AutoThirdPerson implements ClientModInitializer {
 		}
 		
 		boolean doIt = false;
-		if(SETTINGS.boat && vehicle instanceof BoatEntity) {
+		if(SETTINGS.boat && vehicle instanceof Boat) {
 			if(SETTINGS.logSpam) LOGGER.info("This is a boat!");
 			doIt = true;
 		}
-		if(SETTINGS.cart && vehicle instanceof MinecartEntity) {
+		if(SETTINGS.cart && vehicle instanceof Minecart) {
 			if(SETTINGS.logSpam) LOGGER.info("This is a minecart!");
 			doIt = true;
 		}
-		if(SETTINGS.animal && vehicle instanceof AnimalEntity) {
+		if(SETTINGS.animal && vehicle instanceof Animal) {
 			if(SETTINGS.logSpam) LOGGER.info("This is an animal!");
 			doIt = true;
 		}
@@ -155,15 +155,15 @@ public class AutoThirdPerson implements ClientModInitializer {
 	}
 	
 	public static void enterThirdPerson(Reason reason) {
-		MinecraftClient client = MinecraftClient.getInstance();
+		Minecraft client = Minecraft.getInstance();
 		
 		//TODO Hey this state machine stuff is kind of a mess
 		// It might also be a good idea to make e.g. "moving from one mount to another" be atomic, and not actually secretly putting you in FP for less than a frame
 		
-		if(STATE.reason == null && client.options.getPerspective().isFirstPerson()) {
-			STATE.oldPerspective = client.options.getPerspective();
+		if(STATE.reason == null && client.options.getCameraType().isFirstPerson()) {
+			STATE.oldPerspective = client.options.getCameraType();
 			STATE.reason = reason;
-			client.options.setPerspective(Perspective.THIRD_PERSON_BACK);
+			client.options.setCameraType(CameraType.THIRD_PERSON_BACK);
 			
 			if(SETTINGS.logSpam) LOGGER.info("Automatically entering third person due to " + reason);
 		} else if(STATE.isActive()) {
@@ -173,7 +173,7 @@ public class AutoThirdPerson implements ClientModInitializer {
 	}
 	
 	public static void leaveThirdPerson(Reason reason) {
-		MinecraftClient client = MinecraftClient.getInstance();
+		Minecraft client = Minecraft.getInstance();
 		
 		if(!SETTINGS.autoRestore) {
 			if(SETTINGS.logSpam) LOGGER.info("Not automatically leaving third person - auto restore is turned off");
@@ -191,7 +191,7 @@ public class AutoThirdPerson implements ClientModInitializer {
 		}
 		
 		if(SETTINGS.logSpam) LOGGER.info("Automatically leaving third person due to " + reason + " ending");
-		client.options.setPerspective(STATE.oldPerspective);
+		client.options.setCameraType(STATE.oldPerspective);
 		STATE.cancel();
 	}
 	
@@ -201,7 +201,7 @@ public class AutoThirdPerson implements ClientModInitializer {
 	}
 	
 	public static class State {
-		public Perspective oldPerspective = Perspective.FIRST_PERSON;
+		public CameraType oldPerspective = CameraType.FIRST_PERSON;
 		public @Nullable Reason reason;
 		
 		public int elytraFlyingTicks = 0;
@@ -228,7 +228,7 @@ public class AutoThirdPerson implements ClientModInitializer {
 		private final Object extra;
 		
 		public static Reason mounting(Entity vehicle) {
-			return new Reason("mounting", vehicle.getUuid());
+			return new Reason("mounting", vehicle.getUUID());
 		}
 		
 		public static Reason flying() {
