@@ -15,14 +15,12 @@ public class CameraTypeMixin {
 		cancellable = true
 	)
 	public void modifyCycle(CallbackInfoReturnable<CameraType> ci) {
-		if(!AutoThirdPerson.SETTINGS.skipFrontView) return;
+		if(!AutoThirdPerson.INSTANCE.settings.skipFrontView) return;
 		
 		//noinspection ConstantConditions, RedundantCast
 		if((CameraType) (Object) this == CameraType.THIRD_PERSON_BACK) {
 			ci.setReturnValue(CameraType.FIRST_PERSON);
-			if(AutoThirdPerson.SETTINGS.logSpam) {
-				AutoThirdPerson.LOGGER.info("Skipping third-person reversed view");
-			}
+			AutoThirdPerson.INSTANCE.debugSpam("Skipping third-person reversed view");
 		}
 	}
 }

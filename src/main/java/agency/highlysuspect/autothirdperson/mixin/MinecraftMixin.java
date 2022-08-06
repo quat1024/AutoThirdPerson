@@ -17,6 +17,6 @@ public class MinecraftMixin {
 		)
 	)
 	private void onPerspectiveToggle(CallbackInfo ci) {
-		AutoThirdPerson.f5Press();
+		AutoThirdPerson.INSTANCE.f5Press();
 	}
 }

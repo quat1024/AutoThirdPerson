@@ -16,7 +16,7 @@ public class LocalPlayerMixin {
 		at = @At("TAIL")
 	)
 	private void onStartRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
-		AutoThirdPerson.mountOrDismount(vehicle, true);
+		AutoThirdPerson.INSTANCE.mountOrDismount(vehicle, true);
 	}
 	
 	@Inject(
@@ -26,6 +26,6 @@ public class LocalPlayerMixin {
 	private void onStopRiding(CallbackInfo ci) {
 		@SuppressWarnings("ConstantConditions")
 		Entity vehicle = ((Entity) (Object) this).getVehicle();
-		AutoThirdPerson.mountOrDismount(vehicle, false);
+		AutoThirdPerson.INSTANCE.mountOrDismount(vehicle, false);
 	}
 }

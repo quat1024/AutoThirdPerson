@@ -23,20 +23,22 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Objects;
 
 public class AutoThirdPerson implements ClientModInitializer {
 	public static final String MODID = "auto_third_person";
 	public static final Path SETTINGS_PATH = FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg");
 	public static final Logger LOGGER = LogManager.getLogger("Auto Third Person");
 	
-	public static Settings SETTINGS = new Settings();
-	private static final ConfigShape CONFIG_FILE = ConfigShape.createFromPojo(SETTINGS);
+	public static AutoThirdPerson INSTANCE;
 	
-	public static State STATE = new State();
+	public Settings settings = new Settings();
+	private final ConfigShape configShape = ConfigShape.createFromPojo(settings);
+	public State state = new State();
 	
 	public void onInitializeClient() {
-		//This'll get called during first game startup too (it's a "load listener", not just "reload", I guess)
+		INSTANCE = this;
+		
+		//This'll get called during first game startup too (it's a "load listener" as well as "reload", I guess)
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
 			public ResourceLocation getFabricId() {
@@ -55,15 +57,43 @@ public class AutoThirdPerson implements ClientModInitializer {
 			return 0;
 		})));
 		
-		ClientTickEvents.START_CLIENT_TICK.register(AutoThirdPerson::clientTick);
+		ClientTickEvents.START_CLIENT_TICK.register(client -> {
+			//Per-frame status checking.
+			//I wrote this a long time ago and I don't want to touch it, it's scary, lol.
+			if(client.level != null && client.player != null && !client.isPaused()) {
+				if(settings.elytra && client.player.isFallFlying()) {
+					if(state.elytraFlyingTicks == settings.elytraDelay) enterThirdPerson(new FlyingReason());
+					state.elytraFlyingTicks++;
+				} else {
+					if(state.elytraFlyingTicks != 0) leaveThirdPerson(new FlyingReason());
+					state.elytraFlyingTicks = 0;
+				}
+				
+				//I think this is about making sure the swimming rules don't trigger when you are actually flying through the water?
+				boolean swimmingAndFlying = client.player.isFallFlying() && client.player.isSwimming();
+				if(settings.swim && !(settings.elytra && swimmingAndFlying)) {
+					boolean isSwimming = client.player.isSwimming();
+					if(state.wasSwimming != isSwimming) {
+						state.swimTicks = 0;
+						state.wasSwimming = isSwimming;
+					}
+					
+					if(isSwimming && state.swimTicks == settings.swimmingDelayStart) enterThirdPerson(new SwimmingReason());
+					if(!isSwimming && state.swimTicks == settings.swimmingDelayEnd) leaveThirdPerson(new SwimmingReason());
+					
+					state.swimTicks++;
+				}
+			}
+		});
 	}
 	
-	private static void readConfig() {
+	private void readConfig() {
 		try {
-			SETTINGS = CONFIG_FILE.readFromOrCreateFile(SETTINGS_PATH, new Settings());
+			settings = configShape.readFromOrCreateFile(SETTINGS_PATH, new Settings());
 		} catch (ConfigShape.ConfigParseException e) {
 			//Don't bring down the whole game just because the user made a typo in the config file, give them a chance to correct it.
 			//Logging e.getCause() will provide a more informative stacktrace than the trace of the ConfigParseException itself.
+			//The mod name is restated because some logging configs don't show the name of the logger by default.
 			LOGGER.error("[Auto Third Person] Problem parsing config file. Config has not changed.");
 			LOGGER.error(e.getMessage(), e.getCause());
 		} catch (IOException e) {
@@ -71,121 +101,97 @@ public class AutoThirdPerson implements ClientModInitializer {
 		}
 	}
 	
-	//called from the above event
-	public static void clientTick(Minecraft client) {
-		if(client.level != null && client.player != null && !client.isPaused()) {
-			if(SETTINGS.elytra && client.player.isFallFlying()) {
-				if(STATE.elytraFlyingTicks == SETTINGS.elytraDelay) enterThirdPerson(Reason.flying());
-				STATE.elytraFlyingTicks++;
-			} else {
-				if(STATE.elytraFlyingTicks != 0) leaveThirdPerson(Reason.flying());
-				STATE.elytraFlyingTicks = 0;
-			}
-			
-			boolean swimmingAndFlying = client.player.isFallFlying() && client.player.isSwimming();
-			
-			if(SETTINGS.swim && !(SETTINGS.elytra && swimmingAndFlying)) {
-				boolean isSwimming = client.player.isSwimming();
-				if(STATE.wasSwimming != isSwimming) {
-					STATE.swimTicks = 0;
-					STATE.wasSwimming = isSwimming;
-				}
-				
-				if(isSwimming && STATE.swimTicks == SETTINGS.swimmingDelayStart) enterThirdPerson(Reason.swimming());
-				if(!isSwimming && STATE.swimTicks == SETTINGS.swimmingDelayEnd) leaveThirdPerson(Reason.swimming());
-				
-				STATE.swimTicks++;
-			}
-		}
+	public void debugSpam(String yeah) {
+		if(settings.logSpam) LOGGER.info(yeah);
 	}
 	
-	//called from a mixin
-	public static void mountOrDismount(Entity vehicle, boolean mounting) {
+	//called from LocalPlayerMixin
+	public void mountOrDismount(Entity vehicle, boolean mounting) {
 		Minecraft client = Minecraft.getInstance();
 		if(client.level == null || client.player == null || vehicle == null) return;
 		
 		String entityId = Registry.ENTITY_TYPE.getKey(vehicle.getType()).toString();
-		if(SETTINGS.logSpam) LOGGER.info((mounting ? "Mounting " : "Dismounting ") + entityId);
+		debugSpam((mounting ? "Mounting " : "Dismounting ") + entityId);
 		
-		if(SETTINGS.useIgnore && SETTINGS.ignorePattern.matcher(entityId).matches()) {
-			if(SETTINGS.logSpam) LOGGER.info("Ignoring, since it matches the ignore pattern '" + SETTINGS.ignorePattern + "'.");
+		if(settings.useIgnore && settings.ignorePattern.matcher(entityId).matches()) {
+			debugSpam("Ignoring, since it matches the ignore pattern '" + settings.ignorePattern + "'.");
 			return;
 		}
 		
 		boolean doIt = false;
-		if(SETTINGS.boat && vehicle instanceof Boat) {
-			if(SETTINGS.logSpam) LOGGER.info("This is a boat!");
+		if(settings.boat && vehicle instanceof Boat) {
+			debugSpam("This is a boat!");
 			doIt = true;
 		}
-		if(SETTINGS.cart && vehicle instanceof Minecart) {
-			if(SETTINGS.logSpam) LOGGER.info("This is a minecart!");
+		if(settings.cart && vehicle instanceof Minecart) {
+			debugSpam("This is a minecart!");
 			doIt = true;
 		}
-		if(SETTINGS.animal && vehicle instanceof Animal) {
-			if(SETTINGS.logSpam) LOGGER.info("This is an animal!");
+		if(settings.animal && vehicle instanceof Animal) {
+			debugSpam("This is an animal!");
 			doIt = true;
 		}
-		if(SETTINGS.custom && SETTINGS.customPattern.matcher(entityId).matches()) {
-			if(SETTINGS.logSpam) LOGGER.info("This matches the pattern '" + SETTINGS.customPattern + "'!");
+		if(settings.custom && settings.customPattern.matcher(entityId).matches()) {
+			debugSpam("This matches the pattern '" + settings.customPattern + "'!");
 			doIt = true;
 		}
 		
 		if(doIt) {
-			if(mounting) enterThirdPerson(Reason.mounting(vehicle));
-			else leaveThirdPerson(Reason.mounting(vehicle));
+			if(mounting) enterThirdPerson(new MountingReason(vehicle));
+			else leaveThirdPerson(new MountingReason(vehicle));
 		}
 	}
 	
-	public static void f5Press() {
-		if(SETTINGS.cancelAutoRestore && STATE.isActive()) {
+	//called from MinecraftMixin
+	public void f5Press() {
+		if(settings.cancelAutoRestore && state.isActive()) {
 			cancel();
 		}
 	}
 	
-	public static void enterThirdPerson(Reason reason) {
+	public void enterThirdPerson(Reason reason) {
 		Minecraft client = Minecraft.getInstance();
 		
 		//TODO Hey this state machine stuff is kind of a mess
 		// It might also be a good idea to make e.g. "moving from one mount to another" be atomic, and not actually secretly putting you in FP for less than a frame
 		
-		if(STATE.reason == null && client.options.getCameraType().isFirstPerson()) {
-			STATE.oldPerspective = client.options.getCameraType();
-			STATE.reason = reason;
+		if(state.reason == null && client.options.getCameraType().isFirstPerson()) {
+			state.oldPerspective = client.options.getCameraType();
+			state.reason = reason;
 			client.options.setCameraType(CameraType.THIRD_PERSON_BACK);
-			
-			if(SETTINGS.logSpam) LOGGER.info("Automatically entering third person due to " + reason);
-		} else if(STATE.isActive()) {
-			STATE.reason = reason;
-			if(SETTINGS.logSpam) LOGGER.info("Continuing third person into " + reason + " action");
+			debugSpam("Automatically entering third person due to " + reason);
+		} else if(state.isActive()) {
+			state.reason = reason;
+			debugSpam("Continuing third person into " + reason + " action");
 		}
 	}
 	
-	public static void leaveThirdPerson(Reason reason) {
+	public void leaveThirdPerson(Reason reason) {
 		Minecraft client = Minecraft.getInstance();
 		
-		if(!SETTINGS.autoRestore) {
-			if(SETTINGS.logSpam) LOGGER.info("Not automatically leaving third person - auto restore is turned off");
+		if(!settings.autoRestore) {
+			debugSpam("Not automatically leaving third person - auto restore is turned off");
 			return;
 		}
 		
-		if(!STATE.isActive()) {
-			if(SETTINGS.logSpam) LOGGER.info("Not automatically leaving third person - cancelled or inactive");
+		if(!state.isActive()) {
+			debugSpam("Not automatically leaving third person - cancelled or inactive");
 			return;
 		}
 		
-		if(!reason.equals(STATE.reason)) {
-			LOGGER.info("Not automatically leaving third person - current state is " + STATE.reason + ", requested state is " + reason);
+		if(!reason.equals(state.reason)) {
+			debugSpam("Not automatically leaving third person - current state is " + state.reason + ", requested state is " + reason);
 			return;
 		}
 		
-		if(SETTINGS.logSpam) LOGGER.info("Automatically leaving third person due to " + reason + " ending");
-		client.options.setCameraType(STATE.oldPerspective);
-		STATE.cancel();
+		debugSpam("Automatically leaving third person due to " + reason + " ending");
+		client.options.setCameraType(state.oldPerspective);
+		state.cancel();
 	}
 	
-	public static void cancel() {
-		STATE.cancel();
-		if(SETTINGS.logSpam) LOGGER.info("Cancelling auto-restore, if it was about to happen");
+	public void cancel() {
+		state.cancel();
+		debugSpam("Cancelling auto-restore, if it was about to happen");
 	}
 	
 	public static class State {
@@ -205,44 +211,9 @@ public class AutoThirdPerson implements ClientModInitializer {
 		}
 	}
 	
-	public static class Reason {
-		//We have tagged unions at home.
-		private Reason(String magic, Object extra) {
-			this.magic = magic;
-			this.extra = extra;
-		}
-		
-		private final String magic;
-		private final Object extra;
-		
-		public static Reason mounting(Entity vehicle) {
-			return new Reason("mounting", vehicle.getUUID());
-		}
-		
-		public static Reason flying() {
-			return new Reason("flying", null);
-		}
-		
-		public static Reason swimming() {
-			return new Reason("swimming", null);
-		}
-		
-		public String toString() {
-			if("mounting".equals(magic)) {
-				return "mounting entity " + extra.toString();
-			}
-			return magic;
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			if(this == o) return true;
-			if(o == null || getClass() != o.getClass()) return false;
-			
-			Reason reason = (Reason) o;
-			
-			if(!magic.equals(reason.magic)) return false;
-			return Objects.equals(extra, reason.extra);
-		}
-	}
+	//We do have tagged unions at home now!!
+	public sealed interface Reason permits MountingReason, FlyingReason, SwimmingReason {}
+	public static record MountingReason(Entity vehicle) implements Reason {}
+	public static record FlyingReason() implements Reason {}
+	public static record SwimmingReason() implements Reason {}
 }
