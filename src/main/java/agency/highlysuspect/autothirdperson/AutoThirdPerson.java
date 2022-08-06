@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.regex.Pattern;
 
 public class AutoThirdPerson implements ClientModInitializer {
 	public static final String MODID = "auto_third_person";
@@ -216,4 +217,81 @@ public class AutoThirdPerson implements ClientModInitializer {
 	public static record MountingReason(Entity vehicle) implements Reason {}
 	public static record FlyingReason() implements Reason {}
 	public static record SwimmingReason() implements Reason {}
+	
+	public static class Settings {
+		private static final int CURRENT_CONFIG_VERSION = 5;
+		@ConfigShape.SkipDefault
+		private int configVersion = CURRENT_CONFIG_VERSION;
+		
+		/////////////////////
+		@ConfigShape.Section("Scenarios")
+		/////////////////////
+		
+		@ConfigShape.Comment("Automatically go into third person when riding a boat?")
+		public boolean boat = true;
+		@ConfigShape.Comment("Automatically go into third person when riding a minecart?")
+		public boolean cart = true;
+		@ConfigShape.Comment("Automatically go into third person when riding an animal?")
+		public boolean animal = true;
+		@ConfigShape.Comment("Automatically go into third person when flying an elytra?")
+		public boolean elytra = true;
+		@ConfigShape.Comment("Automatically go into third person when swimming?")
+		public boolean swim = false;
+		
+		@ConfigShape.Comment("If 'true', the customPattern will be used, and riding anything matching it will toggle third person.")
+		public boolean custom = false;
+		@ConfigShape.Comment("If 'true', the ignorePattern will be used, and anything matching it will be ignored.")
+		public boolean useIgnore = false;
+		
+		////////////////////////////////////////
+		@ConfigShape.Section("Scenario Options")
+		////////////////////////////////////////
+		
+		@ConfigShape.Comment("Ticks of elytra flight required before the camera automatically toggles if the 'elytra' option is enabled.")
+		@ConfigShape.AtLeast(0)
+		public int elytraDelay = 7;
+		
+		@ConfigShape.Comment("Ticks of swimming required before the camera automatically toggles if the 'swim' option is enabled.")
+		@ConfigShape.AtLeast(0)
+		public int swimmingDelayStart = 0;
+		
+		@ConfigShape.Comment("Ticks of not swimming required before the camera restores if the 'swim' option is enabled.")
+		@ConfigShape.AtLeast(0)
+		public int swimmingDelayEnd = 10;
+		
+		@ConfigShape.Comment("Entity IDs that match this regular expression will be considered if the 'custom' option is enabled.")
+		public Pattern customPattern = Pattern.compile("^minecraft:(cow|chicken)$");
+		
+		@ConfigShape.Comment("Entity IDs that match this regular expression will be ignored if the 'useIgnore' option is enabled.")
+		public Pattern ignorePattern = Pattern.compile("^examplemod:example$");
+		
+		///////////////////////////////////
+		@ConfigShape.Section("Restoration")
+		///////////////////////////////////
+		
+		@ConfigShape.Comment({
+			"When the situation that Auto Third Person put you into third person for is over,",
+			"the camera will be restored back to the way it was."
+		})
+		public boolean autoRestore = true;
+		
+		@ConfigShape.Comment({
+			"If 'true', pressing f5 after mounting something will prevent your camera",
+			"from being automatically restored to first-person when you dismount."
+		})
+		public boolean cancelAutoRestore = true;
+		
+		/////////////////////////////
+		@ConfigShape.Section("Extra")
+		/////////////////////////////
+		
+		@ConfigShape.Comment("Skip the 'third-person front' camera mode when pressing F5.")
+		public boolean skipFrontView = false;
+		
+		@ConfigShape.Comment({
+			"Dump a bunch of debug crap into the log.",
+			"Might be handy!"
+		})
+		public boolean logSpam = false;
+	}
 }
