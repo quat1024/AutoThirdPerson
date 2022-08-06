@@ -1,6 +1,5 @@
 package agency.highlysuspect.autothirdperson;
 
-import agency.highlysuspect.libs.nacl.v1.ConfigReader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -22,26 +21,22 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 public class AutoThirdPerson implements ClientModInitializer {
 	public static final String MODID = "auto_third_person";
 	public static final Path SETTINGS_PATH = FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg");
 	public static final Logger LOGGER = LogManager.getLogger("Auto Third Person");
 	
-	//Custom delimiter is used, to keep compat with the old ad-hoc file format before I made NaCL.
-	private static final ConfigReader NACL_CONFIG_READER = new ConfigReader().setDelimiter(" = ");
+	public static Settings SETTINGS = new Settings();
+	private static final ConfigShape CONFIG_FILE = ConfigShape.createFromPojo(SETTINGS);
 	
-	public static Settings SETTINGS;
 	public static State STATE = new State();
 	
 	public void onInitializeClient() {
-		NACL_CONFIG_READER.registerClassyCodon(Pattern.class, Settings.PATTERN_CODON);
-		
-		readConfig();
-		
+		//This'll get called during first game startup too (it's a "load listener", not just "reload", I guess)
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
 			public ResourceLocation getFabricId() {
@@ -54,32 +49,25 @@ public class AutoThirdPerson implements ClientModInitializer {
 			}
 		});
 		
-		ClientCommandManager.DISPATCHER.register(
-			ClientCommandManager.literal(MODID).then(
-				ClientCommandManager.literal("reload").executes(c -> {
-					readConfig();
-					c.getSource().sendFeedback(new TranslatableComponent("auto_third_person.reload"));
-					return 0;
-				})));
+		ClientCommandManager.DISPATCHER.register(ClientCommandManager.literal(MODID).then(ClientCommandManager.literal("reload").executes(c -> {
+			readConfig();
+			c.getSource().sendFeedback(new TranslatableComponent("auto_third_person.reload"));
+			return 0;
+		})));
 		
 		ClientTickEvents.START_CLIENT_TICK.register(AutoThirdPerson::clientTick);
 	}
 	
 	private static void readConfig() {
-		boolean firstRun = SETTINGS == null;
-		
-		Settings oldSettings = SETTINGS;
 		try {
-			SETTINGS = NACL_CONFIG_READER.read(Settings.class, SETTINGS_PATH);
-		} catch (Exception e) {
-			LOGGER.error("Problem reading config file: ", e);
-			if(firstRun) {
-				SETTINGS = new Settings();
-				LOGGER.error("Using default config file.");
-			} else {
-				SETTINGS = oldSettings;
-				LOGGER.error("Config has not changed.");
-			}
+			SETTINGS = CONFIG_FILE.readFromOrCreateFile(SETTINGS_PATH, new Settings());
+		} catch (ConfigShape.ConfigParseException e) {
+			//Don't bring down the whole game just because the user made a typo in the config file, give them a chance to correct it.
+			//Logging e.getCause() will provide a more informative stacktrace than the trace of the ConfigParseException itself.
+			LOGGER.error("[Auto Third Person] Problem parsing config file. Config has not changed.");
+			LOGGER.error(e.getMessage(), e.getCause());
+		} catch (IOException e) {
+			throw new RuntimeException("Severe problem reading config file", e);
 		}
 	}
 	
