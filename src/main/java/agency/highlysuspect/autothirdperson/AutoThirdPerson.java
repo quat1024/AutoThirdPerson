@@ -1,17 +1,23 @@
 package agency.highlysuspect.autothirdperson;
 
 import cpw.mods.fml.common.ITickHandler;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.event.ForgeSubscribe;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -87,6 +93,19 @@ public class AutoThirdPerson {
 		public String getLabel() {
 			return "Auto Third Person client ticker";
 		}
+	}
+	
+	@ForgeSubscribe
+	public void renderLast(RenderWorldLastEvent e) {
+		if(!settings.fixHandGlitch || Minecraft.getMinecraft().thePlayer == null) return;
+		
+		//Fired immediately before hand rendering. Search `dispatchRenderLast` in EntityRenderer (took me like
+		//5 years to find for some reason). This is our chance to make a move, soooo lucky about this event firing time
+		RenderPlayer renderPlayer = (RenderPlayer) RenderManager.instance.getEntityRenderObject(Minecraft.getMinecraft().thePlayer);
+		ModelBiped modelBipedMain = ObfuscationReflectionHelper.getPrivateValue(RenderPlayer.class, renderPlayer, 0); //please work
+		modelBipedMain.isRiding = false; //Firstperson hand never intended to be drawn in the riding pose.
+		//Now see ItemRenderer#renderItemInFirstPerson, which calls RenderPlayer#func_82441_a which actually draws the hand.
+		//It will call setRotationAngles which will pick up on the now-false value of `isRiding`.
 	}
 	
 	public void debugSpam(String yeah) {
@@ -200,6 +219,7 @@ public class AutoThirdPerson {
 			cancelAutoRestore = config.get("Restoration", "cancelAutoRestore", true, "If 'true', pressing f5 after mounting something will prevent your camera from being automatically restored to first-person when you dismount.").getBoolean(true);
 			
 			skipFrontView = config.get("Extras", "skipFrontView", false, "Skip the 'third-person front' camera mode when pressing F5.").getBoolean(false);
+			fixHandGlitch = config.get("Extras", "fixHandGlitch", true, "Fix the annoying 'weirdly rotated first-person hand' rendering error when you ride or look at someone riding a vehicle.").getBoolean(true);
 			logSpam = config.get("Extras", "logSpam", false, "Dump a bunch of debug crap into the log. Might be handy!").getBoolean(false);
 		}
 		
@@ -232,6 +252,7 @@ public class AutoThirdPerson {
 		//Extra
 		
 		public boolean skipFrontView;
+		public boolean fixHandGlitch;
 		public boolean logSpam;
 	}
 }
