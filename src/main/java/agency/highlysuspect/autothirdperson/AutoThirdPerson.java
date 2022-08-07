@@ -74,6 +74,10 @@ public class AutoThirdPerson implements ClientModInitializer {
 				boolean swimmingAndFlying = client.player.isFallFlying() && client.player.isSwimming();
 				if(settings.swim && !(settings.elytra && swimmingAndFlying)) {
 					boolean isSwimming = client.player.isSwimming();
+					if(state.wasSwimming && settings.stickySwim) {
+						isSwimming |= client.player.isUnderWater();
+					}
+					
 					if(state.wasSwimming != isSwimming) {
 						state.swimTicks = 0;
 						state.wasSwimming = isSwimming;
@@ -223,9 +227,9 @@ public class AutoThirdPerson implements ClientModInitializer {
 		@ConfigShape.SkipDefault
 		private int configVersion = CURRENT_CONFIG_VERSION;
 		
-		/////////////////////
+		/////////////////////////////////
 		@ConfigShape.Section("Scenarios")
-		/////////////////////
+		/////////////////////////////////
 		
 		@ConfigShape.Comment("Automatically go into third person when riding a boat?")
 		public boolean boat = true;
@@ -235,7 +239,7 @@ public class AutoThirdPerson implements ClientModInitializer {
 		public boolean animal = true;
 		@ConfigShape.Comment("Automatically go into third person when flying an elytra?")
 		public boolean elytra = true;
-		@ConfigShape.Comment("Automatically go into third person when swimming?")
+		@ConfigShape.Comment("Automatically go into third person when doing the swimming animation?")
 		public boolean swim = false;
 		
 		@ConfigShape.Comment("If 'true', the customPattern will be used, and riding anything matching it will toggle third person.")
@@ -258,6 +262,12 @@ public class AutoThirdPerson implements ClientModInitializer {
 		@ConfigShape.Comment("Ticks of not swimming required before the camera restores if the 'swim' option is enabled.")
 		@ConfigShape.AtLeast(0)
 		public int swimmingDelayEnd = 10;
+		
+		@ConfigShape.Comment({
+			"If 'true', your head has to completely exit the water to count as 'not swimming anymore', for the purposes of restoring",
+			"the camera when you're done swimming. If 'false', you just have to stop doing the swimming animation."
+		})
+		public boolean stickySwim = true;
 		
 		@ConfigShape.Comment("Entity IDs that match this regular expression will be considered if the 'custom' option is enabled.")
 		public Pattern customPattern = Pattern.compile("^minecraft:(cow|chicken)$");
