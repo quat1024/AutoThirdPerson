@@ -34,6 +34,11 @@ public class ForgeEntrypoint {
 				
 				@Override
 				public void registerResourceReloadListener(Runnable action) {
+					//On Forge this event happens after the initial reload or something.
+					//I load the config in this event so without calling it immediately it just doesnt get loaded.
+					//When the abstraction is leaky :sus:
+					action.run();
+					
 					MinecraftForge.EVENT_BUS.addListener((RegisterClientReloadListenersEvent e) -> e.registerReloadListener((ResourceManagerReloadListener) mgr -> action.run()));
 				}
 				
