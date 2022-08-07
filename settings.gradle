@@ -17,5 +17,5 @@ rootProject.name = "Auto Third Person"
 include(
 	"Xplat",
 	"Fabric",
-	//"Forge",
+	"Forge",
 )

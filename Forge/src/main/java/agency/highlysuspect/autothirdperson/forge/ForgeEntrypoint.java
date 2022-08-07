@@ -4,7 +4,7 @@ import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 import agency.highlysuspect.autothirdperson.XplatStuff;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
@@ -45,7 +45,7 @@ public class ForgeEntrypoint {
 								Commands.literal("reload").executes(
 									ctx -> {
 										leakyAbstraction.run();
-										ctx.getSource().sendSuccess(new TextComponent("Reloaded config file"), false);
+										ctx.getSource().sendSuccess(Component.literal("Reloaded config file"), false);
 										return 0;
 									}))));
 				}
