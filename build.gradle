@@ -75,7 +75,7 @@ if(!file(mcpForged).exists()) {
 //end goofy zone
 
 group = "agency.highlysuspect"
-archivesBaseName = "auto_third_person"
+archivesBaseName = "auto_third_person-forge-${minecraftVersion}"
 version = "1.2.1"
 
 repositories {
