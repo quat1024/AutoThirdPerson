@@ -8,5 +8,6 @@
 	"client": ["LocalPlayerMixin", "MinecraftMixin", "CameraTypeMixin"],
 	"injectors": {
 		"defaultRequire": 1
-	}
+	},
+	"refmap": "auto_third_person.refmap.json"
 }

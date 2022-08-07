@@ -1,0 +1,13 @@
+modLoader = "javafml"
+loaderVersion = "[39,)"
+license = "LGPL-3.0-or-later"
+issueTrackerURL = "https://github.com/quat1024/incorporeal-3/issues"
+logoFile = "assets/auto_third_person/atp_64x.png"
+
+[[mods]]
+modId = "auto_third_person"
+version = "${version}"
+displayName = "Auto Third Person"
+description = "Puts you in third person when you like, get in a boat and stuff."
+authors = "quaternary"
+credits = "Your mom"

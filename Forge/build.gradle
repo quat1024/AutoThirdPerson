@@ -1,0 +1,71 @@
+buildscript {
+	repositories {
+		maven { url = 'https://maven.minecraftforge.net' }
+		maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+		mavenCentral()
+	}
+	dependencies {
+		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+		classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+	}
+}
+apply plugin: 'java'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+
+archivesBaseName = "${project.mod_name}-forge-${project.minecraft_version}"
+
+mixin {
+	add sourceSets.main, "${project.mod_name}.refmap.json"
+	
+	config "${project.mod_name}.mixins.json"
+}
+
+minecraft {
+	mappings channel: 'official', version: project.minecraft_version
+	
+	runs {
+		client {
+			workingDirectory file('./run')
+			property 'forge.logging.console.level', 'debug'
+			property 'fml.earlyprogresswindow', 'false'
+			ideaModule "${rootProject.name}.${project.name}.main"
+			mods {
+				botania {
+					source sourceSets.main
+					source project(":Xplat").sourceSets.main
+				}
+			}
+		}
+		
+		server {
+			workingDirectory file('./run')
+			property 'forge.logging.console.level', 'debug'
+			property 'fml.earlyprogresswindow', 'false'
+			ideaModule "${rootProject.name}.${project.name}.main"
+			mods {
+				botania {
+					source sourceSets.main
+					source project(":Xplat").sourceSets.main
+				}
+			}
+		}
+	}
+}
+
+dependencies {
+	minecraft "net.minecraftforge:forge:${forge_version}"
+	//i imagine mixingradle does this but idk
+	annotationProcessor "org.spongepowered:mixin:0.8.4-SNAPSHOT:processor"
+	
+	compileOnly project(":Xplat")
+}
+
+//fold in xplat resources and sources
+processResources {
+	from project(":Xplat").sourceSets.main.resources
+}
+
+tasks.withType(JavaCompile) {
+	source(project(":Xplat").sourceSets.main.allSource)
+}

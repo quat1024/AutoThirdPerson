@@ -1,0 +1,14 @@
+plugins {
+	id "java"
+	id "org.spongepowered.gradle.vanilla" version "0.2.1-SNAPSHOT"
+}
+
+archivesBaseName = "${project.mod_name}-xplat-${project.minecraft_version}"
+
+minecraft {
+	version(project.minecraft_version)
+}
+
+dependencies {
+	compileOnly "org.spongepowered:mixin:0.8.5"
+}

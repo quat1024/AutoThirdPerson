@@ -1,0 +1,54 @@
+plugins {
+	id 'fabric-loom' version '0.10-SNAPSHOT'
+}
+
+archivesBaseName = "${project.mod_name}-fabric-${project.minecraft_version}"
+
+dependencies {
+	//Minecraft
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.officialMojangMappings()
+	
+	//Fabric loader
+	modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+	
+	//Fabric API
+	modImplementation fabricApi.module("fabric-resource-loader-v0", project.fabric_api_version)
+	modImplementation fabricApi.module("fabric-lifecycle-events-v1", project.fabric_api_version)
+	modImplementation fabricApi.module("fabric-command-api-v1", project.fabric_api_version)
+	
+	//Xplat
+	implementation project(":Xplat")
+}
+
+//fold in xplat resources and sources
+processResources {
+	from project(":Xplat").sourceSets.main.resources
+}
+
+tasks.withType(JavaCompile) {
+	source(project(":Xplat").sourceSets.main.allSource)
+}
+
+//loom doesn't generate run configs by default in subprojects
+loom {
+	runs {
+		client {
+			client()
+			setConfigName("Fabric Client")
+			ideConfigGenerated(true)
+			runDir("./run")
+		}
+		server {
+			server()
+			setConfigName("Fabric Server")
+			ideConfigGenerated(true)
+			runDir("./run")
+		}
+	}
+	
+	//nor can it figure out the refmap name in this situation
+	mixin {
+		defaultRefmapName = "${project.mod_name}.refmap.json"
+	}
+}

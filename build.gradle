@@ -1,34 +1,38 @@
-plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
-}
-
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-archivesBaseName = "${project.mod_name}-${project.minecraft_version}"
-
-dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+subprojects {
+	apply plugin: "java"
+	java.toolchain.languageVersion = JavaLanguageVersion.of(17);
+	java.withSourcesJar();
 	
-	modImplementation fabricApi.module("fabric-resource-loader-v0", project.fabric_api_version)
-	modImplementation fabricApi.module("fabric-lifecycle-events-v1", project.fabric_api_version)
-	modImplementation fabricApi.module("fabric-command-api-v1", project.fabric_api_version)
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+	tasks.withType(JavaCompile).configureEach {
+		it.options.encoding = "UTF-8"
+		it.options.release = 17
 	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-	it.options.encoding = "UTF-8"
-}
-
-java {
-	withSourcesJar()
+	
+	tasks.withType(GenerateModuleMetadata) {
+		//This shit is broke
+		enabled = false
+	}
+	
+	processResources {
+		inputs.property "version", project.version
+		
+		filesMatching(["**/fabric.mod.json", "**/mods.toml"]) {
+			expand "version": project.version
+		}
+	}
+	
+	dependencies {
+		//This mf keeps disappearing on me
+		implementation "org.jetbrains:annotations:16.0.2"
+	}
+	
+	repositories {
+		maven {
+			name = "spunchbob"
+			url = "https://repo.spongepowered.org/repository/maven-public/"
+			content {
+				includeGroup "org.spongepowered"
+			}
+		}
+	}
 }

@@ -1,10 +1,17 @@
+//TODO what stuff is actually needed here
 pluginManagement {
-    repositories {
-        jcenter()
-        maven {
-            name = 'Fabric'
-            url = 'https://maven.fabricmc.net/'
-        }
-        gradlePluginPortal()
-    }
+	repositories {
+		gradlePluginPortal()
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+		maven {
+			name = 'Spunchbob'
+			url = 'https://repo.spongepowered.org/repository/maven-public/'
+		}
+	}
 }
+
+rootProject.name = "Auto Third Person"
+include("Xplat", "Fabric", "Forge")
