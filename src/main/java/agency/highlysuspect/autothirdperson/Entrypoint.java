@@ -21,10 +21,10 @@ public class Entrypoint {
 		LOGGER.setParent(FMLLog.getLogger());
 		
 		if(e.getSide() == Side.CLIENT) {
-			LOGGER.info("[Auto Third Person] Hello, World!");
+			LOGGER.info("Hello, World!");
 			ClassloadingParanoia.doIt(e);
 		} else {
-			LOGGER.info("[Auto Third Person] Not starting, this is a client-only mod but we're on side " + e.getSide() + ".");
+			LOGGER.info("Not starting, this is a client-only mod but we're on side " + e.getSide() + ".");
 		}
 	}
 	
