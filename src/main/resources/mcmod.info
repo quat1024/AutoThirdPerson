@@ -1,0 +1,17 @@
+[
+	{
+		"modid": "auto_third_person",
+		"name": "Auto Third Person",
+		"description": "Puts you in third person when you do certain things!",
+		"version": "${version}",
+		"mcversion": "1.4.7",
+		"url": "https://highlysuspect.agency/",
+		"updateUrl": "",
+		"authors": ["quaternary"],
+		"parent": "",
+		"screenshots": [],
+		"dependencies": [
+			"mod_MinecraftForge"
+		]
+	}
+]

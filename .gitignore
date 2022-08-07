@@ -1,0 +1,25 @@
+/bin
+/build
+/.gradle
+/.classpath
+/.project
+/.settings
+/.metadata
+/download
+.idea/
+
+# gradle haxx
+/mcp726a.zip
+/mcp726a-forged.zip
+/forge*.zip
+/forge*.jar
+
+# personal use
+lol.sh
+buildcraft*.jar
+tubestuff*.jar
+
+# Dammit krita
+*.png~
+*.kra~
+*autosave.kra
