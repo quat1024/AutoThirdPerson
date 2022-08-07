@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -48,7 +48,7 @@ public class FabricEntrypoint implements ClientModInitializer {
 						ClientCommandManager.literal("reload").executes(
 							ctx -> {
 								leakyAbstraction.run();
-								ctx.getSource().sendFeedback(new TranslatableComponent("auto_third_person.reload"));
+								ctx.getSource().sendFeedback(new TextComponent("Reloaded config file"));
 								return 0;
 							})));
 			}
