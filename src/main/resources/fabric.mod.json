@@ -16,7 +16,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"client": [
-			"agency.highlysuspect.autothirdperson.AutoThirdPerson"
+			"agency.highlysuspect.autothirdperson.fabric.FabricEntrypoint"
 		]
 	},
 	"mixins": [

@@ -1,18 +1,8 @@
 package agency.highlysuspect.autothirdperson;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.vehicle.Boat;
@@ -25,40 +15,31 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
-public class AutoThirdPerson implements ClientModInitializer {
+public class AutoThirdPerson {
 	public static final String MODID = "auto_third_person";
-	public static final Path SETTINGS_PATH = FabricLoader.getInstance().getConfigDir().resolve("auto_third_person.cfg");
 	public static final Logger LOGGER = LogManager.getLogger("Auto Third Person");
 	
 	public static AutoThirdPerson INSTANCE;
 	
-	public Settings settings = new Settings();
-	private final ConfigShape configShape = ConfigShape.createFromPojo(settings);
-	public State state = new State();
+	public Settings settings;
+	private final Path settingsPath;
+	private final ConfigShape configShape;
+	private final XplatStuff services;
 	
-	public void onInitializeClient() {
-		INSTANCE = this;
+	public State state;
+	
+	public AutoThirdPerson(XplatStuff services) {
+		this.settings = new Settings();
+		this.settingsPath = services.getConfigDir().resolve("auto_third_person.cfg");
+		this.configShape = ConfigShape.createFromPojo(settings);
+		this.services = services;
 		
-		//This'll get called during first game startup too (it's a "load listener" as well as "reload", I guess)
-		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
-			@Override
-			public ResourceLocation getFabricId() {
-				return new ResourceLocation(MODID, "settings_reloader");
-			}
-			
-			@Override
-			public void onResourceManagerReload(ResourceManager manager) {
-				readConfig();
-			}
-		});
+		this.state = new State();
 		
-		ClientCommandManager.DISPATCHER.register(ClientCommandManager.literal(MODID).then(ClientCommandManager.literal("reload").executes(c -> {
-			readConfig();
-			c.getSource().sendFeedback(new TranslatableComponent("auto_third_person.reload"));
-			return 0;
-		})));
+		services.registerResourceReloadListener(this::readConfig);
+		services.registerClientReloadCommand(this::readConfig);
 		
-		ClientTickEvents.START_CLIENT_TICK.register(client -> {
+		services.registerClientTicker((client) -> {
 			//Per-frame status checking.
 			//I wrote this a long time ago and I don't want to touch it, it's scary, lol.
 			if(client.level != null && client.player != null && !client.isPaused()) {
@@ -94,7 +75,7 @@ public class AutoThirdPerson implements ClientModInitializer {
 	
 	private void readConfig() {
 		try {
-			settings = configShape.readFromOrCreateFile(SETTINGS_PATH, new Settings());
+			settings = configShape.readFromOrCreateFile(settingsPath, new Settings());
 		} catch (ConfigShape.ConfigParseException e) {
 			//Don't bring down the whole game just because the user made a typo in the config file, give them a chance to correct it.
 			//Logging e.getCause() will provide a more informative stacktrace than the trace of the ConfigParseException itself.
