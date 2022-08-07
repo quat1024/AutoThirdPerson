@@ -7,9 +7,11 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityBoat;
@@ -49,23 +51,25 @@ public class AutoThirdPerson {
 		
 		@Override
 		public void tickStart(EnumSet<TickType> enumSet, Object... objects) {
-			if(Minecraft.getMinecraft().thePlayer == null || Minecraft.getMinecraft().theWorld == null) {
+			EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
+			GameSettings gameSettings = Minecraft.getMinecraft().gameSettings;
+			if(player == null || Minecraft.getMinecraft().theWorld == null) {
 				state.reset();
 				return;
 			}
 			
 			//Handle the "Skip front view" setting
-			if(settings.skipFrontView && Minecraft.getMinecraft().gameSettings.thirdPersonView == 2) {
-				Minecraft.getMinecraft().gameSettings.thirdPersonView = 0;
+			if(settings.skipFrontView && gameSettings.thirdPersonView == 2) {
+				gameSettings.thirdPersonView = 0;
 			}
 			
 			//Track whether you manually pressed f5
-			if(Minecraft.getMinecraft().gameSettings.thirdPersonView != state.expectedThirdPersonView) {
+			if(gameSettings.thirdPersonView != state.expectedThirdPersonView) {
 				f5Press();
 			}
 			
 			//Track changes to your vehicle
-			Entity currentVehicle = Minecraft.getMinecraft().thePlayer.ridingEntity;
+			Entity currentVehicle = player.ridingEntity;
 			Entity lastVehicle = state.lastVehicleWeak.get();
 			if(currentVehicle != lastVehicle) { //(object identity compare)
 				//If you were riding something last tick, you now no longer count as riding that
@@ -77,6 +81,13 @@ public class AutoThirdPerson {
 				//and update the weak reference
 				state.lastVehicleWeak = new WeakReference<Entity>(currentVehicle);
 			}
+			
+			//Handle "sneak-dismount" setting
+			if(settings.sneakDismount && !state.wasSneaking && player.isSneaking() && currentVehicle != null) {
+				//func_78768_b -> "interactEntity" or something. Sends a packet like you right clicked on the entity
+				Minecraft.getMinecraft().playerController.func_78768_b(player, currentVehicle);
+			}
+			state.wasSneaking = player.isSneaking();
 		}
 		
 		@Override
@@ -191,10 +202,13 @@ public class AutoThirdPerson {
 		
 		//This version of Forge doesn't have entity mount events. I need to manually check what entity you
 		//were riding every tick and watch for when it changes.
-		private WeakReference<Entity> lastVehicleWeak = new WeakReference<Entity>(null);
+		public WeakReference<Entity> lastVehicleWeak = new WeakReference<Entity>(null);
 		
 		//I'm also not sure what the best way to check whether f5 was pressed is. It's not a real keybind yet.
 		public int expectedThirdPersonView;
+		
+		//Quick hack-fix for sneak dismounting
+		public boolean wasSneaking;
 		
 		public void reset() {
 			active = false;
@@ -220,6 +234,7 @@ public class AutoThirdPerson {
 			
 			skipFrontView = config.get("Extras", "skipFrontView", false, "Skip the 'third-person front' camera mode when pressing F5.").getBoolean(false);
 			fixHandGlitch = config.get("Extras", "fixHandGlitch", true, "Fix the annoying 'weirdly rotated first-person hand' rendering error when you ride or look at someone riding a vehicle.").getBoolean(true);
+			sneakDismount = config.get("Extras", "sneakDismount", false, "Pressing sneak will remove you from the vehicle, instead of having to click on it again, like modern versions.").getBoolean(false);
 			logSpam = config.get("Extras", "logSpam", false, "Dump a bunch of debug crap into the log. Might be handy!").getBoolean(false);
 		}
 		
@@ -253,6 +268,7 @@ public class AutoThirdPerson {
 		
 		public boolean skipFrontView;
 		public boolean fixHandGlitch;
+		public boolean sneakDismount;
 		public boolean logSpam;
 	}
 }
