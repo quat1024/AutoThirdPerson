@@ -1,4 +1,4 @@
-# Auto Third Person but it's for ~~fabric~~ fabric and forge ~~1.16~~ ~~1.17~~ 1.18
+# Auto Third Person but it's for ~~forge~~ ~~fabric~~ fabric and forge ~~1.12~~ ~~1.16~~ ~~1.17~~ ~~1.18~~ 1.19
 
 Puts you in third person when you do certain things.
 
