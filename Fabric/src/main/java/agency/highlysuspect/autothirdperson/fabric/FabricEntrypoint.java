@@ -3,13 +3,14 @@ package agency.highlysuspect.autothirdperson.fabric;
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 import agency.highlysuspect.autothirdperson.XplatStuff;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -43,14 +44,16 @@ public class FabricEntrypoint implements ClientModInitializer {
 			
 			@Override
 			public void registerClientReloadCommand(Runnable leakyAbstraction) {
-				ClientCommandManager.DISPATCHER.register(
-					ClientCommandManager.literal(AutoThirdPerson.MODID).then(
-						ClientCommandManager.literal("reload").executes(
-							ctx -> {
-								leakyAbstraction.run();
-								ctx.getSource().sendFeedback(new TextComponent("Reloaded config file"));
-								return 0;
-							})));
+				ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+					dispatcher.register(
+						ClientCommandManager.literal(AutoThirdPerson.MODID).then(
+							ClientCommandManager.literal("reload").executes(
+								ctx -> {
+									leakyAbstraction.run();
+									ctx.getSource().sendFeedback(Component.literal("Reloaded config file"));
+									return 0;
+								})));
+				});
 			}
 			
 			@Override

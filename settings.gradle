@@ -14,4 +14,8 @@ pluginManagement {
 }
 
 rootProject.name = "Auto Third Person"
-include("Xplat", "Fabric", "Forge")
+include(
+	"Xplat",
+	"Fabric",
+	//"Forge",
+)
