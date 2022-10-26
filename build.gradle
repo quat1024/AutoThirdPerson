@@ -1,0 +1,73 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		maven {
+			name = "GTNH Maven"
+			url = "http://jenkins.usrv.eu:8081/nexus/content/groups/public/"
+			allowInsecureProtocol(true) //really guys
+		}
+		maven {
+			name 'forge'
+			url 'https://maven.minecraftforge.net'
+		}
+	}
+	dependencies {
+		classpath "net.minecraftforge.gradle:ForgeGradle:1.2.9"
+	}
+}
+
+apply plugin: "java"
+apply plugin: "idea"
+apply plugin: "forge"
+
+//i guess i'll put them here
+def minecraftVersion = "1.7.10"
+def forgeVersion = "10.13.4.1614"
+group = "agency.highlysuspect"
+archivesBaseName = "auto_third_person-forge-${minecraftVersion}"
+version = "1.2.1"
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(8)
+	}
+}
+
+repositories {
+	maven {
+		url = "https://maven.minecraftforge.net/"
+		content {
+			includeGroup "net.minecraftforge"
+			
+			//Fixes forge's maven because Gradle 5+ expects poms and maven_metadatas and stuff
+			//but oldass forge artifacts do not have those published for whatever reason
+			metadataSources {artifact() }
+		}
+	}
+	maven {
+		name "Greg's website, which is also a Maven repo with a million things on it"
+		url "https://gregtech.overminddl1.com/"
+		content { includeGroup("org.scala-lang") }
+	}
+}
+
+minecraft {
+	//Yes this is really how forge 1.7.10 versions are named
+	version = "${minecraftVersion}-${forgeVersion}-${minecraftVersion}"
+}
+
+processResources {
+	inputs.property "version", project.version
+	
+	filesMatching(["**/mcmod.info", "**/mods.toml"]) {
+		expand "version": project.version
+	}
+}
+
+//Apparently this is required or IDEA can't load any assets?
+//It seems to be unable to load assets anyway, something's broken.
+idea {
+	module {
+		inheritOutputDirs = true
+	}
+}
