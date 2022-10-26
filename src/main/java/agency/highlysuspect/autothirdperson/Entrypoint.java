@@ -2,6 +2,8 @@ package agency.highlysuspect.autothirdperson;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,7 +22,18 @@ public class Entrypoint {
 	
 	@Mod.EventHandler
 	public void preinit(FMLPreInitializationEvent e) {
-		LOGGER.warn("Hello 1.7.10!!!!!!!");
-		LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");LOGGER.warn("Hello 1.7.10!!!!!!!");
+		if(e.getSide() == Side.CLIENT) {
+			LOGGER.info("Hello, World!");
+			ClassloadingParanoia.doIt(e);
+		} else {
+			LOGGER.info("Not starting, this is a client-only mod but wr're on side " + e.getSide() + ".");
+		}
+	}
+	
+	public static class ClassloadingParanoia {
+		public static void doIt(FMLPreInitializationEvent e) {
+			//Is this enough layers of trying to protect things from the classloader now. Anyway
+			new AutoThirdPerson().clientPreInit(e);
+		}
 	}
 }
