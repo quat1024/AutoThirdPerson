@@ -2,7 +2,7 @@
 
 Puts you in third person when you do certain things. Well, less things than the recent versions, anyways.
 
-LGPL 3.0 or later.
+LGPL 3.0 or later, with my usual "I don't care if you are looking at the buildscript to learn how to compile things" exception.
 
 ## Note
 
@@ -14,11 +14,12 @@ I'm trying to always keep this mod light, so I used it only as a reference for "
 
 Trying to figure things out:
 
-* Gradle 7 removed the "maven" plugin in favor of "maven-publish" but this forgegradle fork seems to expect a `maven` plugin, so you must use gradle 6.x. The latest version is 6.9.3 and it still seems to be somewhat actively maintained.
+* Gradle 7 removed the "maven" plugin in favor of "maven-publish", but this forgegradle fork still seems to expect a `maven` plugin, so you must use gradle 6.x. The latest version is 6.9.3 and it still seems to be somewhat actively maintained.
 * Greg's website has been a Maven server this whole time! Comments in GTNH projects that say it's "a Forge maven mirror" are slightly wrong, it contains some scala crap that's apparently required to run setupDecompWorkspace.
 * You still need the `metadataSources { artifact() }` trick on Forge's maven for artifacts from this time period (i.e. it's not just a 1.4.7 thing lol)
 * The Forge version checker will fail to parse json, it's harmless.
 * If you get `java.lang.NoClassDefFoundError: com/mojang/authlib/exceptions/AuthenticationException` immediately after pressing the IDEA run button, smack that mf gradle refresh button 🔄🔄🔄🔄
+* Compiling fails with cryptic "unsupported class file version" errors on Java 17, despite the toolchain declaration stuff on Gradle. I'm using Java 8 on my PC and in github actions, it seems to work alright.
 
 ## IDEA integration is a fuck
 
