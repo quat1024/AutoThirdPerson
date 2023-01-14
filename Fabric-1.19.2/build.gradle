@@ -18,16 +18,19 @@ dependencies {
 	modImplementation fabricApi.module("fabric-command-api-v2", "0.59.0+1.19.2")
 	
 	//Xplat
-	implementation project(":Xplat")
+	implementation project(":Xplat-1.19.2")
+	implementation project(":Core")
 }
 
 //fold in xplat resources and sources
 processResources {
-	from project(":Xplat").sourceSets.main.resources
+	from project(":Xplat-1.19.2").sourceSets.main.resources
+	from project(":Core").sourceSets.main.resources
 }
 
 tasks.withType(JavaCompile) {
-	source(project(":Xplat").sourceSets.main.allSource)
+	source(project(":Xplat-1.19.2").sourceSets.main.allSource)
+	source(project(":Core").sourceSets.main.allSource)
 }
 
 //loom doesn't generate run configs by default in subprojects

@@ -31,9 +31,10 @@ minecraft {
 			property 'fml.earlyprogresswindow', 'false'
 			ideaModule "auto_third_person.Forge-1.19.2.main"
 			mods {
-				botania {
+				"${rootProject.name}" {
 					source sourceSets.main
-					source project(":Xplat").sourceSets.main
+					source project(":Xplat-1.19.2").sourceSets.main
+					source project(":Core").sourceSets.main
 				}
 			}
 		}
@@ -44,9 +45,10 @@ minecraft {
 			property 'fml.earlyprogresswindow', 'false'
 			ideaModule "auto_third_person.Forge-1.19.2.main"
 			mods {
-				botania {
+				"${rootProject.name}" {
 					source sourceSets.main
-					source project(":Xplat").sourceSets.main
+					source project(":Xplat-1.19.2").sourceSets.main
+					source project(":Core").sourceSets.main
 				}
 			}
 		}
@@ -57,14 +59,17 @@ dependencies {
 	minecraft "net.minecraftforge:forge:1.19.2-43.0.0"
 	annotationProcessor "org.spongepowered:mixin:0.8.4-SNAPSHOT:processor" //i imagine mixingradle does this but idk
 	
-	compileOnly project(":Xplat")
+	implementation project(":Xplat-1.19.2")
+	implementation project(":Core")
 }
 
 //fold in xplat resources and sources
 processResources {
-	from project(":Xplat").sourceSets.main.resources
+	from project(":Xplat-1.19.2").sourceSets.main.resources
+	from project(":Core").sourceSets.main.resources
 }
 
 tasks.withType(JavaCompile) {
-	source(project(":Xplat").sourceSets.main.allSource)
+	source(project(":Xplat-1.19.2").sourceSets.main.allSource)
+	source(project(":Core").sourceSets.main.allSource)
 }

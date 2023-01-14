@@ -1,6 +1,7 @@
 package agency.highlysuspect.autothirdperson.mixin;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
+import agency.highlysuspect.autothirdperson.NineteenTwoMinecraftInteraction;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,17 +16,25 @@ public class LocalPlayerMixin {
 		method = "startRiding",
 		at = @At("TAIL")
 	)
-	private void onStartRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
-		AutoThirdPerson.INSTANCE.mountOrDismount(vehicle, true);
+	private void autoThirdPerson$onStartRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
+		AutoThirdPerson<?, ?> atp = AutoThirdPerson.instance;
+		NineteenTwoMinecraftInteraction mcInteraction = (NineteenTwoMinecraftInteraction) atp.mc;
+		
+		atp.mount(mcInteraction.wrapVehicle(vehicle));
 	}
 	
 	@Inject(
 		method = "removeVehicle",
 		at = @At("HEAD")
 	)
-	private void onStopRiding(CallbackInfo ci) {
+	private void autoThirdPerson$onStopRiding(CallbackInfo ci) {
 		@SuppressWarnings("ConstantConditions")
 		Entity vehicle = ((Entity) (Object) this).getVehicle();
-		AutoThirdPerson.INSTANCE.mountOrDismount(vehicle, false);
+		if(vehicle != null) {
+			AutoThirdPerson<?, ?> atp = AutoThirdPerson.instance;
+			NineteenTwoMinecraftInteraction mcInteraction = (NineteenTwoMinecraftInteraction) atp.mc;
+			
+			atp.dismount(mcInteraction.wrapVehicle(vehicle));
+		}
 	}
 }

@@ -34,5 +34,7 @@ subprojects {
 				includeGroup "org.spongepowered"
 			}
 		}
+		
+		mavenCentral()
 	}
 }

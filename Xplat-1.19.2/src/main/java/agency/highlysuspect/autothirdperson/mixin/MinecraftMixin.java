@@ -16,7 +16,7 @@ public class MinecraftMixin {
 			target = "Lnet/minecraft/client/Options;setCameraType(Lnet/minecraft/client/CameraType;)V"
 		)
 	)
-	private void onPerspectiveToggle(CallbackInfo ci) {
-		AutoThirdPerson.INSTANCE.f5Press();
+	private void autoThirdPerson$onPerspectiveToggle(CallbackInfo ci) {
+		AutoThirdPerson.instance.manualPress();
 	}
 }

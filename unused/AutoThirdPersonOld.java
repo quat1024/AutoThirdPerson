@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
-public class AutoThirdPerson<CMDSOURCE> {
+public class AutoThirdPersonOld<CMDSOURCE> {
 	public static final String MODID = "auto_third_person";
 	public static final Logger LOGGER = LogManager.getLogger("Auto Third Person");
 	
-	public static AutoThirdPerson<?> INSTANCE;
+	public static AutoThirdPersonOld<?> INSTANCE;
 	
 	public Settings settings;
 	private final Path settingsPath;
@@ -28,7 +28,7 @@ public class AutoThirdPerson<CMDSOURCE> {
 	
 	public State state;
 	
-	public AutoThirdPerson(LoaderInteraction<CMDSOURCE> services) {
+	public AutoThirdPersonOld(LoaderInteractionOld<CMDSOURCE> services) {
 		this.settings = new Settings();
 		this.settingsPath = services.getConfigDir().resolve("auto_third_person.cfg");
 		this.configShape = ConfigShape.createFromPojo(settings);
@@ -37,7 +37,7 @@ public class AutoThirdPerson<CMDSOURCE> {
 		
 		services.registerResourceReloadListener(this::readConfig);
 		services.registerClientReloadCommand(
-			services.literal(AutoThirdPerson.MODID).then(
+			services.literal(AutoThirdPersonOld.MODID).then(
 				services.literal("reload").executes(
 					ctx -> {
 						readConfig();
@@ -137,7 +137,8 @@ public class AutoThirdPerson<CMDSOURCE> {
 	//called from MinecraftMixin
 	public void f5Press() {
 		if(settings.cancelAutoRestore && state.isActive()) {
-			cancel();
+			debugSpam("Cancelling auto-restore, if it was about to happen");
+			state.cancel();
 		}
 	}
 	
@@ -179,11 +180,6 @@ public class AutoThirdPerson<CMDSOURCE> {
 		debugSpam("Automatically leaving third person due to " + reason + " ending");
 		client.options.setCameraType(state.oldPerspective);
 		state.cancel();
-	}
-	
-	public void cancel() {
-		state.cancel();
-		debugSpam("Cancelling auto-restore, if it was about to happen");
 	}
 	
 	public static class State {

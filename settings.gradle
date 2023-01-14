@@ -16,7 +16,8 @@ pluginManagement {
 rootProject.name = name
 
 include(
-	"Xplat",
+	"Core",
+	"Xplat-1.19.2",
 	"Fabric-1.19.2",
 	"Forge-1.19.2",
 )
