@@ -3,6 +3,7 @@ package agency.highlysuspect.autothirdperson;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.vehicle.Boat;
@@ -15,29 +16,34 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
-public class AutoThirdPerson {
+public class AutoThirdPerson<CMDSOURCE> {
 	public static final String MODID = "auto_third_person";
 	public static final Logger LOGGER = LogManager.getLogger("Auto Third Person");
 	
-	public static AutoThirdPerson INSTANCE;
+	public static AutoThirdPerson<?> INSTANCE;
 	
 	public Settings settings;
 	private final Path settingsPath;
 	private final ConfigShape configShape;
-	private final XplatStuff services;
 	
 	public State state;
 	
-	public AutoThirdPerson(XplatStuff services) {
+	public AutoThirdPerson(LoaderInteraction<CMDSOURCE> services) {
 		this.settings = new Settings();
 		this.settingsPath = services.getConfigDir().resolve("auto_third_person.cfg");
 		this.configShape = ConfigShape.createFromPojo(settings);
-		this.services = services;
 		
 		this.state = new State();
 		
 		services.registerResourceReloadListener(this::readConfig);
-		services.registerClientReloadCommand(this::readConfig);
+		services.registerClientReloadCommand(
+			services.literal(AutoThirdPerson.MODID).then(
+				services.literal("reload").executes(
+					ctx -> {
+						readConfig();
+						services.getFeedbackSender(ctx.getSource()).accept(Component.literal("Reloaded config file"));
+						return 0;
+					})));
 		
 		services.registerClientTicker((client) -> {
 			//Per-frame status checking.
