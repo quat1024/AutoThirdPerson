@@ -13,6 +13,10 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * A pretty lazily slapped-together description of the options in a config file.
+ * Doesn't hold the current settings, just their defaults.
+ */
 public class SettingsSpec implements Iterable<SettingsSpec.Entry> {
 	/// builder api ///
 	
@@ -88,7 +92,7 @@ public class SettingsSpec implements Iterable<SettingsSpec.Entry> {
 		
 		public String name;
 		
-		//N.B. Matcher.replaceAll(Function) would be very nice, but it's Java 9 only
+		//N.B.: Matcher.replaceAll(Function) would be very nice, but it's Java 9 only,
 		//and i have grand visions of taking this codebase wayyy back in time
 		public String getCamelCaseName() {
 			Pattern p = Pattern.compile(" ."); //space followed by anything

@@ -33,37 +33,37 @@ public interface AtpSettings {
 	AtpSettings DEFAULT_TODO = new AtpSettings() {
 		@Override
 		public int configVersion() {
-			return 69420;
+			return 0;
 		}
 		
 		@Override
 		public boolean boat() {
-			return true;
+			return false;
 		}
 		
 		@Override
 		public boolean cart() {
-			return true;
+			return false;
 		}
 		
 		@Override
 		public boolean animal() {
-			return true;
+			return false;
 		}
 		
 		@Override
 		public boolean elytra() {
-			return true;
+			return false;
 		}
 		
 		@Override
 		public boolean swim() {
-			return true;
+			return false;
 		}
 		
 		@Override
 		public boolean custom() {
-			return true;
+			return false;
 		}
 		
 		@Override
@@ -73,52 +73,52 @@ public interface AtpSettings {
 		
 		@Override
 		public int elytraDelay() {
-			return 5;
+			return 0;
 		}
 		
 		@Override
 		public int swimmingDelayStart() {
-			return 10;
+			return 0;
 		}
 		
 		@Override
 		public int swimmingDelayEnd() {
-			return 10;
+			return 0;
 		}
 		
 		@Override
 		public boolean stickySwim() {
-			return true;
+			return false;
 		}
 		
 		@Override
 		public Pattern customPattern() {
-			return Pattern.compile("lkajsdklajsldksa");
+			return Pattern.compile("default auto third person settings object - custom pattern");
 		}
 		
 		@Override
 		public Pattern ignorePattern() {
-			return Pattern.compile("lkajsdklajsldksa");
+			return Pattern.compile("default auto third person settings object - ignore pattern");
 		}
 		
 		@Override
 		public boolean autoRestore() {
-			return true;
+			return false;
 		}
 		
 		@Override
 		public boolean cancelAutoRestore() {
-			return true;
+			return false;
 		}
 		
 		@Override
 		public boolean skipFrontView() {
-			return true;
+			return false;
 		}
 		
 		@Override
 		public boolean logSpam() {
-			return true;
+			return false;
 		}
 	};
 }

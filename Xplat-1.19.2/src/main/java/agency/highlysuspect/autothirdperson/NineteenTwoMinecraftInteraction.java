@@ -104,7 +104,8 @@ public class NineteenTwoMinecraftInteraction implements MinecraftInteraction {
 		
 		@Override
 		public boolean stillExists() {
-			return ent.get() != null;
+			Entity entity = ent.get();
+			return entity != null && entity.isAlive();
 		}
 		
 		@Override
@@ -122,10 +123,11 @@ public class NineteenTwoMinecraftInteraction implements MinecraftInteraction {
 			if(!(other instanceof EntityVehicle)) return false;
 			Entity myEntity = ent.get();
 			Entity otherEntity = ((EntityVehicle) other).ent.get();
-			return myEntity != null && myEntity == otherEntity;
+			return myEntity != null && myEntity.isAlive() && myEntity == otherEntity;
 		}
 	}
 	
+	@SuppressWarnings("ClassCanBeRecord")
 	private static class Log4jMyLogger implements MyLogger {
 		public Log4jMyLogger(Logger logger) {
 			this.logger = logger;

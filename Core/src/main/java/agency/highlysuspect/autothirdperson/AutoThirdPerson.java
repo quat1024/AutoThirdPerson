@@ -5,6 +5,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
+/**
+ * Handle's the mod's main logic
+ */
 public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderInteraction> {
 	public static final String MODID = "auto_third_person";
 	public static final String NAME = "Auto Third Person";
