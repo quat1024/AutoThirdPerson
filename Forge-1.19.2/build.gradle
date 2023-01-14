@@ -13,23 +13,23 @@ apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
-archivesBaseName = "${project.mod_name}-forge-${project.minecraft_version}"
+archivesBaseName = "${rootProject.name}-forge-1.19.2"
 
 mixin {
-	add sourceSets.main, "${project.mod_name}.refmap.json"
+	add sourceSets.main, "${rootProject.name}.refmap.json"
 	
-	config "${project.mod_name}.mixins.json"
+	config "${rootProject.name}.mixins.json"
 }
 
 minecraft {
-	mappings channel: 'official', version: project.minecraft_version
+	mappings channel: 'official', version: "1.19.2"
 	
 	runs {
 		client {
 			workingDirectory file('./run')
 			property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
-			ideaModule "${rootProject.name}.${project.name}.main"
+			ideaModule "auto_third_person.Forge-1.19.2.main"
 			mods {
 				botania {
 					source sourceSets.main
@@ -42,7 +42,7 @@ minecraft {
 			workingDirectory file('./run')
 			property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
-			ideaModule "${rootProject.name}.${project.name}.main"
+			ideaModule "auto_third_person.Forge-1.19.2.main"
 			mods {
 				botania {
 					source sourceSets.main
@@ -54,9 +54,8 @@ minecraft {
 }
 
 dependencies {
-	minecraft "net.minecraftforge:forge:${forge_version}"
-	//i imagine mixingradle does this but idk
-	annotationProcessor "org.spongepowered:mixin:0.8.4-SNAPSHOT:processor"
+	minecraft "net.minecraftforge:forge:1.19.2-43.0.0"
+	annotationProcessor "org.spongepowered:mixin:0.8.4-SNAPSHOT:processor" //i imagine mixingradle does this but idk
 	
 	compileOnly project(":Xplat")
 }

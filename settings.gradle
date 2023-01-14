@@ -13,9 +13,10 @@ pluginManagement {
 	}
 }
 
-rootProject.name = "Auto Third Person"
+rootProject.name = name
+
 include(
 	"Xplat",
-	"Fabric",
-	"Forge",
+	"Fabric-1.19.2",
+	"Forge-1.19.2",
 )

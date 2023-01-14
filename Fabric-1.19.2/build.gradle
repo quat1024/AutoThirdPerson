@@ -2,20 +2,20 @@ plugins {
 	id "fabric-loom" version "1.0.17"
 }
 
-archivesBaseName = "${project.mod_name}-fabric-${project.minecraft_version}"
+archivesBaseName = "${rootProject.name}-fabric-1.19.2"
 
 dependencies {
 	//Minecraft
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	minecraft "com.mojang:minecraft:1.19.2"
 	mappings loom.officialMojangMappings()
 	
 	//Fabric loader
-	modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+	modImplementation "net.fabricmc:fabric-loader:0.14.9"
 	
 	//Fabric API
-	modImplementation fabricApi.module("fabric-resource-loader-v0", project.fabric_api_version)
-	modImplementation fabricApi.module("fabric-lifecycle-events-v1", project.fabric_api_version)
-	modImplementation fabricApi.module("fabric-command-api-v2", project.fabric_api_version)
+	modImplementation fabricApi.module("fabric-resource-loader-v0", "0.59.0+1.19.2")
+	modImplementation fabricApi.module("fabric-lifecycle-events-v1", "0.59.0+1.19.2")
+	modImplementation fabricApi.module("fabric-command-api-v2", "0.59.0+1.19.2")
 	
 	//Xplat
 	implementation project(":Xplat")
@@ -49,6 +49,7 @@ loom {
 	
 	//nor can it figure out the refmap name in this situation
 	mixin {
-		defaultRefmapName = "${project.mod_name}.refmap.json"
+		//you must go through project.rootProject due to a goofy name conflict with LoomGradleExtensionImpl#isRootProject
+		defaultRefmapName = "${project.rootProject.name}.refmap.json"
 	}
 }
