@@ -18,6 +18,7 @@ public class ForgeEntrypoint {
 				new NineteenTwoMinecraftInteraction(),
 				new ForgeLoaderInteraction()
 			);
+			AutoThirdPerson.instance.init();
 		}
 	}
 }

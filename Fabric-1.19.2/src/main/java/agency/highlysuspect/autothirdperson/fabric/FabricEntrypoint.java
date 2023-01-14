@@ -11,5 +11,6 @@ public class FabricEntrypoint implements ClientModInitializer {
 			new NineteenTwoMinecraftInteraction(),
 			new FabricLoaderInteraction()
 		);
+		AutoThirdPerson.instance.init();
 	}
 }

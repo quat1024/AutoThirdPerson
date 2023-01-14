@@ -8,13 +8,14 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Minecart;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 
 public class NineteenTwoMinecraftInteraction implements MinecraftInteraction {
 	private final Minecraft client = Minecraft.getInstance();
-	private final MyLogger logger = LogManager.getLogger(AutoThirdPerson.NAME)::info;
+	private final MyLogger logger = new Log4jMyLogger(LogManager.getLogger(AutoThirdPerson.NAME));
 	
 	@Override
 	public MyLogger getLogger() {
@@ -122,6 +123,24 @@ public class NineteenTwoMinecraftInteraction implements MinecraftInteraction {
 			Entity myEntity = ent.get();
 			Entity otherEntity = ((EntityVehicle) other).ent.get();
 			return myEntity != null && myEntity == otherEntity;
+		}
+	}
+	
+	private static class Log4jMyLogger implements MyLogger {
+		public Log4jMyLogger(Logger logger) {
+			this.logger = logger;
+		}
+		
+		private final Logger logger;
+		
+		@Override
+		public void info(String msg, Object... args) {
+			logger.info(msg, args);
+		}
+		
+		@Override
+		public void error(String msg, Throwable err) {
+			logger.error(msg, err);
 		}
 	}
 }

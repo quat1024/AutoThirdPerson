@@ -27,6 +27,7 @@ public interface MinecraftInteraction {
 	
 	interface MyLogger {
 		void info(String msg, Object... args);
+		void error(String msg, Throwable err);
 	}
 	
 	enum MyCameraType {

@@ -2,6 +2,9 @@ package agency.highlysuspect.autothirdperson;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+import java.util.regex.Pattern;
+
 public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderInteraction> {
 	public static final String MODID = "auto_third_person";
 	public static final String NAME = "Auto Third Person";
@@ -18,18 +21,39 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		this.mc = mc;
 		this.loader = loader;
 		this.logger = mc.getLogger();
-		
 		this.state = new State();
-		
+	}
+	
+	public void init() {
+		loader.init();
 		loader.registerClientTicker(this::tickClient);
 	}
 	
-	public @Nullable MinecraftInteraction.MyCameraType modifyCycle(MinecraftInteraction.MyCameraType cycleTo) {
-		if(loader.settings().skipFrontView() && cycleTo == MinecraftInteraction.MyCameraType.THIRD_PERSON_REVERSED) {
+	/// external api ///
+	
+	public void mount(MinecraftInteraction.Vehicle mounting) {
+		mountOrDismount(mounting, true);
+	}
+	
+	public void dismount(MinecraftInteraction.Vehicle dismounting) {
+		mountOrDismount(dismounting, false);
+	}
+	
+	public @Nullable MinecraftInteraction.MyCameraType modifyCycle(MinecraftInteraction.MyCameraType cycleFrom) {
+		if(loader.settings().skipFrontView() && cycleFrom == MinecraftInteraction.MyCameraType.THIRD_PERSON) {
 			debugSpam("Skipping third-person reversed view");
 			return MinecraftInteraction.MyCameraType.FIRST_PERSON;
 		} else return null;
 	}
+	
+	public void manualPress() {
+		if(loader.settings().cancelAutoRestore() && state.isActive()) {
+			debugSpam("Cancelling auto-restore, if it was about to happen");
+			state.cancel();
+		}
+	}
+	
+	/// internal api ///
 	
 	private void debugSpam(String msg, Object... args) {
 		if(loader.settings().logSpam()) logger.info(msg, args);
@@ -71,14 +95,6 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		}
 	}
 	
-	public void mount(MinecraftInteraction.Vehicle mounting) {
-		mountOrDismount(mounting, true);
-	}
-	
-	public void dismount(MinecraftInteraction.Vehicle dismounting) {
-		mountOrDismount(dismounting, false);
-	}
-	
 	private void mountOrDismount(MinecraftInteraction.Vehicle vehicle, boolean mounting) {
 		if(!mc.safeToTick()) return;
 		AtpSettings settings = loader.settings();
@@ -114,13 +130,6 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		if(doIt) {
 			if(mounting) enterThirdPerson(new MountingReason(vehicle));
 			else exitThirdPerson(new MountingReason(vehicle));
-		}
-	}
-	
-	public void manualPress() {
-		if(loader.settings().cancelAutoRestore() && state.isActive()) {
-			debugSpam("Cancelling auto-restore, if it was about to happen");
-			state.cancel();
 		}
 	}
 	
@@ -218,5 +227,51 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		public String toString() {
 			return "riding " + vehicle.id();
 		}
+	}
+	
+	/// settings ///
+	
+	public SettingsSpec buildSettingsSpec() {
+		SettingsSpec spec = new SettingsSpec();
+		
+		spec.integer("configVersion", null, 6);
+		
+		spec.section("Scenarios");
+		spec.bool("boat", "Automatically go into third person when riding a boat?", true);
+		spec.bool("cart", "Automatically go into third person when riding a minecart?", true);
+		spec.bool("animal", "Automatically go into third person when riding an animal?", true);
+		if(mc.hasElytra()) {
+			spec.bool("elytra", "Automatically go into third person when flying an elytra?", true);
+		}
+		spec.bool("swim", mc.hasSwimmingAnimation() ?
+			"Automatically go into third person when doing the swimming animation?" :
+			"Automatically go into third person when underwater?",
+			false
+		);
+		spec.bool("custom", "If 'true', the customPattern will be used, and riding anything matching it will toggle third person.", false);
+		spec.bool("useIgnore", "If 'true', the ignorePattern will be used, and anything matching it will be ignored.", false);
+		
+		Consumer<SettingsSpec.IntSetting> nonNegative = s -> s.min = 0;
+		spec.section("Scenario Options");
+		if(mc.hasElytra()) {
+			spec.integer("elytraDelay", "Ticks of elytra flight required before the camera automatically toggles if the 'elytra' option is enabled.", 7, nonNegative);
+		}
+		spec.integer("swimmingDelayStart", "Ticks of swimming required before the camera automatically toggles if the 'swim' option is enabled.", 0, nonNegative);
+		spec.integer("swimmingDelayEnd", "Ticks of not swimming required before the camera restores if the 'swim' option is enabled.", 10, nonNegative);
+		if(mc.hasSwimmingAnimation()) {
+			spec.bool("stickySwim", "If 'true', your head has to completely exit the water to count as 'not swimming anymore', for the purposes of restoring\nthe camera when you're done swimming. If 'false', you just have to stop doing the swimming animation.", true);
+		}
+		spec.pattern("customPattern", "Entity IDs that match this regular expression will be considered if the 'custom' option is enabled.", Pattern.compile("^minecraft:(cow|chicken)$"));
+		spec.pattern("ignorePattern", "Entity IDs that match this regular expression will be ignored if the 'useIgnore' option is enabled.", Pattern.compile("^examplemod:example$"));
+		
+		spec.section("Restoration");
+		spec.bool("autoRestore", "When the situation that Auto Third Person put you into third person for is over,\nthe camera will be restored back to the way it was.", true);
+		spec.bool("cancelAutoRestore", "If 'true', pressing f5 after mounting something will prevent your camera\nfrom being automatically restored to first-person when you dismount.", true);
+		
+		spec.section("Extras");
+		spec.bool("skipFrontView", "Skip the 'third-person front' camera mode when pressing F5.", false);
+		spec.bool("logSpam", "Dump a bunch of debug crap into the log.\nMight be handy!", false);
+		
+		return spec;
 	}
 }
