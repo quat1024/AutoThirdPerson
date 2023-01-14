@@ -43,6 +43,11 @@ public class NineteenTwoMinecraftInteraction implements MinecraftInteraction {
 	}
 	
 	@Override
+	public boolean debugScreenUp() {
+		return client.options.renderDebug;
+	}
+	
+	@Override
 	public boolean safeToTick() {
 		return client.player != null && client.level != null && !client.isPaused();
 	}

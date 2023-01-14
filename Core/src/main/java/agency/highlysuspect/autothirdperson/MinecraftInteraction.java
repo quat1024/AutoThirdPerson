@@ -14,8 +14,14 @@ public interface MinecraftInteraction {
 	/** Whether this Minecraft version has an special swimming animation (post-1.13) */
 	boolean hasSwimmingAnimation();
 	
+	/** Wrap the current Minecraft camera type */
 	MyCameraType getCameraType();
+	
+	/** Unwrap and set the current Minecraft camera type */
 	void setCameraType(MyCameraType type);
+	
+	/** Whether the player has the f3 menu up */
+	boolean debugScreenUp();
 	
 	/** @return Player exists, level exists, game is not paused, etc */
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")

@@ -59,7 +59,7 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	/// internal api ///
 	
 	private void debugSpam(String msg, Object... args) {
-		if(loader.settings().logSpam()) logger.info(msg, args);
+		if(mc.debugScreenUp() || loader.settings().logSpam()) logger.info(msg, args);
 	}
 	
 	private void tickClient() {
