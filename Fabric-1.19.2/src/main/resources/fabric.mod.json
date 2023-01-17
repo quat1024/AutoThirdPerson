@@ -12,8 +12,8 @@
 		"sources": "https://github.com/quat1024/AutoThirdPerson"
 	},
 	"license": "LGPL-3.0-or-later",
-	"icon": "assets/auto_third_person/atp_64x.png",
-	"environment": "*",
+	"icon": "auto_third_person_64x.png",
+	"environment": "client",
 	"entrypoints": {
 		"client": [
 			"agency.highlysuspect.autothirdperson.fabric.FabricEntrypoint"
@@ -23,7 +23,7 @@
 		"auto_third_person.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.7.4",
+		"fabricloader": "*",
 		"fabric-resource-loader-v0": "*",
 		"fabric-lifecycle-events-v1": "*",
 		"fabric-command-api-v2": "*",
