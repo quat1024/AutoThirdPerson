@@ -15,14 +15,10 @@ jobs:
       - name: Build with Gradle™
         uses: gradle/gradle-build-action@v2.3.3
         with:
-          arguments: clean build
+          arguments: clean build collectJars
 
       - name: Upload artifacts™
         uses: actions/upload-artifact@v3
         with:
           name: Artifacts
-          path: |
-            Fabric-1.19.2/build/libs
-            Forge-1.19.2/build/libs
-            Fabric-1.18.2/build/libs
-            Forge-1.18.2/build/libs
+          path: everyJar
