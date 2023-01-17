@@ -3,6 +3,8 @@ package agency.highlysuspect.autothirdperson.fabric;
 import agency.highlysuspect.autothirdperson.AtpSettings;
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 import agency.highlysuspect.autothirdperson.LoaderInteraction;
+import agency.highlysuspect.crummyconfig.CookedCrummyConfig;
+import agency.highlysuspect.crummyconfig.UncookedCrummyConfig;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -17,12 +19,12 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import java.io.IOException;
 
 public class FabricLoaderInteraction implements LoaderInteraction {
-	private CrummyConfig uncookedConfig;
+	private UncookedCrummyConfig uncookedConfig;
 	private AtpSettings settings = AtpSettings.MISSING;
 	
 	@Override
 	public void init() {
-		uncookedConfig = new CrummyConfig(
+		uncookedConfig = new UncookedCrummyConfig(
 			FabricLoader.getInstance().getConfigDir().resolve(AutoThirdPerson.MODID + ".cfg"),
 			AutoThirdPerson.instance.buildSettingsSpec()
 		);

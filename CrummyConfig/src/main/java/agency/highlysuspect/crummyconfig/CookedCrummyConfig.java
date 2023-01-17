@@ -1,11 +1,11 @@
-package agency.highlysuspect.autothirdperson.fabric;
+package agency.highlysuspect.crummyconfig;
 
 import agency.highlysuspect.autothirdperson.AtpSettings;
 
 import java.util.regex.Pattern;
 
 public class CookedCrummyConfig implements AtpSettings {
-	public CookedCrummyConfig(CrummyConfig raw) {
+	public CookedCrummyConfig(UncookedCrummyConfig raw) {
 		configVersion = raw.ints.get("configVersion");
 		boat = raw.bools.get("boat");
 		cart = raw.bools.get("cart");

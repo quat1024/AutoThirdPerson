@@ -21,3 +21,11 @@ If there's an artifact for only one loader on a given version, I don't use an `X
 ### `[Loader]-[...]`
 
 Code and resources specific to each distributed artifact. This project has access to the modloader, and can implement `LoaderInteraction`. It also plugs everything in to the modloader, initializing the Core with the appropriate Interaction APIs.
+
+### `CrummyConfig`
+
+Lowest-common-denominator config system that only depends on the config intermediate representation in `:Core`, so it can be used on platforms without an ecosystem config system to plug into, thanks Fabric.
+
+Create an `UncookedCrummyConfig` - you supply a `Path` to load the file from - and call `load` whenever you want (probably plug this into F3+T or a client command). Turn this into something `AutoThirdPerson` can use with `CookedCrummyConfig`.
+
+Despite it being basic it produces kinda nice looking config files imo ;)

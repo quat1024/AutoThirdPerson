@@ -1,4 +1,4 @@
-package agency.highlysuspect.autothirdperson.fabric;
+package agency.highlysuspect.crummyconfig;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 import agency.highlysuspect.autothirdperson.SettingsSpec;
@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class CrummyConfig {
-	public CrummyConfig(Path path, SettingsSpec spec) {
+public class UncookedCrummyConfig {
+	public UncookedCrummyConfig(Path path, SettingsSpec spec) {
 		this.spec = spec;
 		this.path = path;
 		

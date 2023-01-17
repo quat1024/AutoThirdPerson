@@ -1,0 +1,17 @@
+plugins {
+	id "java"
+}
+
+archivesBaseName = "${rootProject.name}-crummyconfig"
+
+dependencies {
+	implementation project(":Core")
+}
+
+processResources {
+	from project(":Core").sourceSets.main.resources
+}
+
+tasks.withType(JavaCompile) {
+	source(project(":Core").sourceSets.main.allSource)
+}
