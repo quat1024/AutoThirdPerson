@@ -237,7 +237,7 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	public SettingsSpec buildSettingsSpec() {
 		SettingsSpec spec = new SettingsSpec();
 		
-		spec.integer("configVersion", null, 6);
+		spec.integer("configVersion", null, 6, s -> s.writeDefaultComment = false);
 		
 		spec.section("Scenarios");
 		spec.bool("boat", "Automatically go into third person when riding a boat?", true);

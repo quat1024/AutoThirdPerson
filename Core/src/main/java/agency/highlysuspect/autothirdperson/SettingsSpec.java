@@ -62,6 +62,10 @@ public class SettingsSpec implements Iterable<SettingsSpec.Entry> {
 		entries.forEach(visitor);
 	}
 	
+	public Setting<?> getSetting(String name) {
+		return allSettings.get(name);
+	}
+	
 	public IntSetting getIntSetting(String name) {
 		return allIntSettings.get(name);
 	}
@@ -120,9 +124,11 @@ public class SettingsSpec implements Iterable<SettingsSpec.Entry> {
 			this.defaultValue = defaultValue;
 		}
 		
-		public String name;
-		public @Nullable String comment;
-		public T defaultValue;
+		public final String name;
+		public final @Nullable String comment;
+		public final T defaultValue;
+		
+		public boolean writeDefaultComment = true;
 	}
 	
 	public static class IntSetting extends Setting<Integer> {
@@ -139,6 +145,10 @@ public class SettingsSpec implements Iterable<SettingsSpec.Entry> {
 		
 		public boolean hasMax() {
 			return max != Integer.MAX_VALUE;
+		}
+		
+		public int clamp(int value) {
+			return Math.min(Math.max(value, min), max);
 		}
 	}
 	

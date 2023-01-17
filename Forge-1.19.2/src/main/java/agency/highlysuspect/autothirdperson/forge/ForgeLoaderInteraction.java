@@ -13,7 +13,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class ForgeLoaderInteraction implements LoaderInteraction {
 	private UncookedForgeSettings uncookedForgeSettings;
-	private AtpSettings cookedForgeSettings = AtpSettings.DEFAULT_TODO;
+	private AtpSettings cookedForgeSettings = AtpSettings.MISSING;
 	
 	@Override
 	public void init() {

@@ -146,6 +146,11 @@ public class NineteenTwoMinecraftInteraction implements MinecraftInteraction {
 		}
 		
 		@Override
+		public void warn(String msg, Object... args) {
+			logger.warn(msg, args);
+		}
+		
+		@Override
 		public void error(String msg, Throwable err) {
 			logger.error(msg, err);
 		}

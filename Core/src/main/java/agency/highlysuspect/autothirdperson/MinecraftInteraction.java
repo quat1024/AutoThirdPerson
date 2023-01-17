@@ -39,7 +39,7 @@ public interface MinecraftInteraction {
 	/** We have Log4j at home */
 	interface MyLogger {
 		void info(String msg, Object... args);
-		
+		void warn(String msg, Object... args);
 		void error(String msg, Throwable err);
 	}
 	

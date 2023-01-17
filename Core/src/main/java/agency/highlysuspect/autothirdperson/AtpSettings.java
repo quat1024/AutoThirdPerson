@@ -30,7 +30,7 @@ public interface AtpSettings {
 	boolean skipFrontView();
 	boolean logSpam();
 	
-	AtpSettings DEFAULT_TODO = new AtpSettings() {
+	AtpSettings MISSING = new AtpSettings() {
 		@Override
 		public int configVersion() {
 			return 0;

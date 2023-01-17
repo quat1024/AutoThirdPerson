@@ -1,46 +1,30 @@
-package agency.highlysuspect.autothirdperson.forge;
+package agency.highlysuspect.autothirdperson.fabric;
 
 import agency.highlysuspect.autothirdperson.AtpSettings;
-import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 
 import java.util.regex.Pattern;
 
-public class CookedForgeSettings implements AtpSettings {
-	public CookedForgeSettings(UncookedForgeSettings raw) {
-		configVersion = raw.ints.get("configVersion").get();
-		boat = raw.bools.get("boat").get();
-		cart = raw.bools.get("cart").get();
-		animal = raw.bools.get("animal").get();
-		elytra = raw.bools.get("elytra").get();
-		swim = raw.bools.get("swim").get();
-		custom = raw.bools.get("custom").get();
-		useIgnore = raw.bools.get("useIgnore").get();
-		elytraDelay = raw.ints.get("elytraDelay").get();
-		swimmingDelayStart = raw.ints.get("swimmingDelayStart").get();
-		swimmingDelayEnd = raw.ints.get("swimmingDelayEnd").get();
-		stickySwim = raw.bools.get("stickySwim").get();
-		autoRestore = raw.bools.get("autoRestore").get();
-		cancelAutoRestore = raw.bools.get("cancelAutoRestore").get();
-		skipFrontView = raw.bools.get("skipFrontView").get();
-		logSpam = raw.bools.get("logSpam").get();
+public class CookedCrummyConfig implements AtpSettings {
+	public CookedCrummyConfig(CrummyConfig raw) {
+		configVersion = raw.ints.get("configVersion");
+		boat = raw.bools.get("boat");
+		cart = raw.bools.get("cart");
+		animal = raw.bools.get("animal");
+		elytra = raw.bools.get("elytra");
+		swim = raw.bools.get("swim");
+		custom = raw.bools.get("custom");
+		useIgnore = raw.bools.get("useIgnore");
+		elytraDelay = raw.ints.get("elytraDelay");
+		swimmingDelayStart = raw.ints.get("swimmingDelayStart");
+		swimmingDelayEnd = raw.ints.get("swimmingDelayEnd");
+		stickySwim = raw.bools.get("stickySwim");
+		autoRestore = raw.bools.get("autoRestore");
+		cancelAutoRestore = raw.bools.get("cancelAutoRestore");
+		skipFrontView = raw.bools.get("skipFrontView");
+		logSpam = raw.bools.get("logSpam");
 		
-		Pattern cust;
-		try {
-			cust = Pattern.compile(raw.patterns.get("customPattern").get());
-		} catch (Exception e) {
-			AutoThirdPerson.instance.logger.error("Exception loading customPattern: ", e);
-			cust = Pattern.compile(raw.patterns.get("customPattern").getDefault());
-		}
-		this.customPattern = cust;
-		
-		Pattern ignore;
-		try {
-			ignore = Pattern.compile(raw.patterns.get("ignorePattern").get());
-		} catch (Exception e) {
-			AutoThirdPerson.instance.logger.error("Exception loading ignorePattern: ", e);
-			ignore = Pattern.compile(raw.patterns.get("ignorePattern").getDefault());
-		}
-		this.ignorePattern = ignore;
+		customPattern = raw.patterns.get("customPattern");
+		ignorePattern = raw.patterns.get("ignorePattern");
 	}
 	
 	private final int configVersion;
