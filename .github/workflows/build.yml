@@ -24,3 +24,5 @@ jobs:
           path: |
             Fabric-1.19.2/build/libs
             Forge-1.19.2/build/libs
+            Fabric-1.18.2/build/libs
+            Forge-1.18.2/build/libs

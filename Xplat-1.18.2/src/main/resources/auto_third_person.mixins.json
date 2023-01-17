@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "agency.highlysuspect.autothirdperson.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"mixins": [
+	],
+	"client": ["LocalPlayerMixin", "MinecraftMixin", "CameraTypeMixin"],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"refmap": "auto_third_person.refmap.json"
+}

@@ -22,4 +22,8 @@ include(
 	"Xplat-1.19.2",
 	"Fabric-1.19.2",
 	"Forge-1.19.2",
+	
+	"Xplat-1.18.2",
+	"Fabric-1.18.2",
+	"Forge-1.18.2",
 )

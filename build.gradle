@@ -38,3 +38,12 @@ subprojects {
 		mavenCentral()
 	}
 }
+
+task("genAllIntellijRuns") {
+	dependsOn([
+		":Fabric-1.19.2:ideaSyncTask",
+		":Fabric-1.18.2:ideaSyncTask",
+		":Forge-1.19.2:genIntellijRuns",
+		":Forge-1.18.2:genIntellijRuns",
+	])
+}

@@ -2,36 +2,36 @@ plugins {
 	id "fabric-loom" version "1.0.17"
 }
 
-archivesBaseName = "${rootProject.name}-fabric-1.19.2"
+archivesBaseName = "${rootProject.name}-fabric-1.18.2"
 
 dependencies {
 	//Minecraft
-	minecraft "com.mojang:minecraft:1.19.2"
+	minecraft "com.mojang:minecraft:1.18.2"
 	mappings loom.officialMojangMappings()
 	
 	//Fabric loader
 	modImplementation "net.fabricmc:fabric-loader:0.14.9"
 	
 	//Fabric API
-	modImplementation fabricApi.module("fabric-resource-loader-v0", "0.59.0+1.19.2")
-	modImplementation fabricApi.module("fabric-lifecycle-events-v1", "0.59.0+1.19.2")
-	modImplementation fabricApi.module("fabric-command-api-v2", "0.59.0+1.19.2")
+	modImplementation fabricApi.module("fabric-resource-loader-v0", "0.48.0+1.18.2")
+	modImplementation fabricApi.module("fabric-lifecycle-events-v1", "0.48.0+1.18.2")
+	modImplementation fabricApi.module("fabric-command-api-v1", "0.48.0+1.18.2")
 	
 	//Xplat
-	implementation project(":Xplat-1.19.2")
+	implementation project(":Xplat-1.18.2")
 	implementation project(":CrummyConfig")
 	implementation project(":Core")
 }
 
 //fold in xplat resources and sources
 processResources {
-	from project(":Xplat-1.19.2").sourceSets.main.resources
+	from project(":Xplat-1.18.2").sourceSets.main.resources
 	from project(":CrummyConfig").sourceSets.main.resources
 	from project(":Core").sourceSets.main.resources
 }
 
 tasks.withType(JavaCompile) {
-	source(project(":Xplat-1.19.2").sourceSets.main.allSource)
+	source(project(":Xplat-1.18.2").sourceSets.main.allSource)
 	source(project(":CrummyConfig").sourceSets.main.allSource)
 	source(project(":Core").sourceSets.main.allSource)
 }
@@ -41,13 +41,13 @@ loom {
 	runs {
 		client {
 			client()
-			setConfigName("Fabric 1.19.2 Client")
+			setConfigName("Fabric 1.18.2 Client")
 			ideConfigGenerated(true)
 			runDir("./run")
 		}
 		server {
 			server()
-			setConfigName("Fabric 1.19.2 Server")
+			setConfigName("Fabric 1.18.2 Server")
 			ideConfigGenerated(true)
 			runDir("./run")
 		}

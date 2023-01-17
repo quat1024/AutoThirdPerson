@@ -1,0 +1,32 @@
+{
+	"schemaVersion": 1,
+	"id": "auto_third_person",
+	"version": "${version}",
+	"name": "Auto Third Person",
+	"description": "Puts you in third person when you like, get in a boat and stuff.",
+	"authors": [
+		"quaternary"
+	],
+	"contact": {
+		"homepage": "https://highlysuspect.agency",
+		"sources": "https://github.com/quat1024/AutoThirdPerson"
+	},
+	"license": "LGPL-3.0-or-later",
+	"icon": "auto_third_person_64x.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"agency.highlysuspect.autothirdperson.fabric.FabricEntrypoint"
+		]
+	},
+	"mixins": [
+		"auto_third_person.mixins.json"
+	],
+	"depends": {
+		"fabricloader": "*",
+		"fabric-resource-loader-v0": "*",
+		"fabric-lifecycle-events-v1": "*",
+		"fabric-command-api-v1": "*",
+		"minecraft": ">=1.18"
+	}
+}
