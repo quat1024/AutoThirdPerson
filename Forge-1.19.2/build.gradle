@@ -13,6 +13,8 @@ apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
+ext.gimmeJava(17)
+
 archivesBaseName = "${rootProject.name}-forge-1.19.2"
 
 mixin {

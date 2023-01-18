@@ -2,25 +2,71 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
+//beware that IDEA uses the term "project" to refer to the top-level thing, and "module" to refer to children,
+//but Gradle would call those the "root project" and "projects"/"subprojects" respectively
+//with that said:
+//set the *default* (project-wide, not module-wide) IDEA language level to 17
+//the default language level is sometimes used for things like determining which JDK to run Gradle with.
+//this project mixes java versions across the modules, and IDEA seems to be a bit unpredictable about
+//which one it decides to use as the default.
+//TODO: doesn't seem to work? it's still picking java 6
+apply plugin: "idea"
+idea.project {
+	languageLevel("JDK_17")
+}
+
+//this block is executed for each subproject, as if it was copied and pasted into the buildscript
 subprojects {
 	apply plugin: "java"
+	apply plugin: "idea"
 	
-	java {
-		toolchain {
-			languageVersion = JavaLanguageVersion.of(17)
+	//defines a function available through ext.gimmeJava (basically, a crude form of gradle plugin)
+	//this configures a project-specific gradle toolchain
+	project.ext.gimmeJava = (int ver) -> {
+		if(ver <= 8) {
+			//For java 6-8 projects, use a java 8 toolchain and set target/source compatibility
+			java.toolchain {
+				project.logger.lifecycle("{}: configuring Java 8 toolchain", project.displayName)
+				languageVersion = JavaLanguageVersion.of(8)
+				vendor = JvmVendorSpec.ADOPTIUM
+			}
+			
+			String compat = "1." + ver
+			//i forgor if setting these on project scope does anything but it can't hurt..?????
+			it.sourceCompatibility = compat
+			it.targetCompatibility = compat
+			tasks.withType(JavaCompile).configureEach {
+				project.logger.lifecycle("{}: setting source/target compatibility to {} on task {}", project.displayName, compat, it.name)
+				sourceCompatibility = compat
+				targetCompatibility = compat
+			}
+		} else {
+			//For newer versions, use the exact requested toolchain and set -release flag
+			java.toolchain {
+				project.logger.lifecycle("{}: configuring Java {} toolchain", project.displayName, ver)
+				languageVersion = JavaLanguageVersion.of(ver)
+				vendor = JvmVendorSpec.ADOPTIUM
+			}
+			
+			tasks.withType(JavaCompile).configureEach {
+				project.logger.lifecycle("{}: setting release to {} on task {}", project.displayName, ver, it.name)
+				options.release = ver
+			}
 		}
 	}
 	
+	//i heard this is good practice? sure
 	tasks.withType(JavaCompile).configureEach {
 		it.options.encoding = "UTF-8"
-		it.options.release = 17
 	}
 	
+	//probably broken due to all the remapping nonsense that minecraft gradle plugins do
+	//not entirely sure, though (and also not really sure what this does in the first place)
 	tasks.withType(GenerateModuleMetadata) {
-		//This shit is broke
-		enabled = false
+		enabled = false //probably broken
 	}
 	
+	//substitute ${version} placeholders in certain files in /resources
 	processResources {
 		inputs.property "version", project.version
 		
@@ -29,12 +75,8 @@ subprojects {
 		}
 	}
 	
-	dependencies {
-		//This mf keeps disappearing on me
-		implementation "org.jetbrains:annotations:16.0.2"
-	}
-	
 	repositories {
+		//mainly so i don't have to keep configuring where to get mixin stuff from a zillion times on forge projects
 		maven {
 			name = "spunchbob"
 			url = "https://repo.spongepowered.org/repository/maven-public/"
@@ -43,10 +85,25 @@ subprojects {
 			}
 		}
 		
-		mavenCentral()
+		//i want my nonnull annotations
+		mavenCentral({
+			content {
+				includeGroup("org.jetbrains")
+			}
+		})
+	}
+	
+	//give me my nonnull annotations
+	dependencies {
+		implementation "org.jetbrains:annotations:16.0.2"
 	}
 }
 
+//shitty task that (somewhat brute-forcely) looks in every applicable project's build/libs/ directory and pastes the files out
+//this is mainly because the Github Actions upload-artifact task is annoying and keeps the same folder structure
+//like if you have it upload fabric-1.18.2/build/libs/blah.jar it will end up inside that same path inside the release zip
+//thats irritating, let's copy them into the same folder so actions will also put them inside one folder
+//(it doesn't actually depend on any of the build tasks, so run this after building)
 Path everyJar = project.file("everyJar").toPath()
 task("collectJars") {
 	setGroup("aaaaaaaaaaaaa")
@@ -59,7 +116,7 @@ task("collectJars") {
 				Path libsDir = p.getBuildDir().toPath().resolve("libs")
 				if(Files.notExists(libsDir)) continue
 				
-				//pick the one with the shortest filename (the one without -dev or -sources)
+				//pick the one with the shortest filename (which will be the one without -dev or -sources)
 				Files.list(libsDir)
 					.sorted(Comparator.comparing(path -> path.toString().length()))
 					.findFirst()

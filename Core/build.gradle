@@ -2,4 +2,6 @@ plugins {
 	id "java"
 }
 
+ext.gimmeJava(6)
+
 archivesBaseName = "${rootProject.name}-core"

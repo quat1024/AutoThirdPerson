@@ -2,6 +2,8 @@ plugins {
 	id "fabric-loom" version "1.0.17"
 }
 
+ext.gimmeJava(17)
+
 archivesBaseName = "${rootProject.name}-fabric-1.18.2"
 
 dependencies {
