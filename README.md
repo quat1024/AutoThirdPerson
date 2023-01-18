@@ -6,6 +6,8 @@ LGPL 3.0 or later.
 
 ## Warning
 
+Forge 1.16.5 is broken i don't know why. I commented it out in the settings.gradle so it won't get built.
+
 You need a *lot* of RAM to run `./gradlew build`, which builds every project. `gradle.properties` allows Gradle 4 gigabytes of RAM, which will only grow as I add more projects. Try commenting out some subproject declarations in `settings.gradle` if you're having issues. (As a side effect, if you're moving to a new computer, compiling this project is a great way to populate your Gradle cache.)
 
 Parallel building has been disabled in `gradle.properties`, because there seems to be some bug where if you invoke multiple Looms at the same time they stomp on each other, and I wouldn't be surprised if there was a ForgeGradle bug too. Apologies in advance for the lost performance.
