@@ -5,11 +5,10 @@ package agency.highlysuspect.autothirdperson;
  */
 public interface LoaderInteraction {
 	/**
-	 * called right after setting up AutoThirdPerson, atp.instance is available
+	 * called right after setting up AutoThirdPerson. atp.instance is available.
+	 * It's ok to not use this, but :Core uses java 6 and default methods are not supported ;) 
 	 */
-	default void init() {
-		
-	}
+	void init();
 	
 	/**
 	 * @return The current settings.

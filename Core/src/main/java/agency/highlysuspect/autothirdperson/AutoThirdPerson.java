@@ -2,7 +2,6 @@ package agency.highlysuspect.autothirdperson;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 /**
@@ -29,7 +28,12 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	
 	public void init() {
 		loader.init();
-		loader.registerClientTicker(this::tickClient);
+		loader.registerClientTicker(new Runnable() {
+			@Override
+			public void run() {
+				tickClient();
+			}
+		});
 	}
 	
 	/// external api ///
@@ -237,7 +241,12 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	public SettingsSpec buildSettingsSpec() {
 		SettingsSpec spec = new SettingsSpec();
 		
-		spec.integer("configVersion", null, 6, s -> s.writeDefaultComment = false);
+		spec.integer("configVersion", null, 6, new MyConsumer<SettingsSpec.IntSetting>() {
+			@Override
+			public void accept(SettingsSpec.IntSetting thing) {
+				thing.writeDefaultComment = false;
+			}
+		});
 		
 		spec.section("Scenarios");
 		spec.bool("boat", "Automatically go into third person when riding a boat?", true);
@@ -254,7 +263,13 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		spec.bool("custom", "If 'true', the customPattern will be used, and riding anything matching it will toggle third person.", false);
 		spec.bool("useIgnore", "If 'true', the ignorePattern will be used, and anything matching it will be ignored.", false);
 		
-		Consumer<SettingsSpec.IntSetting> nonNegative = s -> s.min = 0;
+		MyConsumer<SettingsSpec.IntSetting> nonNegative = new MyConsumer<SettingsSpec.IntSetting>() {
+			@Override
+			public void accept(SettingsSpec.IntSetting thing) {
+				thing.min = 0;
+			}
+		};
+		
 		spec.section("Scenario Options");
 		if(mc.hasElytra()) {
 			spec.integer("elytraDelay", "Ticks of elytra flight required before the camera automatically toggles if the 'elytra' option is enabled.", 7, nonNegative);

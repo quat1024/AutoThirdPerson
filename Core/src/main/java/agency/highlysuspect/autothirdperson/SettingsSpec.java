@@ -5,11 +5,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,10 +25,10 @@ public class SettingsSpec implements Iterable<SettingsSpec.Entry> {
 	}
 	
 	public void integer(String name, @Nullable String comment, int defaultValue) {
-		integer(name, comment, defaultValue, x -> {});
+		integer(name, comment, defaultValue, MyConsumerUtil.<IntSetting>doNothing());
 	}
 	
-	public void integer(String name, @Nullable String comment, int defaultValue, Consumer<IntSetting> configurator) {
+	public void integer(String name, @Nullable String comment, int defaultValue, MyConsumer<IntSetting> configurator) {
 		IntSetting setting = new IntSetting(name, comment, defaultValue);
 		configurator.accept(setting);
 		entries.add(setting);
@@ -58,8 +58,10 @@ public class SettingsSpec implements Iterable<SettingsSpec.Entry> {
 		return entries.iterator();
 	}
 	
-	public void visitEntries(Consumer<Entry> visitor) {
-		entries.forEach(visitor);
+	public void visitEntries(MyConsumer<Entry> visitor) {
+		for(Entry e : entries) {
+			visitor.accept(e);
+		}
 	}
 	
 	public Setting<?> getSetting(String name) {
@@ -80,12 +82,12 @@ public class SettingsSpec implements Iterable<SettingsSpec.Entry> {
 	
 	/// bookkeeping ///
 	
-	private final List<Entry> entries = new ArrayList<>();
+	private final List<Entry> entries = new ArrayList<Entry>();
 	
-	private final Map<String, Setting<?>> allSettings = new HashMap<>();
-	private final Map<String, IntSetting> allIntSettings = new HashMap<>();
-	private final Map<String, BoolSetting> allBoolSettings = new HashMap<>();
-	private final Map<String, PatternSetting> allPatternSettings = new HashMap<>();
+	private final Map<String, Setting<?>> allSettings = new HashMap<String, Setting<?>>();
+	private final Map<String, IntSetting> allIntSettings = new HashMap<String, IntSetting>();
+	private final Map<String, BoolSetting> allBoolSettings = new HashMap<String, BoolSetting>();
+	private final Map<String, PatternSetting> allPatternSettings = new HashMap<String, PatternSetting>();
 	
 	public interface Entry {}
 	

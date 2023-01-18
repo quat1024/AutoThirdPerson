@@ -43,15 +43,18 @@ public class UncookedCrummyConfig {
 		List<String> out = new ArrayList<>();
 		
 		for(SettingsSpec.Entry entry : spec) {
-			if(entry instanceof SettingsSpec.Section sec) {
-				String bar = "#".repeat(sec.name.length() + 6);
+			if(entry instanceof SettingsSpec.Section) {
+				SettingsSpec.Section sec = (SettingsSpec.Section) entry;
+				String bar = repeat("#", sec.name.length() + 6);
 				out.add(bar);
 				out.add("## " + sec.name + " ##");
 				out.add(bar);
-			} else if(entry instanceof SettingsSpec.Setting<?> genericSetting) {
+			} else if(entry instanceof SettingsSpec.Setting<?>) {
+				SettingsSpec.Setting<?> genericSetting = (SettingsSpec.Setting<?>) entry;
 				if(genericSetting.comment != null) for(String commentLine : genericSetting.comment.split("\n")) out.add("# " + commentLine);
 				if(genericSetting.writeDefaultComment) out.add("# Default: " + stringifyValue(genericSetting.defaultValue));
-				if(entry instanceof SettingsSpec.IntSetting i) {
+				if(entry instanceof SettingsSpec.IntSetting) {
+					SettingsSpec.IntSetting i = (SettingsSpec.IntSetting) entry;
 					if(i.hasMin()) out.add("# Must be at least " + i.min + ".");
 					if(i.hasMax()) out.add("# Must be at most " + i.max + ".");
 				}
@@ -73,7 +76,7 @@ public class UncookedCrummyConfig {
 		
 		for(int line = 0; line < lines.size(); line++) {
 			String s = lines.get(line).trim();
-			if(s.isBlank() || s.startsWith("#")) continue;
+			if(s.isEmpty() || s.startsWith("#")) continue;
 			
 			String[] split = s.split("=", 2);
 			if(split.length != 2) {
@@ -103,7 +106,8 @@ public class UncookedCrummyConfig {
 	})
 	private <T> void readOne(SettingsSpec.Setting<T> opt, String valueStr) throws Exception {
 		Map<String, T> destination = chooseMap(opt);
-		if(opt instanceof SettingsSpec.IntSetting i) {
+		if(opt instanceof SettingsSpec.IntSetting) {
+			SettingsSpec.IntSetting i = (SettingsSpec.IntSetting) opt;
 			Object value = i.clamp(Integer.parseInt(valueStr));
 			destination.put(opt.name, (T) value);
 		} else if(opt instanceof SettingsSpec.BoolSetting) {
@@ -117,7 +121,12 @@ public class UncookedCrummyConfig {
 	}
 	
 	private void loadDefaultValues() {
-		for(SettingsSpec.Entry entry : spec) if(entry instanceof SettingsSpec.Setting<?> genericSetting) loadDefaultValue(genericSetting);
+		for(SettingsSpec.Entry entry : spec) {
+			if(entry instanceof SettingsSpec.Setting<?>) {
+				SettingsSpec.Setting<?> genericSetting = (SettingsSpec.Setting<?>) entry;
+				loadDefaultValue(genericSetting);
+			}
+		}
 	}
 	
 	//broken into another method in order to name <T>
@@ -139,5 +148,14 @@ public class UncookedCrummyConfig {
 		//Should be unreachable...
 		AutoThirdPerson.instance.logger.warn("Missing settings map for setting {}. This is a bug!", opt.name);
 		return new HashMap<>();
+	}
+	
+	//Functionally the same as String#repeat, but Java 8 compatible.
+	private static String repeat(String in, int count) {
+		StringBuilder bob = new StringBuilder(in.length() * count);
+		for(int i = 0; i < count; i++) {
+			bob.append(in);
+		}
+		return bob.toString();
 	}
 }
