@@ -4,6 +4,14 @@ Puts you in third person when you do certain things.
 
 LGPL 3.0 or later.
 
+## Warning
+
+You need a *lot* of RAM to run `build`, which builds every project at the same time. `gradle.properties` allows Gradle 4 gigabytes of RAM, which will only grow as I add more projects. Try commenting out some subproject declarations in `settings.gradle` if you're having issues.
+
+Parallel building has been disabled in `gradle.properties`, because there seems to be some bug where if you invoke multiple Looms at the same time, they stomp on each other. Apologies in advance for the lost performance.
+
+Loom will sometimes explode with some nonsense about being unable to parse the version numbers provided in the `fabricApi.module` calls. If this happens just try again. (this might be related to the race condition) 
+
 ## Subprojects guided tour
 
 These subprojects depend on each other with - I dunno if it's a real Gradle term, but with "textual dependencies", where the compilation classpath of the dependent is directly added to the compilation classpath of the dependee. This means there isn't a `Fabric-1.19.2` artifact that depends on `Core` as a separate artifact; it just contains the classes from `Core` instead. That's the goal anyways.
