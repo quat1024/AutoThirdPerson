@@ -109,23 +109,30 @@ task("collectJars") {
 	setGroup("aaaaaaaaaaaaa")
 	setDescription("Copy build artifacts into top-level `everyJar` folder")
 	doLast {
-		Files.createDirectories(everyJar)
-		for(Project p : getSubprojects()) {
-			if(p.name.startsWith("Fabric") || p.name.startsWith("Forge")) {
-				//look inside build/libs/ directory
-				Path libsDir = p.getBuildDir().toPath().resolve("libs")
-				if(Files.notExists(libsDir)) continue
-				
-				//pick the one with the shortest filename (which will be the one without -dev or -sources)
-				Files.list(libsDir)
-					.sorted(Comparator.comparing(path -> path.toString().length()))
-					.findFirst()
-					.ifPresent(shortest -> {
-						//copy into everyJar directory
-						Path dest = everyJar.resolve(shortest.getFileName().toString())
-						Files.copy(shortest, dest, StandardCopyOption.REPLACE_EXISTING)
-					})
+		project.logger.lifecycle("everyJar: {}", everyJar)
+		for (Project p : getSubprojects()) {
+			Path destDir;
+			if (p.name.startsWith("Fabric") || p.name.startsWith("Forge")) {
+				destDir = everyJar
+			} else {
+				destDir = everyJar.resolve("others")
 			}
+			Files.createDirectories(destDir)
+			
+			//look inside build/libs/ directory
+			Path libsDir = p.getBuildDir().toPath().resolve("libs")
+			if (Files.notExists(libsDir)) continue
+			
+			//pick the one with the shortest filename (which will be the one without -dev or -sources)
+			Files.list(libsDir)
+				.sorted(Comparator.comparing(path -> path.toString().length()))
+				.findFirst()
+				.ifPresent(shortest -> {
+					//copy into everyJar directory
+					Path dest = destDir.resolve(shortest.getFileName().toString())
+					project.logger.lifecycle("Copying {} to {}", shortest, dest);
+					Files.copy(shortest, dest, StandardCopyOption.REPLACE_EXISTING)
+				})
 		}
 	}
 }

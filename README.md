@@ -4,9 +4,11 @@ Puts you in third person when you do certain things. This used to be a simple mo
 
 LGPL 3.0 or later.
 
-## Warning
+## Warnings
 
-Forge 1.16.5 is broken i don't know why. I commented it out in the settings.gradle so it won't get built.
+The 1.19.3 version is made extremely begrudgingly. There is literally no reason to play this version. Play 1.19.2.
+
+Forge 1.16.5 is broken, no i don't know why. The other Forges work. I commented it out in the settings.gradle so it won't get built.
 
 You need a *lot* of RAM to run `./gradlew build`, which builds every project. `gradle.properties` allows Gradle 4 gigabytes of RAM, which will only grow as I add more projects. Try commenting out some subproject declarations in `settings.gradle` if you're having issues. (As a side effect, if you're moving to a new computer, compiling this project is a great way to populate your Gradle cache.)
 
@@ -14,7 +16,7 @@ Parallel building has been disabled in `gradle.properties`, because there seems 
 
 Loom will sometimes explode with some nonsense about being unable to parse the version numbers provided in the `fabricApi.module` calls. If this happens just try again. (this might be related to the race condition)
 
-If ForgeGradle explodes with something about "ProjectScopeServices has been closed." that's some forgegradle bug with the daemon. `./gradlew --stop` fixes it. Yes, even if the daemon is already disabled, intellij sync always uses the daemon.
+If ForgeGradle explodes with something about "ProjectScopeServices has been closed." that's some forgegradle bug with the daemon. `./gradlew --stop` fixes it. Yes, even if the daemon is already disabled, intellij sync always uses the daemon. It's a good idea to run `--stop` after touching any forgegrade projects (especially adding a new one)
 
 Yes, touching literally anything to do with Gradle will cause it to logspam about configuring every project. This is because most Minecraft plugins don't support the gradle "configure on-demand" stuff.
 
@@ -38,7 +40,7 @@ Loader-agnostic, but not version-agnostic stuff. This project has access to Mine
 
 If there's an artifact for only one loader on a given version, I don't use an `Xplat` artifact to implement `MinecraftInteraction`, i'll just do them both.
 
-Must be compatible with that version's Java version, so, probably Java 17 or Java 8.
+Must be compatible with that version's Java version, so, probably Java 17 or 16 or 8.
 
 ### `[Loader]-[...]`
 
@@ -50,6 +52,10 @@ Also must be compatible with that version's Java version.
 
 Lowest-common-denominator config system that only depends on the config intermediate representation in `:Core`, so it can be used on platforms without an ecosystem config system to plug into, thanks Fabric.
 
-Must be compatible with Java 8.
+Must be compatible with Java 8, as it's used by Fabric 1.16.5. (Todo, it should probably be Java 6.)
 
 Create an `UncookedCrummyConfig` - you supply a `Path` to load the file from - and call `load` whenever you want (probably plug this into F3+T or a client command). Turn this into something `AutoThirdPerson` can use with `CookedCrummyConfig`.  Despite it being basic it produces kinda nice looking config files imo ;)
+
+## todo
+
+Evaluate [dropbox/focus](https://github.com/dropbox/focus) - i doubt it'll work because minecraft plugins do their expensive work in afterEvaluate, but who knows

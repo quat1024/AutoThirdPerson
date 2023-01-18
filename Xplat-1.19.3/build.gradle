@@ -1,0 +1,21 @@
+plugins {
+	id "java"
+	id "org.spongepowered.gradle.vanilla" version "0.2.1-SNAPSHOT"
+}
+
+ext.gimmeJava(17)
+
+archivesBaseName = "${rootProject.name}-xplat-1.19.3-please-play-1.19.2-instead"
+
+minecraft {
+	version("1.19.3")
+}
+
+dependencies {
+	compileOnly "org.spongepowered:mixin:0.8.5"
+	implementation project(":Core")
+}
+
+tasks.withType(JavaCompile) {
+	source(project(":Core").sourceSets.main.allSource)
+}
