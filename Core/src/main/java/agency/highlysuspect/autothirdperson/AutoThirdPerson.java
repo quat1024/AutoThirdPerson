@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.regex.Pattern;
 
 /**
- * Handle's the mod's main logic
+ * Handles the mod's main logic
  */
 public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderInteraction> {
 	public static final String MODID = "auto_third_person";
@@ -15,7 +15,7 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	
 	public final MC mc;
 	public final LI loader;
-	public final MinecraftInteraction.MyLogger logger;
+	public final MyLogger logger;
 	
 	public final State state;
 	
@@ -38,18 +38,18 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	
 	/// external api ///
 	
-	public void mount(MinecraftInteraction.Vehicle mounting) {
+	public void mount(Vehicle mounting) {
 		mountOrDismount(mounting, true);
 	}
 	
-	public void dismount(MinecraftInteraction.Vehicle dismounting) {
+	public void dismount(Vehicle dismounting) {
 		mountOrDismount(dismounting, false);
 	}
 	
-	public @Nullable MinecraftInteraction.MyCameraType modifyCycle(MinecraftInteraction.MyCameraType cycleFrom) {
-		if(loader.settings().skipFrontView() && cycleFrom == MinecraftInteraction.MyCameraType.THIRD_PERSON) {
+	public @Nullable MyCameraType modifyCycle(MyCameraType cycleFrom) {
+		if(loader.settings().skipFrontView() && cycleFrom == MyCameraType.THIRD_PERSON) {
 			debugSpam("Skipping third-person reversed view");
-			return MinecraftInteraction.MyCameraType.FIRST_PERSON;
+			return MyCameraType.FIRST_PERSON;
 		} else return null;
 	}
 	
@@ -102,7 +102,7 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		}
 	}
 	
-	private void mountOrDismount(MinecraftInteraction.Vehicle vehicle, boolean mounting) {
+	private void mountOrDismount(Vehicle vehicle, boolean mounting) {
 		if(!mc.safeToTick()) return;
 		AtpSettings settings = loader.settings();
 		
@@ -114,17 +114,17 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		}
 		
 		boolean doIt = false;
-		if(settings.boat() && vehicle.classification() == MinecraftInteraction.VehicleClassification.BOAT) {
+		if(settings.boat() && vehicle.classification() == VehicleClassification.BOAT) {
 			debugSpam("This is a boat!");
 			doIt = true;
 		}
 		
-		if(settings.cart() && vehicle.classification() == MinecraftInteraction.VehicleClassification.MINECART) {
+		if(settings.cart() && vehicle.classification() == VehicleClassification.MINECART) {
 			debugSpam("This is a minecart!");
 			doIt = true;
 		}
 		
-		if(settings.animal() && vehicle.classification() == MinecraftInteraction.VehicleClassification.ANIMAL) {
+		if(settings.animal() && vehicle.classification() == VehicleClassification.ANIMAL) {
 			debugSpam("This is an animal!");
 			doIt = true;
 		}
@@ -141,10 +141,10 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	}
 	
 	private void enterThirdPerson(Reason reason) {
-		if(state.reason == null && mc.getCameraType() == MinecraftInteraction.MyCameraType.FIRST_PERSON) {
+		if(state.reason == null && mc.getCameraType() == MyCameraType.FIRST_PERSON) {
 			state.oldPerspective = mc.getCameraType();
 			state.reason = reason;
-			mc.setCameraType(MinecraftInteraction.MyCameraType.THIRD_PERSON);
+			mc.setCameraType(MyCameraType.THIRD_PERSON);
 			debugSpam("Automatically entering third person due to {}", reason);
 		} else if(state.isActive()) {
 			state.reason = reason;
@@ -174,7 +174,7 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	}
 	
 	public static class State {
-		public MinecraftInteraction.MyCameraType oldPerspective = MinecraftInteraction.MyCameraType.FIRST_PERSON;
+		public MyCameraType oldPerspective = MyCameraType.FIRST_PERSON;
 		public @Nullable Reason reason;
 		
 		public int elytraFlyingTicks = 0;
@@ -219,11 +219,11 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	
 	@SuppressWarnings("ClassCanBeRecord")
 	public static final class MountingReason implements Reason {
-		public MountingReason(MinecraftInteraction.Vehicle vehicle) {
+		public MountingReason(Vehicle vehicle) {
 			this.vehicle = vehicle;
 		}
 		
-		private final MinecraftInteraction.Vehicle vehicle;
+		private final Vehicle vehicle;
 		
 		@Override
 		public boolean equals(Object other) {

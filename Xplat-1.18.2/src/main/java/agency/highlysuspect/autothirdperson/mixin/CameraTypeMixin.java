@@ -1,8 +1,8 @@
 package agency.highlysuspect.autothirdperson.mixin;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
-import agency.highlysuspect.autothirdperson.MinecraftInteraction;
 import agency.highlysuspect.autothirdperson.EightteenTwoMinecraftInteraction;
+import agency.highlysuspect.autothirdperson.MyCameraType;
 import net.minecraft.client.CameraType;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +21,8 @@ public class CameraTypeMixin {
 		AutoThirdPerson<?, ?> atp = AutoThirdPerson.instance;
 		EightteenTwoMinecraftInteraction mcInteraction = (EightteenTwoMinecraftInteraction) atp.mc;
 		
-		@Nullable MinecraftInteraction.MyCameraType cycleOverride = atp.modifyCycle(mcInteraction.wrapCameraType((CameraType) (Object) this));
+		@SuppressWarnings("ConstantConditions") //mixin cast
+		@Nullable MyCameraType cycleOverride = atp.modifyCycle(mcInteraction.wrapCameraType((CameraType) (Object) this));
 		
 		if(cycleOverride != null) {
 			ci.setReturnValue(mcInteraction.unwrapCameraType(cycleOverride));
