@@ -132,7 +132,6 @@ public class SixteenFiveMinecraftInteractions implements MinecraftInteraction {
 		}
 	}
 	
-	@SuppressWarnings("ClassCanBeRecord")
 	private static class Log4jMyLogger implements MyLogger {
 		public Log4jMyLogger(Logger logger) {
 			this.logger = logger;

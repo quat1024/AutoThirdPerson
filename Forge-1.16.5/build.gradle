@@ -58,7 +58,7 @@ minecraft {
 }
 
 dependencies {
-	minecraft "net.minecraftforge:forge:1.16.5-36.2.39"
+	minecraft "net.minecraftforge:forge:1.16.5-36.2.34"
 	annotationProcessor "org.spongepowered:mixin:0.8.4-SNAPSHOT:processor" //i imagine mixingradle does this but idk
 	
 	implementation project(":Xplat-1.16.5")
