@@ -15,7 +15,12 @@ jobs:
       - name: Build with Gradle™
         uses: gradle/gradle-build-action@v2.3.3
         with:
-          arguments: clean build collectJars
+          arguments: clean build
+          
+      - name: Please actually execute my Gradle task! ✅ Thank you
+        uses: gradle/gradle-build-action@v2.3.3
+        with:
+          arguments: collectJars
 
       - name: Upload artifacts™
         uses: actions/upload-artifact@v3
