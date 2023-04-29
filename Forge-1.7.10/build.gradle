@@ -1,0 +1,53 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		maven { url "https://maven.fabricmc.net" }
+		maven { url "https://repo.sleeping.town" }
+	}
+	dependencies {
+		classpath "agency.highlysuspect:voldeloom:2.3"
+	}
+}
+
+apply plugin: "agency.highlysuspect.voldeloom"
+
+archivesBaseName = "${rootProject.name}-forge-1.7.10"
+
+ext.gimmeJava(6)
+
+volde {
+	runs {
+		client {
+			programArg "--username=quaternary"
+			//TODO, really should make voldeloom pass these itself on 1.7.10, required to launch.
+			programArg "--assetIndex=1.7.10"
+			programArg "--userProperties={}"
+			programArg "--accessToken=69"
+			
+			//TODO: voldeloom issue #1 (lmao)
+			runDir = "Forge-1.7.10/run"
+		}
+	}
+}
+
+String minecraftVersion = "1.7.10"
+String forgeVersion = "1.7.10-10.13.4.1614-1.7.10" //yes it says 1.7.10 on both sides lol
+
+dependencies {
+	minecraft "com.mojang:minecraft:${minecraftVersion}"
+	forge "net.minecraftforge:forge:${forgeVersion}:universal"
+	mappings volde.layered {
+		importMCPBot("https://mcpbot.unascribed.com/", minecraftVersion, "stable", "12-1.7.10")
+	}
+	
+	implementation project(":Core")
+}
+
+//fold in xplat resources and sources
+processResources {
+	from project(":Core").sourceSets.main.resources
+}
+
+tasks.withType(JavaCompile) {
+	source(project(":Core").sourceSets.main.allSource)
+}

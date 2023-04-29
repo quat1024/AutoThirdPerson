@@ -24,27 +24,27 @@ If you need to `--refresh-dependencies` ITS GONNA DO ALL OF THEM btw. God help y
 
 ## Subprojects guided tour
 
-These subprojects depend on each other with - I dunno if it's a real Gradle term, but with "textual dependencies", where the compilation classpath of the dependent is directly added to the compilation classpath of the dependee. This means there isn't a `Fabric-1.19.2` artifact that depends on `Core` as a separate artifact; it just contains the classes from `Core` instead. That's the goal anyways.
+These subprojects depend on each other with - I dunno if it's a real Gradle term, but with "textual dependencies", where the compilation classpath of the dependent is directly added to the compilation classpath of the dependee. This means there isn't a `Fabric-1.19.2` artifact that depends on `Core` as a separate artifact; it just contains the classes from `Core` instead.
 
 ### `Core`
 
-Version-agnostic, loader-agnostic engine of Auto Third Person. This is where the logic lives, as well as where the `MinecraftInteraction` and `LoaderInteraction` API surfaces are defined.
+Version-agnostic, loader-agnostic engine of Auto Third Person. This is where the logic lives, as well as where the `MinecraftInteraction` and `LoaderInteraction` API surfaces are defined. Must be compatible with Java 6. (Blame 1.4.7.)
 
-Must be compatible with Java 6. (Blame 1.4.7.)
+This doesn't use any special Gradle plugins.
 
 ### `Xplat-...`
 
-Loader-agnostic, but not version-agnostic stuff. This project has access to Minecraft's code, and can implement `MinecraftInteraction`.
+Loader-agnostic, but not version-agnostic stuff. This project has access to Minecraft's code, and can implement `MinecraftInteraction`. Must be compatible with that version's Java version, so, probably Java 17 or 16 or 8.
 
-If there's an artifact for only one loader on a given version, I don't use an `Xplat` artifact to implement `MinecraftInteraction`, i'll just do them both.
-
-Must be compatible with that version's Java version, so, probably Java 17 or 16 or 8.
+These typically use VanillaGradle.
 
 ### `[Loader]-[...]`
 
-Code and resources specific to each distributed artifact. This project has access to the modloader, and can implement `LoaderInteraction`. It also plugs everything in to the modloader, initializing the Core with the appropriate Interaction APIs.
+Code and resources specific to each distributed artifact. This project has access to the modloader, and can implement `LoaderInteraction`. It also plugs everything in to the modloader, initializing the Core with the appropriate Interaction APIs. Also must be compatible with that version's Java version.
 
-Also must be compatible with that version's Java version.
+If there's an artifact for only one loader on a given version, I don't use an `Xplat` artifact to implement `MinecraftInteraction`, i'll just do them both.
+
+Fabric subprojects use Fabric Loom, recent (1.16+) Forge subprojects use ForgeGradle, and old (1.7-) Forge subprojects use [Voldeloom](https://github.com/CrackedPolishedBlackstoneBricksMC/voldeloom/).
 
 ### `CrummyConfig`
 
@@ -54,6 +54,12 @@ Must be compatible with Java 8, as it's used by Fabric 1.16.5. (Todo, it should 
 
 Create an `UncookedCrummyConfig` - you supply a `Path` to load the file from - and call `load` whenever you want (probably plug this into F3+T or a client command). Turn this into something `AutoThirdPerson` can use with `CookedCrummyConfig`.  Despite it being basic it produces kinda nice looking config files imo ;)
 
+This doesn't use any special Gradle plugins.
+
 ## todo
 
-Evaluate [dropbox/focus](https://github.com/dropbox/focus) - i doubt it'll work because minecraft plugins do their expensive work in afterEvaluate, but who knows
+* Evaluate [dropbox/focus](https://github.com/dropbox/focus) - i doubt it'll work because minecraft plugins do their expensive work in afterEvaluate, but who knows
+* I think Apathy takes a better approach, where inheritance is used to implement the various services instead of having `AutoThirdPerson` be a singleton
+* The interface ended up pretty awkward to implement in the experimental 1.7.10 version:
+  * lack of "mount"/"dismount" events meant i needed to keep track of it myself
+  * Hard to add new settings (eg. fix hand glitch)

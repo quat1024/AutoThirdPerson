@@ -1,7 +1,5 @@
 package agency.highlysuspect.autothirdperson;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Facade that abstracts away the differences between Minecraft versions.
  */

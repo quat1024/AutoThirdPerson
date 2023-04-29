@@ -23,6 +23,7 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		this.mc = mc;
 		this.loader = loader;
 		this.logger = mc.getLogger();
+		logger.info("Auto Third Person loading...");
 		this.state = new State();
 	}
 	
@@ -34,6 +35,8 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 				tickClient();
 			}
 		});
+		
+		logger.info("Auto Third Person initialized.");
 	}
 	
 	/// external api ///
@@ -62,7 +65,7 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	
 	/// internal api ///
 	
-	private void debugSpam(String msg, Object... args) {
+	public void debugSpam(String msg, Object... args) {
 		if(mc.debugScreenUp() || loader.settings().logSpam()) logger.info(msg, args);
 	}
 	
