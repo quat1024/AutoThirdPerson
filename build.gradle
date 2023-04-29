@@ -21,6 +21,7 @@ subprojects {
 	project.ext.gimmeJava = (int ver) -> {
 		if(ver <= 8) {
 			//For java 6-8 projects, use a java 8 toolchain and set target/source compatibility
+			//It's hard to get actual java 6 toolchains so this will do
 			java.toolchain {
 				project.logger.lifecycle("{}: configuring Java 8 toolchain", project.displayName)
 				languageVersion = JavaLanguageVersion.of(8)

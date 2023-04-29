@@ -6,8 +6,6 @@ LGPL 3.0 or later.
 
 ## Warnings
 
-The 1.19.3 version is made extremely begrudgingly. There is literally no reason to play this version. Play 1.19.2.
-
 Forge 1.16.5 is broken, no i don't know why. The other Forges work. I commented it out in the settings.gradle so it won't get built.
 
 You need a *lot* of RAM to run `./gradlew build`, which builds every project. `gradle.properties` allows Gradle 4 gigabytes of RAM, which will only grow as I add more projects. Try commenting out some subproject declarations in `settings.gradle` if you're having issues. (As a side effect, if you're moving to a new computer, compiling this project is a great way to populate your Gradle cache.)

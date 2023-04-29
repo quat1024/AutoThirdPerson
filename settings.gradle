@@ -19,9 +19,9 @@ include(
 	"Core",
 	"CrummyConfig",
 	
-	"Xplat-1.19.3",
-	"Fabric-1.19.3",
-	"Forge-1.19.3",
+	"Xplat-1.19.4",
+	"Fabric-1.19.4",
+	"Forge-1.19.4",
 	
 	"Xplat-1.19.2",
 	"Fabric-1.19.2",
