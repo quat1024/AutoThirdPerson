@@ -1,7 +1,3 @@
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.StandardCopyOption
-
 //beware that IDEA uses the term "project" to refer to the top-level thing, and "module" to refer to children,
 //but Gradle would call those the "root project" and "projects"/"subprojects" respectively
 //with that said:
@@ -63,7 +59,7 @@ subprojects {
 	//probably broken due to all the remapping nonsense that minecraft gradle plugins do
 	//not entirely sure, though (and also not really sure what this does in the first place)
 	tasks.withType(GenerateModuleMetadata) {
-		enabled = false //probably broken
+		enabled = false
 	}
 	
 	//substitute ${version} placeholders in certain files in /resources
@@ -96,43 +92,5 @@ subprojects {
 	//give me my nonnull annotations
 	dependencies {
 		implementation "org.jetbrains:annotations:16.0.2"
-	}
-}
-
-//shitty task that (somewhat brute-forcely) looks in every applicable project's build/libs/ directory and pastes the files out
-//this is mainly because the Github Actions upload-artifact task is annoying and keeps the same folder structure
-//like if you have it upload fabric-1.18.2/build/libs/blah.jar it will end up inside that same path inside the release zip
-//thats irritating, let's copy them into the same folder so actions will also put them inside one folder
-//(it doesn't actually depend on any of the build tasks, so run this after building)
-Path everyJar = project.file("everyJar").toPath()
-task("collectJars") {
-	setGroup("aaaaaaaaaaaaa")
-	setDescription("Copy build artifacts into top-level `everyJar` folder")
-	doLast {
-		project.logger.lifecycle("everyJar: {}", everyJar)
-		for (Project p : getSubprojects()) {
-			Path destDir;
-			if (p.name.startsWith("Fabric") || p.name.startsWith("Forge")) {
-				destDir = everyJar
-			} else {
-				destDir = everyJar.resolve("others")
-			}
-			Files.createDirectories(destDir)
-			
-			//look inside build/libs/ directory
-			Path libsDir = p.getBuildDir().toPath().resolve("libs")
-			if (Files.notExists(libsDir)) continue
-			
-			//pick the one with the shortest filename (which will be the one without -dev or -sources)
-			Files.list(libsDir)
-				.sorted(Comparator.comparing(path -> path.toString().length()))
-				.findFirst()
-				.ifPresent(shortest -> {
-					//copy into everyJar directory
-					Path dest = destDir.resolve(shortest.getFileName().toString())
-					project.logger.lifecycle("Copying {} to {}", shortest, dest);
-					Files.copy(shortest, dest, StandardCopyOption.REPLACE_EXISTING)
-				})
-		}
 	}
 }
