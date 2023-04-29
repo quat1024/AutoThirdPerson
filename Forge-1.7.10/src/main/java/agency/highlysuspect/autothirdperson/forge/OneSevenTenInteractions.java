@@ -68,6 +68,16 @@ public class OneSevenTenInteractions implements LoaderInteraction, MinecraftInte
 	}
 	
 	@SubscribeEvent
+	public void tick(TickEvent.ClientTickEvent e) {
+		if(e.phase != TickEvent.Phase.START) return;
+		
+		//atp core's client tickers
+		for(Runnable clientTicker : clientTickers) {
+			clientTicker.run();
+		}
+	}
+	
+	@SubscribeEvent
 	public void frame(TickEvent.RenderTickEvent e) {
 		if(e.phase != TickEvent.Phase.START) return;
 		
@@ -88,11 +98,6 @@ public class OneSevenTenInteractions implements LoaderInteraction, MinecraftInte
 			
 			//and update the state
 			myState.lastVehicleWeak = new WeakReference<Entity>(currentVehicle);
-		}
-		
-		//atp core's client tickers
-		for(Runnable clientTicker : clientTickers) {
-			clientTicker.run();
 		}
 	}
 	
