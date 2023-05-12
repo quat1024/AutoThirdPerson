@@ -22,13 +22,7 @@ public class ForgeEntrypoint {
 	
 	public static class ClassloadingParanoia {
 		public static void doIt(FMLPreInitializationEvent e) {
-			OneSevenTenInteractions interactions = new OneSevenTenInteractions(e);
-			new AutoThirdPerson<OneSevenTenInteractions, OneSevenTenInteractions>(
-				interactions,
-				interactions,
-				new VersionCapabilities.Builder()
-					.hasHandGlitch()
-			).initLoader();
+			new ForgeImpl(e).init();
 		}
 	}
 }

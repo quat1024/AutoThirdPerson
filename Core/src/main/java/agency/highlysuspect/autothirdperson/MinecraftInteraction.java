@@ -5,7 +5,7 @@ package agency.highlysuspect.autothirdperson;
  */
 @Deprecated //merge into AutoThirdPerson
 public interface MinecraftInteraction {
-	MyLogger getLogger();
+	MyLogger makeLogger();
 	
 	/** Wrap the current Minecraft camera type */
 	MyCameraType getCameraType();

@@ -13,7 +13,7 @@ public abstract class AutoThirdPerson implements MinecraftInteraction, LoaderInt
 	
 	public static AutoThirdPerson instance;
 	
-	public final MyLogger logger = getLogger();
+	public final MyLogger logger;
 	public final VersionCapabilities version = caps(new VersionCapabilities.Builder()).build();
 	public final State state;
 	
@@ -22,12 +22,12 @@ public abstract class AutoThirdPerson implements MinecraftInteraction, LoaderInt
 			instance = this;
 		} else {
 			RuntimeException e = new IllegalStateException(NAME + " instantiated twice!");
-			getLogger().error(NAME + " instantiated twice!", e);
+			e.printStackTrace();
+			makeLogger().error(NAME + " instantiated twice!", e);
 			throw e;
 		}
 		
-		logger.info(NAME + " loading...");
-		
+		this.logger = makeLogger();
 		this.state = new State();
 	}
 	

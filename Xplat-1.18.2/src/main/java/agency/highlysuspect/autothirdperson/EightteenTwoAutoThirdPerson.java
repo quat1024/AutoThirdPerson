@@ -16,28 +16,26 @@ import java.lang.ref.WeakReference;
 public abstract class EightteenTwoAutoThirdPerson extends AutoThirdPerson {
 	private final Minecraft client = Minecraft.getInstance();
 	
-	private final MyLogger logFacade = new MyLogger() {
-		private final Logger log4jlogger = LogManager.getLogger(AutoThirdPerson.NAME);
-		
-		@Override
-		public void info(String msg, Object... args) {
-			log4jlogger.info(msg, args);
-		}
-		
-		@Override
-		public void warn(String msg, Object... args) {
-			log4jlogger.warn(msg, args);
-		}
-		
-		@Override
-		public void error(String msg, Throwable err) {
-			log4jlogger.error(msg, err);
-		}
-	};
-	
 	@Override
-	public MyLogger getLogger() {
-		return logFacade;
+	public MyLogger makeLogger() {
+		return new MyLogger() {
+			private final Logger log4jlogger = LogManager.getLogger(AutoThirdPerson.NAME);
+			
+			@Override
+			public void info(String msg, Object... args) {
+				log4jlogger.info(msg, args);
+			}
+			
+			@Override
+			public void warn(String msg, Object... args) {
+				log4jlogger.warn(msg, args);
+			}
+			
+			@Override
+			public void error(String msg, Throwable err) {
+				log4jlogger.error(msg, err);
+			}
+		};
 	}
 	
 	@Override
