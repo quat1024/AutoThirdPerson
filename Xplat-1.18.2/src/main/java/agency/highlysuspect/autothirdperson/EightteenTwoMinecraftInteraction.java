@@ -13,13 +13,36 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 
-public class EightteenTwoMinecraftInteraction implements MinecraftInteraction {
+public abstract class EightteenTwoMinecraftInteraction extends AutoThirdPerson {
 	private final Minecraft client = Minecraft.getInstance();
-	private final MyLogger logger = new Log4jMyLogger(LogManager.getLogger(AutoThirdPerson.NAME));
+	
+	private final MyLogger logFacade = new MyLogger() {
+		private final Logger log4jlogger = LogManager.getLogger(AutoThirdPerson.NAME);
+		
+		@Override
+		public void info(String msg, Object... args) {
+			log4jlogger.info(msg, args);
+		}
+		
+		@Override
+		public void warn(String msg, Object... args) {
+			log4jlogger.warn(msg, args);
+		}
+		
+		@Override
+		public void error(String msg, Throwable err) {
+			log4jlogger.error(msg, err);
+		}
+	};
 	
 	@Override
 	public MyLogger getLogger() {
-		return logger;
+		return logFacade;
+	}
+	
+	@Override
+	public VersionCapabilities.Builder caps(VersionCapabilities.Builder caps) {
+		return caps.hasElytra().hasSwimmingAnimation();
 	}
 	
 	@Override
@@ -119,30 +142,6 @@ public class EightteenTwoMinecraftInteraction implements MinecraftInteraction {
 			Entity myEntity = ent.get();
 			Entity otherEntity = ((EntityVehicle) other).ent.get();
 			return myEntity != null && myEntity.isAlive() && myEntity == otherEntity;
-		}
-	}
-	
-	@SuppressWarnings("ClassCanBeRecord")
-	private static class Log4jMyLogger implements MyLogger {
-		public Log4jMyLogger(Logger logger) {
-			this.logger = logger;
-		}
-		
-		private final Logger logger;
-		
-		@Override
-		public void info(String msg, Object... args) {
-			logger.info(msg, args);
-		}
-		
-		@Override
-		public void warn(String msg, Object... args) {
-			logger.warn(msg, args);
-		}
-		
-		@Override
-		public void error(String msg, Throwable err) {
-			logger.error(msg, err);
 		}
 	}
 }

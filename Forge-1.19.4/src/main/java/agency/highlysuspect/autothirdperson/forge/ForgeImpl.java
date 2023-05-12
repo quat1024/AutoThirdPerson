@@ -14,6 +14,7 @@ public class ForgeImpl extends NineteenFourAutoThirdPerson {
 	private UncookedForgeSettings uncookedForgeSettings;
 	private AtpSettings cookedForgeSettings = AtpSettings.MISSING;
 	
+	@Override
 	public void init() {
 		super.init();
 		
