@@ -1,46 +1,49 @@
 package agency.highlysuspect.autothirdperson;
 
 public class VersionCapabilities {
-	public VersionCapabilities(boolean hasElytra, boolean hasSwimmingAnimation, boolean hasHandGlitch, boolean hasSneakDismount) {
+	public VersionCapabilities(boolean hasElytra, boolean hasSwimmingAnimation, boolean hasHandGlitch, boolean noSneakDismount) {
 		this.hasElytra = hasElytra;
 		this.hasSwimmingAnimation = hasSwimmingAnimation;
 		this.hasHandGlitch = hasHandGlitch;
-		this.hasSneakDismount = hasSneakDismount;
+		this.noSneakDismount = noSneakDismount;
 	}
 	
+	//features
 	public final boolean hasElytra;
 	public final boolean hasSwimmingAnimation;
+	
+	//antifeatures
 	public final boolean hasHandGlitch;
-	public final boolean hasSneakDismount;
+	public final boolean noSneakDismount;
 	
 	public static class Builder {
 		private boolean hasElytra;
 		private boolean hasSwimmingAnimation;
 		private boolean hasHandGlitch;
-		private boolean hasSneakDismount;
+		private boolean noSneakDismount;
 		
-		public Builder hasElytra(boolean hasElytra) {
-			this.hasElytra = hasElytra;
+		public Builder hasElytra() {
+			this.hasElytra = true;
 			return this;
 		}
 		
-		public Builder hasSwimmingAnimation(boolean hasSwimmingAnimation) {
-			this.hasSwimmingAnimation = hasSwimmingAnimation;
+		public Builder hasSwimmingAnimation() {
+			this.hasSwimmingAnimation = true;
 			return this;
 		}
 		
-		public Builder hasHandGlitch(boolean hasHandGlitch) {
-			this.hasHandGlitch = hasHandGlitch;
+		public Builder hasHandGlitch() {
+			this.hasHandGlitch = true;
 			return this;
 		}
 		
-		public Builder hasSneakDismount(boolean hasSneakDismount) {
-			this.hasSneakDismount = hasSneakDismount;
+		public Builder noSneakDismount() {
+			this.noSneakDismount = true;
 			return this;
 		}
 		
 		public VersionCapabilities build() {
-			return new VersionCapabilities(hasElytra, hasSwimmingAnimation, hasHandGlitch, hasSneakDismount);
+			return new VersionCapabilities(hasElytra, hasSwimmingAnimation, hasHandGlitch, noSneakDismount);
 		}
 	}
 }

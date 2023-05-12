@@ -1,6 +1,7 @@
 package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
+import agency.highlysuspect.autothirdperson.VersionCapabilities;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -22,8 +23,12 @@ public class ForgeEntrypoint {
 	public static class ClassloadingParanoia {
 		public static void doIt(FMLPreInitializationEvent e) {
 			OneSevenTenInteractions interactions = new OneSevenTenInteractions(e);
-			AutoThirdPerson.instance = new AutoThirdPerson<OneSevenTenInteractions, OneSevenTenInteractions>(interactions, interactions);
-			AutoThirdPerson.instance.init();
+			new AutoThirdPerson<OneSevenTenInteractions, OneSevenTenInteractions>(
+				interactions,
+				interactions,
+				new VersionCapabilities.Builder()
+					.hasHandGlitch()
+			).initLoader();
 		}
 	}
 }

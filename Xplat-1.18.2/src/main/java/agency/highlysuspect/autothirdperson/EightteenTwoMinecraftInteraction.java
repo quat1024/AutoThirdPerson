@@ -23,16 +23,6 @@ public class EightteenTwoMinecraftInteraction implements MinecraftInteraction {
 	}
 	
 	@Override
-	public boolean hasElytra() {
-		return true;
-	}
-	
-	@Override
-	public boolean hasSwimmingAnimation() {
-		return true;
-	}
-	
-	@Override
 	public MyCameraType getCameraType() {
 		return wrapCameraType(client.options.getCameraType());
 	}

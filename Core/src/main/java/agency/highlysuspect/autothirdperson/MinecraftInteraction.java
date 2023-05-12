@@ -3,14 +3,9 @@ package agency.highlysuspect.autothirdperson;
 /**
  * Facade that abstracts away the differences between Minecraft versions.
  */
+@Deprecated //merge into AutoThirdPerson
 public interface MinecraftInteraction {
 	MyLogger getLogger();
-	
-	/** Whether this Minecraft version has an elytra in it (post-1.9) */
-	boolean hasElytra();
-	
-	/** Whether this Minecraft version has an special swimming animation (post-1.13) */
-	boolean hasSwimmingAnimation();
 	
 	/** Wrap the current Minecraft camera type */
 	MyCameraType getCameraType();

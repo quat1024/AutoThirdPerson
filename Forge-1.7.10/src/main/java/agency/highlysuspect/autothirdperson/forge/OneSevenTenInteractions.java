@@ -188,7 +188,7 @@ public class OneSevenTenInteractions implements LoaderInteraction, MinecraftInte
 	//implementing the core:
 	
 	@Override
-	public void init() {
+	public void initLoader() {
 		//"Events silently failing when registered to the wrong bus" is nothing new
 		//Party like it's 1.18.2!!!
 		MinecraftForge.EVENT_BUS.register(this);
@@ -238,16 +238,6 @@ public class OneSevenTenInteractions implements LoaderInteraction, MinecraftInte
 	}
 	
 	//unsupported things
-	
-	@Override
-	public boolean hasElytra() {
-		return false;
-	}
-	
-	@Override
-	public boolean hasSwimmingAnimation() {
-		return false;
-	}
 	
 	@Override
 	public boolean playerIsElytraFlying() {

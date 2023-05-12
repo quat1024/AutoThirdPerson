@@ -16,7 +16,7 @@ public class ForgeLoaderInteraction implements LoaderInteraction {
 	private AtpSettings cookedForgeSettings = AtpSettings.MISSING;
 	
 	@Override
-	public void init() {
+	public void initLoader() {
 		uncookedForgeSettings = new UncookedForgeSettings(AutoThirdPerson.instance.buildSettingsSpec());
 		
 		FMLJavaModLoadingContext.get().getModEventBus().register(this);

@@ -20,6 +20,6 @@ every version: register a ticker (preferably as early as possible *before* camer
 
 # architecture
 
-currently: kinda botania style, two "service" classes are required in the constructor: one for interacting with minecraft & one for interacting with the loader.
+currently: kinda botania style, two "service" classes are required in the constructor: one for interacting with minecraft & one for interacting with the loader. A little bit wrong (like "logging" requires interacting with FML on 1.4.7, so it's not really a vanilla-only capability) and I don't really think the separation proves useful.
 
-better approach imo: one mod class full of abstract methods, extended in the xplat module and further extended in the loader module
+better approach imo: one mod class full of abstract methods, extended abstractly in the xplat module with whatever is possible to implement there, and further extended in the loader module

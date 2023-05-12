@@ -1,7 +1,6 @@
 package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
-import agency.highlysuspect.autothirdperson.NineteenFourMinecraftInteraction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -14,11 +13,7 @@ public class ForgeEntrypoint {
 	
 	private static class NiceClientEntrypointDude {
 		private static void niceClientEntrypointDude() {
-			AutoThirdPerson.instance = new AutoThirdPerson<>(
-				new NineteenFourMinecraftInteraction(),
-				new ForgeLoaderInteraction()
-			);
-			AutoThirdPerson.instance.init();
+			new ForgeImpl().init();
 		}
 	}
 }

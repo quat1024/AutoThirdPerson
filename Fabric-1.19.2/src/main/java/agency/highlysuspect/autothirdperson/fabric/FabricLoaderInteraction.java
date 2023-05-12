@@ -23,7 +23,7 @@ public class FabricLoaderInteraction implements LoaderInteraction {
 	private AtpSettings settings = AtpSettings.MISSING;
 	
 	@Override
-	public void init() {
+	public void initLoader() {
 		uncookedConfig = new UncookedCrummyConfig(
 			FabricLoader.getInstance().getConfigDir().resolve(AutoThirdPerson.MODID + ".cfg"),
 			AutoThirdPerson.instance.buildSettingsSpec()

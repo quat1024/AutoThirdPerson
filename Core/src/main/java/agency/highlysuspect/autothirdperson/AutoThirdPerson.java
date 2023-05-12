@@ -7,36 +7,41 @@ import java.util.regex.Pattern;
 /**
  * Handles the mod's main logic
  */
-public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderInteraction> {
+public abstract class AutoThirdPerson implements MinecraftInteraction, LoaderInteraction {
 	public static final String MODID = "auto_third_person";
 	public static final String NAME = "Auto Third Person";
 	
-	public static AutoThirdPerson<?, ?> instance;
+	public static AutoThirdPerson instance;
 	
-	public final MC mc;
-	public final LI loader;
-	public final MyLogger logger;
-	
+	public final MyLogger logger = getLogger();
+	public final VersionCapabilities version = caps(new VersionCapabilities.Builder()).build();
 	public final State state;
 	
-	public AutoThirdPerson(MC mc, LI loader) {
-		this.mc = mc;
-		this.loader = loader;
-		this.logger = mc.getLogger();
-		logger.info("Auto Third Person loading...");
+	public AutoThirdPerson() {
+		if(instance == null) {
+			instance = this;
+		} else {
+			RuntimeException e = new IllegalStateException(NAME + " instantiated twice!");
+			getLogger().error(NAME + " instantiated twice!", e);
+			throw e;
+		}
+		
+		logger.info(NAME + " loading...");
+		
 		this.state = new State();
 	}
 	
+	public abstract VersionCapabilities.Builder caps(VersionCapabilities.Builder builder);
+	
 	public void init() {
-		loader.init();
-		loader.registerClientTicker(new Runnable() {
+		logger.info(NAME + "initializing...");
+		
+		registerClientTicker(new Runnable() {
 			@Override
 			public void run() {
 				tickClient();
 			}
 		});
-		
-		logger.info("Auto Third Person initialized.");
 	}
 	
 	/// external api ///
@@ -50,14 +55,14 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	}
 	
 	public @Nullable MyCameraType modifyCycle(MyCameraType cycleFrom) {
-		if(loader.settings().skipFrontView() && cycleFrom == MyCameraType.THIRD_PERSON) {
+		if(settings().skipFrontView() && cycleFrom == MyCameraType.THIRD_PERSON) {
 			debugSpam("Skipping third-person reversed view");
 			return MyCameraType.FIRST_PERSON;
 		} else return null;
 	}
 	
 	public void manualPress() {
-		if(loader.settings().cancelAutoRestore() && state.isActive()) {
+		if(settings().cancelAutoRestore() && state.isActive()) {
 			debugSpam("Cancelling auto-restore, if it was about to happen");
 			state.cancel();
 		}
@@ -66,17 +71,17 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	/// internal api ///
 	
 	public void debugSpam(String msg, Object... args) {
-		if(mc.debugScreenUp() || loader.settings().logSpam()) logger.info(msg, args);
+		if(debugScreenUp() || settings().logSpam()) logger.info(msg, args);
 	}
 	
 	private void tickClient() {
-		if(!mc.safeToTick()) return;
-		AtpSettings settings = loader.settings();
+		if(!safeToTick()) return;
+		AtpSettings settings = settings();
 		
-		boolean isFlying = mc.hasElytra() && mc.playerIsElytraFlying();
-		boolean isSwimming = mc.hasSwimmingAnimation() ? mc.playerInSwimmingAnimation() : mc.playerIsUnderwater();
+		boolean isFlying = version.hasElytra && playerIsElytraFlying();
+		boolean isSwimming = version.hasSwimmingAnimation ? playerInSwimmingAnimation() : playerIsUnderwater();
 		
-		if(settings.elytra() && mc.playerIsElytraFlying()) {
+		if(settings.elytra() && playerIsElytraFlying()) {
 			if(state.elytraFlyingTicks == settings.elytraDelay()) {
 				enterThirdPerson(new FlyingReason());
 			}
@@ -90,7 +95,7 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		
 		if(settings.swim() && !(settings.elytra() && isFlying && isSwimming)) { //so swimming rules don't trigger when you dip underwater while flying with elytra
 			if(state.wasSwimming && settings.stickySwim()) {
-				isSwimming |= mc.playerIsUnderwater();
+				isSwimming |= playerIsUnderwater();
 			}
 			
 			if(state.wasSwimming != isSwimming) {
@@ -106,8 +111,8 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	}
 	
 	private void mountOrDismount(Vehicle vehicle, boolean mounting) {
-		if(!mc.safeToTick()) return;
-		AtpSettings settings = loader.settings();
+		if(!safeToTick()) return;
+		AtpSettings settings = settings();
 		
 		debugSpam((mounting ? "Mounting " : "Dismounting ") + vehicle.id());
 		
@@ -144,10 +149,10 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	}
 	
 	private void enterThirdPerson(Reason reason) {
-		if(state.reason == null && mc.getCameraType() == MyCameraType.FIRST_PERSON) {
-			state.oldPerspective = mc.getCameraType();
+		if(state.reason == null && getCameraType() == MyCameraType.FIRST_PERSON) {
+			state.oldPerspective = getCameraType();
 			state.reason = reason;
-			mc.setCameraType(MyCameraType.THIRD_PERSON);
+			setCameraType(MyCameraType.THIRD_PERSON);
 			debugSpam("Automatically entering third person due to {}", reason);
 		} else if(state.isActive()) {
 			state.reason = reason;
@@ -156,7 +161,7 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 	}
 	
 	private void exitThirdPerson(Reason reason) {
-		if(!loader.settings().autoRestore()) {
+		if(!settings().autoRestore()) {
 			debugSpam("Not automatically leaving third person due to {} ending - auto restore is turned off", reason);
 			return;
 		}
@@ -172,7 +177,7 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		}
 		
 		debugSpam("Automatically leaving third person due to {} ending", reason);
-		mc.setCameraType(state.oldPerspective);
+		setCameraType(state.oldPerspective);
 		state.cancel();
 	}
 	
@@ -255,10 +260,10 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		spec.bool("boat", "Automatically go into third person when riding a boat?", true);
 		spec.bool("cart", "Automatically go into third person when riding a minecart?", true);
 		spec.bool("animal", "Automatically go into third person when riding an animal?", true);
-		if(mc.hasElytra()) {
+		if(version.hasElytra) {
 			spec.bool("elytra", "Automatically go into third person when flying an elytra?", true);
 		}
-		spec.bool("swim", mc.hasSwimmingAnimation() ?
+		spec.bool("swim", version.hasSwimmingAnimation ?
 			"Automatically go into third person when doing the swimming animation?" :
 			"Automatically go into third person when underwater?",
 			false
@@ -274,12 +279,12 @@ public class AutoThirdPerson<MC extends MinecraftInteraction, LI extends LoaderI
 		};
 		
 		spec.section("Scenario Options");
-		if(mc.hasElytra()) {
+		if(version.hasElytra) {
 			spec.integer("elytraDelay", "Ticks of elytra flight required before the camera automatically toggles if the 'elytra' option is enabled.", 7, nonNegative);
 		}
 		spec.integer("swimmingDelayStart", "Ticks of swimming required before the camera automatically toggles if the 'swim' option is enabled.", 0, nonNegative);
 		spec.integer("swimmingDelayEnd", "Ticks of not swimming required before the camera restores if the 'swim' option is enabled.", 10, nonNegative);
-		if(mc.hasSwimmingAnimation()) {
+		if(version.hasSwimmingAnimation) {
 			spec.bool("stickySwim", "If 'true', your head has to completely exit the water to count as 'not swimming anymore', for the purposes of restoring\nthe camera when you're done swimming. If 'false', you just have to stop doing the swimming animation.", true);
 		}
 		spec.pattern("customPattern", "Entity IDs that match this regular expression will be considered if the 'custom' option is enabled.", Pattern.compile("^minecraft:(cow|chicken)$"));
