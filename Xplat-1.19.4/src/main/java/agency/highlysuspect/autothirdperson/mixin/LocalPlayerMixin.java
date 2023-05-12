@@ -17,10 +17,9 @@ public class LocalPlayerMixin {
 		at = @At("TAIL")
 	)
 	private void autoThirdPerson$onStartRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
-		AutoThirdPerson<?, ?> atp = AutoThirdPerson.instance;
-		NineteenFourAutoThirdPerson mcInteraction = (NineteenFourAutoThirdPerson) atp.mc;
+		NineteenFourAutoThirdPerson atp = (NineteenFourAutoThirdPerson) AutoThirdPerson.instance;
 		
-		atp.mount(mcInteraction.wrapVehicle(vehicle));
+		atp.mount(atp.wrapVehicle(vehicle));
 	}
 	
 	@Inject(
@@ -31,10 +30,9 @@ public class LocalPlayerMixin {
 		@SuppressWarnings("ConstantConditions")
 		Entity vehicle = ((Entity) (Object) this).getVehicle();
 		if(vehicle != null) {
-			AutoThirdPerson<?, ?> atp = AutoThirdPerson.instance;
-			NineteenFourAutoThirdPerson mcInteraction = (NineteenFourAutoThirdPerson) atp.mc;
+			NineteenFourAutoThirdPerson atp = (NineteenFourAutoThirdPerson) AutoThirdPerson.instance;
 			
-			atp.dismount(mcInteraction.wrapVehicle(vehicle));
+			atp.dismount(atp.wrapVehicle(vehicle));
 		}
 	}
 }

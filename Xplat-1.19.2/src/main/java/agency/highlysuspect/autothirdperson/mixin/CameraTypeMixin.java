@@ -18,14 +18,13 @@ public class CameraTypeMixin {
 		cancellable = true
 	)
 	public void autoThirdPerson$modifyCycle(CallbackInfoReturnable<CameraType> ci) {
-		AutoThirdPerson<?, ?> atp = AutoThirdPerson.instance;
-		NineteenTwoAutoThirdPerson mcInteraction = (NineteenTwoAutoThirdPerson) atp.mc;
+		NineteenTwoAutoThirdPerson atp = (NineteenTwoAutoThirdPerson) AutoThirdPerson.instance;
 		
 		@SuppressWarnings("ConstantConditions") //mixin cast
-		@Nullable MyCameraType cycleOverride = atp.modifyCycle(mcInteraction.wrapCameraType((CameraType) (Object) this));
+		@Nullable MyCameraType cycleOverride = atp.modifyCycle(atp.wrapCameraType((CameraType) (Object) this));
 		
 		if(cycleOverride != null) {
-			ci.setReturnValue(mcInteraction.unwrapCameraType(cycleOverride));
+			ci.setReturnValue(atp.unwrapCameraType(cycleOverride));
 		}
 	}
 }
