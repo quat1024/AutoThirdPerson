@@ -1,4 +1,4 @@
-package agency.highlysuspect.autothirdperson;
+package agency.highlysuspect.autothirdperson.wrap;
 
 /** Wrapper around the vanilla camera type enum */
 public enum MyCameraType {

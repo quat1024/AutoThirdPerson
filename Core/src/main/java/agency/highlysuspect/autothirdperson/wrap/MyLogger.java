@@ -1,4 +1,4 @@
-package agency.highlysuspect.autothirdperson;
+package agency.highlysuspect.autothirdperson.wrap;
 
 /** We have Log4j at home */
 public interface MyLogger {

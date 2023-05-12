@@ -1,13 +1,14 @@
 package agency.highlysuspect.autothirdperson;
 
+import agency.highlysuspect.autothirdperson.consumer.MyConsumer;
+import agency.highlysuspect.autothirdperson.wrap.MyCameraType;
+import agency.highlysuspect.autothirdperson.wrap.MyLogger;
+import agency.highlysuspect.autothirdperson.wrap.Vehicle;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
 
-/**
- * Handles the mod's main logic
- */
-public abstract class AutoThirdPerson implements MinecraftInteraction, LoaderInteraction {
+public abstract class AutoThirdPerson {
 	public static final String MODID = "auto_third_person";
 	public static final String NAME = "Auto Third Person";
 	
@@ -32,6 +33,42 @@ public abstract class AutoThirdPerson implements MinecraftInteraction, LoaderInt
 	}
 	
 	public abstract VersionCapabilities.Builder caps(VersionCapabilities.Builder builder);
+	public abstract MyLogger makeLogger();
+	
+	/** Wrap the current Minecraft camera type */
+	public abstract MyCameraType getCameraType();
+	
+	/** Unwrap and set the current Minecraft camera type */
+	public abstract void setCameraType(MyCameraType type);
+	
+	/** Whether the player has the f3 menu up */
+	public abstract boolean debugScreenUp();
+	
+	/** @return Player exists, level exists, game is not paused, etc */
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
+	public abstract boolean safeToTick();
+	
+	/** or `false` if this game doesn't have an elytra */
+	public abstract boolean playerIsElytraFlying();
+	
+	/** or `false` if this game doesn't have the swimming animation */
+	public abstract boolean playerInSwimmingAnimation();
+	
+	/** Whether the player's head/camera/whatever is underwater, used for `stickySwim` and for the swim setting on pre-1.13 */
+	public abstract boolean playerIsUnderwater();
+	
+	/**
+	 * @return The current settings.
+	 *         If this loader can automatically reload settings, this should return the most up-to-date copy of them.
+	 *         If it can't, this should return the most up-to-date copy after a manual reload step, or after game startup, or whatever.
+	 *         Don't return `null`; there's a default setting object in AtpSettings.
+	 */
+	public abstract AtpSettings settings();
+	
+	/**
+	 * Tell the loader to call this Runnable every frame.
+	 */
+	public abstract void registerClientTicker(Runnable action);
 	
 	public void init() {
 		logger.info(NAME + "initializing...");
@@ -68,11 +105,11 @@ public abstract class AutoThirdPerson implements MinecraftInteraction, LoaderInt
 		}
 	}
 	
-	/// internal api ///
-	
 	public void debugSpam(String msg, Object... args) {
 		if(debugScreenUp() || settings().logSpam()) logger.info(msg, args);
 	}
+	
+	/// internal api ///
 	
 	private void tickClient() {
 		if(!safeToTick()) return;
@@ -122,17 +159,17 @@ public abstract class AutoThirdPerson implements MinecraftInteraction, LoaderInt
 		}
 		
 		boolean doIt = false;
-		if(settings.boat() && vehicle.classification() == VehicleClassification.BOAT) {
+		if(settings.boat() && vehicle.classification() == Vehicle.Classification.BOAT) {
 			debugSpam("This is a boat!");
 			doIt = true;
 		}
 		
-		if(settings.cart() && vehicle.classification() == VehicleClassification.MINECART) {
+		if(settings.cart() && vehicle.classification() == Vehicle.Classification.MINECART) {
 			debugSpam("This is a minecart!");
 			doIt = true;
 		}
 		
-		if(settings.animal() && vehicle.classification() == VehicleClassification.ANIMAL) {
+		if(settings.animal() && vehicle.classification() == Vehicle.Classification.ANIMAL) {
 			debugSpam("This is an animal!");
 			doIt = true;
 		}
@@ -225,7 +262,6 @@ public abstract class AutoThirdPerson implements MinecraftInteraction, LoaderInt
 		}
 	}
 	
-	@SuppressWarnings("ClassCanBeRecord")
 	public static final class MountingReason implements Reason {
 		public MountingReason(Vehicle vehicle) {
 			this.vehicle = vehicle;
@@ -297,6 +333,9 @@ public abstract class AutoThirdPerson implements MinecraftInteraction, LoaderInt
 		spec.section("Extras");
 		spec.bool("skipFrontView", "Skip the 'third-person front' camera mode when pressing F5.", false);
 		spec.bool("logSpam", "Dump a bunch of debug crap into the log.\nMight be handy!", false);
+		if(version.hasHandGlitch) {
+			spec.bool("fixHandGlitch", "Fix the annoying 'weirdly rotated first-person hand' rendering error when you ride or look at someone riding a vehicle.", true);
+		}
 		
 		return spec;
 	}

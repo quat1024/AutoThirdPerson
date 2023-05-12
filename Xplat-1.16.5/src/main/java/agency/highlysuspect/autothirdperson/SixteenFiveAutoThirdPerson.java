@@ -1,5 +1,8 @@
 package agency.highlysuspect.autothirdperson;
 
+import agency.highlysuspect.autothirdperson.wrap.MyCameraType;
+import agency.highlysuspect.autothirdperson.wrap.MyLogger;
+import agency.highlysuspect.autothirdperson.wrap.Vehicle;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
@@ -108,15 +111,15 @@ public abstract class SixteenFiveAutoThirdPerson extends AutoThirdPerson {
 			this.ent = new WeakReference<>(ent);
 			this.id = ent == null ? "<nothing>" : Registry.ENTITY_TYPE.getKey(ent.getType()).toString();
 			
-			if(ent instanceof Minecart) this.type = VehicleClassification.MINECART;
-			else if(ent instanceof Boat) this.type = VehicleClassification.BOAT;
-			else if(ent instanceof Animal) this.type = VehicleClassification.ANIMAL;
-			else this.type = VehicleClassification.OTHER;
+			if(ent instanceof Minecart) this.type = Classification.MINECART;
+			else if(ent instanceof Boat) this.type = Classification.BOAT;
+			else if(ent instanceof Animal) this.type = Classification.ANIMAL;
+			else this.type = Classification.OTHER;
 		}
 		
 		private final WeakReference<Entity> ent;
 		private final String id;
-		private final VehicleClassification type;
+		private final Classification type;
 		
 		@Override
 		public boolean stillExists() {
@@ -130,7 +133,7 @@ public abstract class SixteenFiveAutoThirdPerson extends AutoThirdPerson {
 		}
 		
 		@Override
-		public @NotNull VehicleClassification classification() {
+		public @NotNull Classification classification() {
 			return type;
 		}
 		

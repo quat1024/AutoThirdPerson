@@ -1,10 +1,9 @@
 package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
-import agency.highlysuspect.autothirdperson.MyCameraType;
-import agency.highlysuspect.autothirdperson.MyLogger;
-import agency.highlysuspect.autothirdperson.Vehicle;
-import agency.highlysuspect.autothirdperson.VehicleClassification;
+import agency.highlysuspect.autothirdperson.wrap.MyCameraType;
+import agency.highlysuspect.autothirdperson.wrap.MyLogger;
+import agency.highlysuspect.autothirdperson.wrap.Vehicle;
 import agency.highlysuspect.autothirdperson.VersionCapabilities;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -81,15 +80,15 @@ public abstract class OneSevenTenAutoThirdPerson extends AutoThirdPerson {
 			this.ent = new WeakReference<Entity>(ent);
 			this.id = ent == null ? "<nothing>" : EntityList.getEntityString(ent);
 			
-			if(ent instanceof EntityMinecart) this.type = VehicleClassification.MINECART;
-			else if(ent instanceof EntityBoat) this.type = VehicleClassification.BOAT;
-			else if(ent instanceof EntityAnimal) this.type = VehicleClassification.ANIMAL;
-			else this.type = VehicleClassification.OTHER;
+			if(ent instanceof EntityMinecart) this.type = Classification.MINECART;
+			else if(ent instanceof EntityBoat) this.type = Classification.BOAT;
+			else if(ent instanceof EntityAnimal) this.type = Classification.ANIMAL;
+			else this.type = Classification.OTHER;
 		}
 		
 		private final WeakReference<Entity> ent;
 		private final String id;
-		private final VehicleClassification type;
+		private final Classification type;
 		
 		@Override
 		public boolean stillExists() {
@@ -103,7 +102,7 @@ public abstract class OneSevenTenAutoThirdPerson extends AutoThirdPerson {
 		}
 		
 		@Override
-		public @NotNull VehicleClassification classification() {
+		public @NotNull Classification classification() {
 			return type;
 		}
 		

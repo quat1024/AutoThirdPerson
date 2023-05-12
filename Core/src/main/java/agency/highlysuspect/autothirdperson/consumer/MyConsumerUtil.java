@@ -1,4 +1,4 @@
-package agency.highlysuspect.autothirdperson;
+package agency.highlysuspect.autothirdperson.consumer;
 
 /**
  * Static methods in interfaces are also not supported yet :cry:

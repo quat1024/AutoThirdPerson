@@ -29,6 +29,7 @@ public interface AtpSettings {
 	//extra
 	boolean skipFrontView();
 	boolean logSpam();
+	boolean fixHandGlitch();
 	
 	AtpSettings MISSING = new AtpSettings() {
 		@Override
@@ -118,6 +119,11 @@ public interface AtpSettings {
 		
 		@Override
 		public boolean logSpam() {
+			return false;
+		}
+		
+		@Override
+		public boolean fixHandGlitch() {
 			return false;
 		}
 	};

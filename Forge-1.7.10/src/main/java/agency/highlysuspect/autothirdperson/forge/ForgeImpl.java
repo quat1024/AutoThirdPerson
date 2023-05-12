@@ -119,10 +119,9 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 		}
 	}
 	
-	//TODO: readd config option again
 	@SubscribeEvent
 	public void onRenderHand(RenderHandEvent e) {
-		if(client.thePlayer == null) return;
+		if(client.thePlayer == null || !settings.fixHandGlitch()) return;
 		
 		Render entityRenderer = RenderManager.instance.getEntityRenderObject(client.thePlayer);
 		if(entityRenderer instanceof RenderPlayer) {

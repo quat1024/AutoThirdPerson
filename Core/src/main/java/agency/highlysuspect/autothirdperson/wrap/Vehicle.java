@@ -1,4 +1,4 @@
-package agency.highlysuspect.autothirdperson;
+package agency.highlysuspect.autothirdperson.wrap;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -18,10 +18,17 @@ public interface Vehicle {
 	/**
 	 * General vehicle category, or `OTHER` if it doesn't fit in one. Used for the generic category options.
 	 */
-	@NotNull VehicleClassification classification();
+	@NotNull Classification classification();
 	
 	/**
 	 * Whether these two `Vehicle`s refer to the same vehicle.
 	 */
 	boolean vehicleEquals(Vehicle other);
+	
+	enum Classification {
+		BOAT,
+		MINECART,
+		ANIMAL,
+		OTHER
+	}
 }

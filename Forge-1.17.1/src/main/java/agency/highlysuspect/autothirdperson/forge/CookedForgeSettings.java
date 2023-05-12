@@ -153,4 +153,11 @@ public class CookedForgeSettings implements AtpSettings {
 	public boolean logSpam() {
 		return logSpam;
 	}
+	
+	//Not supported
+	
+	@Override
+	public boolean fixHandGlitch() {
+		return false;
+	}
 }

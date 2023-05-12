@@ -1,11 +1,12 @@
 package agency.highlysuspect.autothirdperson;
 
+import agency.highlysuspect.autothirdperson.consumer.MyConsumer;
+import agency.highlysuspect.autothirdperson.consumer.MyConsumerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;

@@ -18,13 +18,13 @@ public class CookedCrummyConfig implements AtpSettings {
 		swimmingDelayStart = raw.ints.get("swimmingDelayStart");
 		swimmingDelayEnd = raw.ints.get("swimmingDelayEnd");
 		stickySwim = raw.bools.get("stickySwim");
+		customPattern = raw.patterns.get("customPattern");
+		ignorePattern = raw.patterns.get("ignorePattern");
 		autoRestore = raw.bools.get("autoRestore");
 		cancelAutoRestore = raw.bools.get("cancelAutoRestore");
 		skipFrontView = raw.bools.get("skipFrontView");
 		logSpam = raw.bools.get("logSpam");
-		
-		customPattern = raw.patterns.get("customPattern");
-		ignorePattern = raw.patterns.get("ignorePattern");
+		fixHandGlitch = raw.bools.get("fixHandGlitch");
 	}
 	
 	private final int configVersion;
@@ -45,6 +45,7 @@ public class CookedCrummyConfig implements AtpSettings {
 	private final boolean cancelAutoRestore;
 	private final boolean skipFrontView;
 	private final boolean logSpam;
+	private final boolean fixHandGlitch;
 	
 	@Override
 	public int configVersion() {
@@ -134,5 +135,10 @@ public class CookedCrummyConfig implements AtpSettings {
 	@Override
 	public boolean logSpam() {
 		return logSpam;
+	}
+	
+	@Override
+	public boolean fixHandGlitch() {
+		return fixHandGlitch;
 	}
 }

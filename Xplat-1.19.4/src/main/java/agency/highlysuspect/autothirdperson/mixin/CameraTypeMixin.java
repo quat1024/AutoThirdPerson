@@ -1,7 +1,7 @@
 package agency.highlysuspect.autothirdperson.mixin;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
-import agency.highlysuspect.autothirdperson.MyCameraType;
+import agency.highlysuspect.autothirdperson.wrap.MyCameraType;
 import agency.highlysuspect.autothirdperson.NineteenFourAutoThirdPerson;
 import net.minecraft.client.CameraType;
 import org.jetbrains.annotations.Nullable;

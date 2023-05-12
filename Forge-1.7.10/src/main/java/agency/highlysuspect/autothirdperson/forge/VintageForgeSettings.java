@@ -2,7 +2,7 @@ package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AtpSettings;
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
-import agency.highlysuspect.autothirdperson.MyConsumer;
+import agency.highlysuspect.autothirdperson.consumer.MyConsumer;
 import agency.highlysuspect.autothirdperson.SettingsSpec;
 import net.minecraftforge.common.config.Configuration;
 
@@ -70,6 +70,7 @@ public class VintageForgeSettings implements AtpSettings {
 		cancelAutoRestore = boolValues.get("cancelAutoRestore");
 		skipFrontView = boolValues.get("skipFrontView");
 		logSpam = boolValues.get("logSpam");
+		fixHandGlitch = boolValues.get("fixHandGlitch");
 	}
 	
 	private final int configVersion;
@@ -87,6 +88,7 @@ public class VintageForgeSettings implements AtpSettings {
 	private final boolean cancelAutoRestore;
 	private final boolean skipFrontView;
 	private final boolean logSpam;
+	private final boolean fixHandGlitch;
 	
 	@Override
 	public int configVersion() {
@@ -163,7 +165,12 @@ public class VintageForgeSettings implements AtpSettings {
 		return logSpam;
 	}
 	
-	//Unsupported options
+	@Override
+	public boolean fixHandGlitch() {
+		return fixHandGlitch;
+	}
+	
+	//Not supported
 	
 	@Override
 	public int elytraDelay() {
