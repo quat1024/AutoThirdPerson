@@ -1,7 +1,7 @@
 package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AtpSettings;
-import agency.highlysuspect.autothirdperson.NineteenTwoMinecraftInteraction;
+import agency.highlysuspect.autothirdperson.NineteenTwoAutoThirdPerson;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -10,7 +10,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-public class ForgeImpl extends NineteenTwoMinecraftInteraction {
+public class ForgeImpl extends NineteenTwoAutoThirdPerson {
 	private UncookedForgeSettings uncookedForgeSettings;
 	private AtpSettings cookedForgeSettings = AtpSettings.MISSING;
 	

@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 
-public abstract class NineteenTwoMinecraftInteraction extends AutoThirdPerson {
+public abstract class SeventeenOneAutoThirdPerson extends AutoThirdPerson {
 	private final Minecraft client = Minecraft.getInstance();
 	
 	private final MyLogger logFacade = new MyLogger() {

@@ -1,7 +1,7 @@
 package agency.highlysuspect.autothirdperson.fabric;
 
 import agency.highlysuspect.autothirdperson.AtpSettings;
-import agency.highlysuspect.autothirdperson.SixteenFiveMinecraftInteractions;
+import agency.highlysuspect.autothirdperson.SixteenFiveAutoThirdPerson;
 import agency.highlysuspect.crummyconfig.CookedCrummyConfig;
 import agency.highlysuspect.crummyconfig.UncookedCrummyConfig;
 import net.fabricmc.api.ClientModInitializer;
@@ -17,7 +17,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.IOException;
 
-public class FabricEntrypoint extends SixteenFiveMinecraftInteractions implements ClientModInitializer {
+public class FabricEntrypoint extends SixteenFiveAutoThirdPerson implements ClientModInitializer {
 	private UncookedCrummyConfig uncookedConfig;
 	private AtpSettings settings = AtpSettings.MISSING;
 	

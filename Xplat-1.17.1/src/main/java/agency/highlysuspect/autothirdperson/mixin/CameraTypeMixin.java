@@ -1,7 +1,7 @@
 package agency.highlysuspect.autothirdperson.mixin;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
-import agency.highlysuspect.autothirdperson.SeventeenOneMinecraftInteraction;
+import agency.highlysuspect.autothirdperson.SeventeenOneAutoThirdPerson;
 import agency.highlysuspect.autothirdperson.MyCameraType;
 import net.minecraft.client.CameraType;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +19,7 @@ public class CameraTypeMixin {
 	)
 	public void autoThirdPerson$modifyCycle(CallbackInfoReturnable<CameraType> ci) {
 		AutoThirdPerson<?, ?> atp = AutoThirdPerson.instance;
-		SeventeenOneMinecraftInteraction mcInteraction = (SeventeenOneMinecraftInteraction) atp.mc;
+		SeventeenOneAutoThirdPerson mcInteraction = (SeventeenOneAutoThirdPerson) atp.mc;
 		
 		@SuppressWarnings("ConstantConditions") //mixin cast
 		@Nullable MyCameraType cycleOverride = atp.modifyCycle(mcInteraction.wrapCameraType((CameraType) (Object) this));

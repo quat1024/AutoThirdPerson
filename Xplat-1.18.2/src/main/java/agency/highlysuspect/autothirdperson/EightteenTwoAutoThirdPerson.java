@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 
-public abstract class SixteenFiveMinecraftInteractions extends AutoThirdPerson {
+public abstract class EightteenTwoAutoThirdPerson extends AutoThirdPerson {
 	private final Minecraft client = Minecraft.getInstance();
 	
 	private final MyLogger logFacade = new MyLogger() {
@@ -86,19 +86,19 @@ public abstract class SixteenFiveMinecraftInteractions extends AutoThirdPerson {
 	///
 	
 	public MyCameraType wrapCameraType(CameraType type) {
-		switch(type) {
-			case FIRST_PERSON: default: return MyCameraType.FIRST_PERSON;
-			case THIRD_PERSON_BACK: return MyCameraType.THIRD_PERSON;
-			case THIRD_PERSON_FRONT: return MyCameraType.THIRD_PERSON_REVERSED;
-		}
+		return switch(type) {
+			case FIRST_PERSON -> MyCameraType.FIRST_PERSON;
+			case THIRD_PERSON_BACK -> MyCameraType.THIRD_PERSON;
+			case THIRD_PERSON_FRONT -> MyCameraType.THIRD_PERSON_REVERSED;
+		};
 	}
 	
 	public CameraType unwrapCameraType(MyCameraType type) {
-		switch(type) {
-			case FIRST_PERSON: default: return CameraType.FIRST_PERSON;
-			case THIRD_PERSON: return CameraType.THIRD_PERSON_BACK;
-			case THIRD_PERSON_REVERSED: return CameraType.THIRD_PERSON_FRONT;
-		}
+		return switch(type) {
+			case FIRST_PERSON -> CameraType.FIRST_PERSON;
+			case THIRD_PERSON -> CameraType.THIRD_PERSON_BACK;
+			case THIRD_PERSON_REVERSED -> CameraType.THIRD_PERSON_FRONT;
+		};
 	}
 	
 	public Vehicle wrapVehicle(Entity ent) {
@@ -142,29 +142,6 @@ public abstract class SixteenFiveMinecraftInteractions extends AutoThirdPerson {
 			Entity myEntity = ent.get();
 			Entity otherEntity = ((EntityVehicle) other).ent.get();
 			return myEntity != null && myEntity.isAlive() && myEntity == otherEntity;
-		}
-	}
-	
-	private static class Log4jMyLogger implements MyLogger {
-		public Log4jMyLogger(Logger logger) {
-			this.logger = logger;
-		}
-		
-		private final Logger logger;
-		
-		@Override
-		public void info(String msg, Object... args) {
-			logger.info(msg, args);
-		}
-		
-		@Override
-		public void warn(String msg, Object... args) {
-			logger.warn(msg, args);
-		}
-		
-		@Override
-		public void error(String msg, Throwable err) {
-			logger.error(msg, err);
 		}
 	}
 }
