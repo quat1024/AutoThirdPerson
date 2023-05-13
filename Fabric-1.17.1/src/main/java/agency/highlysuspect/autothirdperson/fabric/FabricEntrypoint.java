@@ -30,6 +30,8 @@ public class FabricEntrypoint extends SeventeenOneAutoThirdPerson implements Cli
 	public void init() {
 		super.init();
 		
+		ClientTickEvents.START_CLIENT_TICK.register(__ -> tickClient());
+		
 		uncookedConfig = new UncookedCrummyConfig(
 			FabricLoader.getInstance().getConfigDir().resolve(MODID + ".cfg"),
 			instance.buildSettingsSpec()
@@ -73,10 +75,5 @@ public class FabricEntrypoint extends SeventeenOneAutoThirdPerson implements Cli
 	@Override
 	public AtpSettings settings() {
 		return settings;
-	}
-	
-	@Override
-	public void registerClientTicker(Runnable action) {
-		ClientTickEvents.START_CLIENT_TICK.register(mc -> action.run());
 	}
 }

@@ -18,6 +18,12 @@ public class ForgeImpl extends NineteenFourAutoThirdPerson {
 	public void init() {
 		super.init();
 		
+		MinecraftForge.EVENT_BUS.addListener((TickEvent.ClientTickEvent e) -> {
+			if(e.phase == TickEvent.Phase.START) { //Nice api dummy
+				tickClient();
+			}
+		});
+		
 		uncookedForgeSettings = new UncookedForgeSettings(buildSettingsSpec());
 		
 		FMLJavaModLoadingContext.get().getModEventBus().register(this);
@@ -36,14 +42,5 @@ public class ForgeImpl extends NineteenFourAutoThirdPerson {
 	@Override
 	public AtpSettings settings() {
 		return cookedForgeSettings;
-	}
-	
-	@Override
-	public void registerClientTicker(Runnable action) {
-		MinecraftForge.EVENT_BUS.addListener((TickEvent.ClientTickEvent e) -> {
-			if(e.phase == TickEvent.Phase.START) { //Nice api dummy
-				action.run();
-			}
-		});
 	}
 }

@@ -29,7 +29,7 @@ public abstract class AutoThirdPerson {
 		}
 		
 		this.logger = makeLogger();
-		this.state = new State();
+		this.state = makeState();
 	}
 	
 	public abstract VersionCapabilities.Builder caps(VersionCapabilities.Builder builder);
@@ -44,7 +44,7 @@ public abstract class AutoThirdPerson {
 	/** Whether the player has the f3 menu up */
 	public abstract boolean debugScreenUp();
 	
-	/** @return Player exists, level exists, game is not paused, etc */
+	/** Player exists, level exists, game is not paused, etc */
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public abstract boolean safeToTick();
 	
@@ -58,27 +58,18 @@ public abstract class AutoThirdPerson {
 	public abstract boolean playerIsUnderwater();
 	
 	/**
-	 * @return The current settings.
-	 *         If this loader can automatically reload settings, this should return the most up-to-date copy of them.
-	 *         If it can't, this should return the most up-to-date copy after a manual reload step, or after game startup, or whatever.
-	 *         Don't return `null`; there's a default setting object in AtpSettings.
+	 * The current settings. If this loader can automatically reload settings, this should return the most up-to-date copy of them.
+	 * If it can't, this should return the most up-to-date copy after a manual reload step, or after game startup, or whatever.
+	 * Don't return `null`; there's a default setting object in AtpSettings.
 	 */
 	public abstract AtpSettings settings();
 	
-	/**
-	 * Tell the loader to call this Runnable every frame.
-	 */
-	public abstract void registerClientTicker(Runnable action);
+	public State makeState() {
+		return new State();
+	}
 	
 	public void init() {
-		logger.info(NAME + "initializing...");
-		
-		registerClientTicker(new Runnable() {
-			@Override
-			public void run() {
-				tickClient();
-			}
-		});
+		logger.info(NAME + " initializing...");
 	}
 	
 	/// external api ///
@@ -109,9 +100,7 @@ public abstract class AutoThirdPerson {
 		if(debugScreenUp() || settings().logSpam()) logger.info(msg, args);
 	}
 	
-	/// internal api ///
-	
-	private void tickClient() {
+	public void tickClient() {
 		if(!safeToTick()) return;
 		AtpSettings settings = settings();
 		
@@ -146,6 +135,8 @@ public abstract class AutoThirdPerson {
 			state.swimTicks++;
 		}
 	}
+	
+	//internal api
 	
 	private void mountOrDismount(Vehicle vehicle, boolean mounting) {
 		if(!safeToTick()) return;
@@ -232,6 +223,13 @@ public abstract class AutoThirdPerson {
 		
 		public void cancel() {
 			reason = null;
+		}
+		
+		public void reset() {
+			oldPerspective = MyCameraType.FIRST_PERSON;
+			reason = null;
+			elytraFlyingTicks = swimTicks = 0;
+			wasSwimming = false;
 		}
 	}
 	

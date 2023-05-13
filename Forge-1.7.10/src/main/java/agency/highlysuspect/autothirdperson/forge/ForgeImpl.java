@@ -1,7 +1,6 @@
 package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AtpSettings;
-import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 import cpw.mods.fml.client.GuiIngameModOptions;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -19,20 +18,19 @@ import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ForgeImpl extends OneSevenTenAutoThirdPerson {
-	private final List<Runnable> clientTickers = new ArrayList<Runnable>();
-	private final OneSevenTenState myState = new OneSevenTenState();
-	
 	private final Configuration forgeConfig;
 	private VintageForgeSettings settings;
 	
 	public ForgeImpl(FMLPreInitializationEvent e) {
-		this.forgeConfig = new Configuration(new File(e.getModConfigurationDirectory(), "auto_third_person.cfg"));
+		this.forgeConfig = new Configuration(e.getSuggestedConfigurationFile());
+	}
+	
+	@Override
+	public State makeState() {
+		return new OneSevenTenState();
 	}
 	
 	@Override
@@ -52,11 +50,6 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 		return settings;
 	}
 	
-	@Override
-	public void registerClientTicker(Runnable action) {
-		clientTickers.add(action);
-	}
-	
 	//frog events
 	
 	//tired: making a settings gui for your mod
@@ -74,10 +67,7 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 	public void tick(TickEvent.ClientTickEvent e) {
 		if(e.phase != TickEvent.Phase.START) return;
 		
-		//atp core's client tickers
-		for(Runnable clientTicker : clientTickers) {
-			clientTicker.run();
-		}
+		tickClient();
 	}
 	
 	@SubscribeEvent
@@ -85,9 +75,12 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 		if(e.phase != TickEvent.Phase.START) return;
 		
 		if(!safeToTick()) {
-			myState.reset();
+			state.reset();
 			return;
 		}
+		
+		//TODO: push this up into a generic
+		OneSevenTenState myState = (OneSevenTenState) state;
 		
 		//Track changes to vehicle (forge doesn't have mount/dismount events yet)
 		Entity currentVehicle = client.thePlayer.ridingEntity;
@@ -135,10 +128,12 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 		}
 	}
 	
-	private static class OneSevenTenState {
+	private static class OneSevenTenState extends State {
 		WeakReference<Entity> lastVehicleWeak = new WeakReference<Entity>(null);
 		
-		void reset() {
+		@Override
+		public void reset() {
+			super.reset();
 			lastVehicleWeak.clear();
 		}
 	}

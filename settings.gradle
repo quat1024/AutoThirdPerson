@@ -39,5 +39,7 @@ include(
 	"Fabric-1.16.5",
 //	"Forge-1.16.5" //TODO, mappings funny moments
 	
-	"Forge-1.7.10"
+	"Forge-1.7.10",
+	
+	"Forge-1.4.7"
 )
