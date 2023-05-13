@@ -100,6 +100,18 @@ public abstract class AutoThirdPerson {
 		if(debugScreenUp() || settings().logSpam()) logger.info(msg, args);
 	}
 	
+	public void renderClient() {
+		if(!safeToTick()) return;
+		
+		if(settings().skipFrontView()) {
+			MyCameraType currentCameraType = getCameraType();
+			if(currentCameraType == MyCameraType.THIRD_PERSON_REVERSED) {
+				debugSpam("Skipping third-person reversed view");
+				setCameraType(MyCameraType.FIRST_PERSON);
+			}
+		}
+	}
+	
 	public void tickClient() {
 		if(!safeToTick()) return;
 		AtpSettings settings = settings();
