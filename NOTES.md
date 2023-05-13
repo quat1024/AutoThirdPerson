@@ -1,3 +1,15 @@
+# things to do later
+
+Ive worked a lot on old froge versions today, need to retest that the new forge+fabric versions work too
+
+check that CrummyConfig error handling is the way i want it
+
+Try to remove a few mixins:
+
+* `CameraTypeMixin`: A perframe that changes the camera type isn't so bad, instead of modifying `cycle`
+* `LocalPlayerMixin`: tracks mounting/dismounting, useful on Fabric but froge has entity mounting events
+* `MinecraftMixin`: checks for manual F5-presses, not time-sensitive, there might be keyboard events
+
 # tracking what the player is riding
 
 modern Forge versions (at least 1.12): have **events** that are fired when an entity is mounted or dismounted
@@ -23,8 +35,3 @@ every version: register a ticker (preferably as early as possible *before* camer
 previous version: kinda botania style, two "service" classes are required in the constructor: one for interacting with minecraft & one for interacting with the loader. A little bit wrong (like "logging" requires interacting with FML on 1.4.7, so it's not really a vanilla-only capability) and I don't really think the separation proves useful.
 
 better approach imo: one mod class full of abstract methods, extended abstractly in the xplat module with whatever is possible to implement there, and further extended in the loader module
-
-Tweaks:
-
-* Would be nice if the `State` type was pluggable, especially for the old versions of forge
-* Remove the "client tickers" thing in favor of "making the loader call AutoThirdPerson#tick"
