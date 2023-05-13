@@ -1,7 +1,6 @@
 package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AtpSettings;
-import agency.highlysuspect.autothirdperson.wrap.MyCameraType;
 import agency.highlysuspect.autothirdperson.wrap.MyLogger;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ITickHandler;
@@ -83,7 +82,8 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 	//frog events
 	
 	//subscribed via the tick handler
-	private void frame() {
+	@Override
+	public void renderClient() {
 		if(!safeToTick()) {
 			state.reset();
 			return;
@@ -92,16 +92,12 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 		//TODO: push this up into a generic
 		OneFourSevenState myState = (OneFourSevenState) state;
 		
-		//Handle the "Skip front view" setting (I don't think there's keyboard events?)
-		if(settings().skipFrontView() && client.gameSettings.thirdPersonView == 2) {
-			debugSpam("Skipping third-person reversed view");
-			client.gameSettings.thirdPersonView = 0;
-		}
-		
-		//Track whether you manually pressed F5 (same, I don't think there's keyboard events yet)
+		//Track whether you manually pressed F5 (There's no keyboard events yet)
 		if(client.gameSettings.thirdPersonView != myState.expectedThirdPersonView) {
 			manualPress();
 		}
+		
+		super.renderClient(); //Handles skip-front-view
 		
 		//Track changes to vehicle (forge doesn't have mount/dismount events yet)
 		Entity currentVehicle = client.thePlayer.ridingEntity;
@@ -164,9 +160,9 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 	//expectedThirdPersonView variable. We need to update it when we automatically change the camera
 	//so it doesn't trip that detector
 	@Override
-	public void setCameraType(MyCameraType type) {
+	public void setCameraType(int type) {
 		super.setCameraType(type);
-		((OneFourSevenState) state).expectedThirdPersonView = type.ordinal();
+		((OneFourSevenState) state).expectedThirdPersonView = type;
 	}
 	
 	private static class OneFourSevenState extends State {
@@ -191,7 +187,7 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 		
 		@Override
 		public void tickStart(EnumSet<TickType> types, Object... args) {
-			if(types.contains(TickType.RENDER)) frame(); //called every frame
+			if(types.contains(TickType.RENDER)) renderClient(); //called every frame
 			else if(types.contains(TickType.CLIENT)) tickClient(); //called 20 times per second
 		}
 		

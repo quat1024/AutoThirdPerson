@@ -20,7 +20,7 @@ It's a mess out there! Different loaders provide different services for configur
 
 ## Layout
 
-The core is `Core/.../AutoThirdPerson.java`, and is a singleton with a bunch of abstract methods. I generally use a pattern where I implement as much as possible without touching the modloader (in classes named like `OneSixteenFiveAutoThirdPerson`) in a still-abstract class, then finish the rest in a modloader-specific class. The core also contains some thin wrappers over bits shared across all Minecraft versions (like `MyCameraType`) just so i can refer to them. It must remain compatible with Java 6, a couple of the old versions require it.
+The core is `Core/.../AutoThirdPerson.java`, and is a singleton with a bunch of abstract methods. I generally use a pattern where I implement as much as possible without touching the modloader (in classes named like `OneSixteenFiveAutoThirdPerson`) in a still-abstract class, then finish the rest in a modloader-specific class. The core also contains some thin wrappers over bits shared across all Minecraft versions just so i can refer to them. It must remain compatible with Java 6.
 
 * modern versions with official mappings (1.17, 1.18, 1.19, 1.19 again) - using [VanillaGradle](https://github.com/SpongePowered/VanillaGradle/) in the `xplat` modules to write code against vanilla minecraft using official names, then using the modloader-specific gradle plugins to complete the mod, also using official names
 * 1.16 - ForgeGradle's `"official"` mappings channel is a big fat lie and not actually official mappings... so right now the forge 1.16 one is broken
@@ -28,6 +28,10 @@ The core is `Core/.../AutoThirdPerson.java`, and is a singleton with a bunch of 
   * Feel free to request ports for Forge 1.3, 1.5, and 1.6 if you want em, voldeloom works on those too
 
 `CrummyConfig` is a lowest-common-denominator configuration loading system, used on Fabric which doesn't come with a config API. Written against Java 8.
+
+### dirty secret
+
+The mod isn't usually tested very well because there's 12 versions to try :joy:
 
 ## Warnings
 

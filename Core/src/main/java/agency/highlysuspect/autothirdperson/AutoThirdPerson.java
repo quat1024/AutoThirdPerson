@@ -1,7 +1,6 @@
 package agency.highlysuspect.autothirdperson;
 
 import agency.highlysuspect.autothirdperson.consumer.MyConsumer;
-import agency.highlysuspect.autothirdperson.wrap.MyCameraType;
 import agency.highlysuspect.autothirdperson.wrap.MyLogger;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +16,12 @@ public abstract class AutoThirdPerson {
 	public final MyLogger logger;
 	public final VersionCapabilities version = caps(new VersionCapabilities.Builder()).build();
 	public final State state;
+	
+	//Well-known camera types.
+	//Note that a mod *might* enum-extend and add a new camera type, so this isn't the complete universe. 
+	public static final int FIRST_PERSON = 0;
+	public static final int THIRD_PERSON = 1;
+	public static final int THIRD_PERSON_REVERSED = 2;
 	
 	public AutoThirdPerson() {
 		if(instance == null) {
@@ -35,14 +40,17 @@ public abstract class AutoThirdPerson {
 	public abstract VersionCapabilities.Builder caps(VersionCapabilities.Builder builder);
 	public abstract MyLogger makeLogger();
 	
-	/** Wrap the current Minecraft camera type */
-	public abstract MyCameraType getCameraType();
+	public abstract int getCameraType();
+	public abstract void setCameraType(int type);
+	public int numberOfCameraTypes() {
+		//It makes sense to me that a mod might add additional camera types.
+		//On versions that use an `int` to manage camera types, it's not possible to check how many types there are.
+		//But, like, maybe a mod enum-extends new types? Then we can check with CameraType.values().length, at least.
+		//I dunno, this feels like a bit of a reach.
+		return 3;
+	}
 	
-	/** Unwrap and set the current Minecraft camera type */
-	public abstract void setCameraType(MyCameraType type);
-	
-	/** Whether the player has the f3 menu up */
-	public abstract boolean debugScreenUp();
+	public abstract boolean f3ScreenUp();
 	
 	/** Player exists, level exists, game is not paused, etc */
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -54,7 +62,7 @@ public abstract class AutoThirdPerson {
 	/** or `false` if this game doesn't have the swimming animation */
 	public abstract boolean playerInSwimmingAnimation();
 	
-	/** Whether the player's head/camera/whatever is underwater, used for `stickySwim` and for the swim setting on pre-1.13 */
+	/** Whether the player's head/camera/whatever is underwater, used for `stickySwim`, and for the swim setting on pre-1.13 */
 	public abstract boolean playerIsUnderwater();
 	
 	/**
@@ -82,13 +90,6 @@ public abstract class AutoThirdPerson {
 		mountOrDismount(dismounting, false);
 	}
 	
-	public @Nullable MyCameraType modifyCycle(MyCameraType cycleFrom) {
-		if(settings().skipFrontView() && cycleFrom == MyCameraType.THIRD_PERSON) {
-			debugSpam("Skipping third-person reversed view");
-			return MyCameraType.FIRST_PERSON;
-		} else return null;
-	}
-	
 	public void manualPress() {
 		if(settings().cancelAutoRestore() && state.isActive()) {
 			debugSpam("Cancelling auto-restore, if it was about to happen");
@@ -97,17 +98,17 @@ public abstract class AutoThirdPerson {
 	}
 	
 	public void debugSpam(String msg, Object... args) {
-		if(debugScreenUp() || settings().logSpam()) logger.info(msg, args);
+		if(f3ScreenUp() || settings().logSpam()) logger.info(msg, args);
 	}
 	
 	public void renderClient() {
 		if(!safeToTick()) return;
 		
 		if(settings().skipFrontView()) {
-			MyCameraType currentCameraType = getCameraType();
-			if(currentCameraType == MyCameraType.THIRD_PERSON_REVERSED) {
+			int currentCameraType = getCameraType();
+			if(currentCameraType == THIRD_PERSON_REVERSED) {
 				debugSpam("Skipping third-person reversed view");
-				setCameraType(MyCameraType.FIRST_PERSON);
+				setCameraType((currentCameraType + 1) % numberOfCameraTypes());
 			}
 		}
 	}
@@ -189,10 +190,10 @@ public abstract class AutoThirdPerson {
 	}
 	
 	private void enterThirdPerson(Reason reason) {
-		if(state.reason == null && getCameraType() == MyCameraType.FIRST_PERSON) {
+		if(state.reason == null && getCameraType() == FIRST_PERSON) {
 			state.oldPerspective = getCameraType();
 			state.reason = reason;
-			setCameraType(MyCameraType.THIRD_PERSON);
+			setCameraType(THIRD_PERSON);
 			debugSpam("Automatically entering third person due to {}", reason);
 		} else if(state.isActive()) {
 			state.reason = reason;
@@ -222,7 +223,7 @@ public abstract class AutoThirdPerson {
 	}
 	
 	public static class State {
-		public MyCameraType oldPerspective = MyCameraType.FIRST_PERSON;
+		public int oldPerspective = FIRST_PERSON;
 		public @Nullable Reason reason;
 		
 		public int elytraFlyingTicks = 0;
@@ -238,7 +239,7 @@ public abstract class AutoThirdPerson {
 		}
 		
 		public void reset() {
-			oldPerspective = MyCameraType.FIRST_PERSON;
+			oldPerspective = FIRST_PERSON;
 			reason = null;
 			elytraFlyingTicks = swimTicks = 0;
 			wasSwimming = false;

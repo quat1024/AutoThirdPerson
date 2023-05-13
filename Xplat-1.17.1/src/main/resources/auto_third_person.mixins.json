@@ -5,7 +5,7 @@
 	"compatibilityLevel": "JAVA_16",
 	"mixins": [
 	],
-	"client": ["LocalPlayerMixin", "MinecraftMixin", "CameraTypeMixin"],
+	"client": ["LocalPlayerMixin", "MinecraftMixin", "GameRendererMixin"],
 	"injectors": {
 		"defaultRequire": 1
 	},

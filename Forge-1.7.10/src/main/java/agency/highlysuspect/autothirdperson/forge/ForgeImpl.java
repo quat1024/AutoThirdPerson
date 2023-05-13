@@ -79,6 +79,8 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 			return;
 		}
 		
+		renderClient();
+		
 		//TODO: push this up into a generic
 		OneSevenTenState myState = (OneSevenTenState) state;
 		
@@ -102,13 +104,6 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 		//terrible mcp name - "check if it's pressed without consuming the click", here
 		if(client.gameSettings.keyBindTogglePerspective.getIsKeyPressed()) {
 			manualPress();
-		}
-		
-		//The key input event is fired right after handling keyBindTogglePerspective in vanilla.
-		//Instead of using atp core modifyCycle let's handle it here
-		if(settings.skipFrontView() && client.gameSettings.thirdPersonView == 2) {
-			debugSpam("Skipping third-person reversed view");
-			client.gameSettings.thirdPersonView = 0;
 		}
 	}
 	

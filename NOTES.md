@@ -10,6 +10,8 @@ Try to remove a few mixins:
 * `LocalPlayerMixin`: tracks mounting/dismounting, useful on Fabric but froge has entity mounting events
 * `MinecraftMixin`: checks for manual F5-presses, not time-sensitive, there might be keyboard events
 
+Make sure to add proper client-side-only markers on all forge versions (why is forge weird )(pls)
+
 # tracking what the player is riding
 
 modern Forge versions (at least 1.12): have **events** that are fired when an entity is mounted or dismounted

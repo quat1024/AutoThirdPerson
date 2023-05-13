@@ -50,12 +50,7 @@ public class ForgeImpl extends OneTwelveTwoAutoThirdPerson {
 	public void onFrame(TickEvent.RenderTickEvent e) {
 		if(e.phase != TickEvent.Phase.START) return;
 		
-		//We could handle this in the key input event, but the event is fired disconcertingly late.
-		//It renders the third-person reversed view for a *handful* of frames before switching. I don't like it.
-		if(settings.skipFrontView() && client.gameSettings.thirdPersonView == 2) {
-			debugSpam("Skipping third-person reversed view");
-			client.gameSettings.thirdPersonView = 0;
-		}
+		renderClient();
 	}
 	
 	@SubscribeEvent

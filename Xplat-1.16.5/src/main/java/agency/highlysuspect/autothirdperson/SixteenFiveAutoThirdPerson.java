@@ -1,6 +1,5 @@
 package agency.highlysuspect.autothirdperson;
 
-import agency.highlysuspect.autothirdperson.wrap.MyCameraType;
 import agency.highlysuspect.autothirdperson.wrap.MyLogger;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
 import net.minecraft.client.CameraType;
@@ -47,17 +46,22 @@ public abstract class SixteenFiveAutoThirdPerson extends AutoThirdPerson {
 	}
 	
 	@Override
-	public MyCameraType getCameraType() {
-		return wrapCameraType(client.options.getCameraType());
+	public int getCameraType() {
+		return client.options.getCameraType().ordinal();
 	}
 	
 	@Override
-	public void setCameraType(MyCameraType type) {
-		client.options.setCameraType(unwrapCameraType(type));
+	public void setCameraType(int type) {
+		client.options.setCameraType(CameraType.values()[type]);
 	}
 	
 	@Override
-	public boolean debugScreenUp() {
+	public int numberOfCameraTypes() {
+		return CameraType.values().length;
+	}
+	
+	@Override
+	public boolean f3ScreenUp() {
 		return client.options.renderDebug;
 	}
 	
@@ -82,24 +86,6 @@ public abstract class SixteenFiveAutoThirdPerson extends AutoThirdPerson {
 	public boolean playerIsUnderwater() {
 		assert client.player != null;
 		return client.player.isUnderWater();
-	}
-	
-	///
-	
-	public MyCameraType wrapCameraType(CameraType type) {
-		switch(type) {
-			case FIRST_PERSON: default: return MyCameraType.FIRST_PERSON;
-			case THIRD_PERSON_BACK: return MyCameraType.THIRD_PERSON;
-			case THIRD_PERSON_FRONT: return MyCameraType.THIRD_PERSON_REVERSED;
-		}
-	}
-	
-	public CameraType unwrapCameraType(MyCameraType type) {
-		switch(type) {
-			case FIRST_PERSON: default: return CameraType.FIRST_PERSON;
-			case THIRD_PERSON: return CameraType.THIRD_PERSON_BACK;
-			case THIRD_PERSON_REVERSED: return CameraType.THIRD_PERSON_FRONT;
-		}
 	}
 	
 	public Vehicle wrapVehicle(Entity ent) {
@@ -143,29 +129,6 @@ public abstract class SixteenFiveAutoThirdPerson extends AutoThirdPerson {
 			Entity myEntity = ent.get();
 			Entity otherEntity = ((EntityVehicle) other).ent.get();
 			return myEntity != null && myEntity.isAlive() && myEntity == otherEntity;
-		}
-	}
-	
-	private static class Log4jMyLogger implements MyLogger {
-		public Log4jMyLogger(Logger logger) {
-			this.logger = logger;
-		}
-		
-		private final Logger logger;
-		
-		@Override
-		public void info(String msg, Object... args) {
-			logger.info(msg, args);
-		}
-		
-		@Override
-		public void warn(String msg, Object... args) {
-			logger.warn(msg, args);
-		}
-		
-		@Override
-		public void error(String msg, Throwable err) {
-			logger.error(msg, err);
 		}
 	}
 }

@@ -2,7 +2,6 @@ package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 import agency.highlysuspect.autothirdperson.VersionCapabilities;
-import agency.highlysuspect.autothirdperson.wrap.MyCameraType;
 import agency.highlysuspect.autothirdperson.wrap.MyLogger;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
 import net.minecraft.block.material.Material;
@@ -12,7 +11,6 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.util.math.MathHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -50,17 +48,17 @@ public abstract class OneTwelveTwoAutoThirdPerson extends AutoThirdPerson {
 	}
 	
 	@Override
-	public MyCameraType getCameraType() {
-		return MyCameraType.values()[MathHelper.clamp(client.gameSettings.thirdPersonView, 0, 2)];
+	public int getCameraType() {
+		return client.gameSettings.thirdPersonView;
 	}
 	
 	@Override
-	public void setCameraType(MyCameraType type) {
-		client.gameSettings.thirdPersonView = type.ordinal();
+	public void setCameraType(int type) {
+		client.gameSettings.thirdPersonView = type;
 	}
 	
 	@Override
-	public boolean debugScreenUp() {
+	public boolean f3ScreenUp() {
 		return client.gameSettings.showDebugInfo;
 	}
 	

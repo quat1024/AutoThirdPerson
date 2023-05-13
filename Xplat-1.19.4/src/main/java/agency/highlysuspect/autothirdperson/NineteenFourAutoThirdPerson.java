@@ -1,6 +1,5 @@
 package agency.highlysuspect.autothirdperson;
 
-import agency.highlysuspect.autothirdperson.wrap.MyCameraType;
 import agency.highlysuspect.autothirdperson.wrap.MyLogger;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
 import net.minecraft.client.CameraType;
@@ -47,17 +46,22 @@ public abstract class NineteenFourAutoThirdPerson extends AutoThirdPerson {
 	}
 	
 	@Override
-	public MyCameraType getCameraType() {
-		return wrapCameraType(client.options.getCameraType());
+	public int getCameraType() {
+		return client.options.getCameraType().ordinal();
 	}
 	
 	@Override
-	public void setCameraType(MyCameraType type) {
-		client.options.setCameraType(unwrapCameraType(type));
+	public void setCameraType(int type) {
+		client.options.setCameraType(CameraType.values()[type]);
 	}
 	
 	@Override
-	public boolean debugScreenUp() {
+	public int numberOfCameraTypes() {
+		return CameraType.values().length;
+	}
+	
+	@Override
+	public boolean f3ScreenUp() {
 		return client.options.renderDebug;
 	}
 	
@@ -82,24 +86,6 @@ public abstract class NineteenFourAutoThirdPerson extends AutoThirdPerson {
 	public boolean playerIsUnderwater() {
 		assert client.player != null;
 		return client.player.isUnderWater();
-	}
-	
-	///
-	
-	public MyCameraType wrapCameraType(CameraType type) {
-		return switch(type) {
-			case FIRST_PERSON -> MyCameraType.FIRST_PERSON;
-			case THIRD_PERSON_BACK -> MyCameraType.THIRD_PERSON;
-			case THIRD_PERSON_FRONT -> MyCameraType.THIRD_PERSON_REVERSED;
-		};
-	}
-	
-	public CameraType unwrapCameraType(MyCameraType type) {
-		return switch(type) {
-			case FIRST_PERSON -> CameraType.FIRST_PERSON;
-			case THIRD_PERSON -> CameraType.THIRD_PERSON_BACK;
-			case THIRD_PERSON_REVERSED -> CameraType.THIRD_PERSON_FRONT;
-		};
 	}
 	
 	public Vehicle wrapVehicle(Entity ent) {

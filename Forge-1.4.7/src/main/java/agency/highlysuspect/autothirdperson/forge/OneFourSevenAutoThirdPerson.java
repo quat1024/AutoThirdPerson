@@ -2,7 +2,6 @@ package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 import agency.highlysuspect.autothirdperson.VersionCapabilities;
-import agency.highlysuspect.autothirdperson.wrap.MyCameraType;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -24,17 +23,17 @@ public abstract class OneFourSevenAutoThirdPerson extends AutoThirdPerson {
 	}
 	
 	@Override
-	public MyCameraType getCameraType() {
-		return MyCameraType.wrapFromInt(client.gameSettings.thirdPersonView);
+	public int getCameraType() {
+		return client.gameSettings.thirdPersonView;
 	}
 	
 	@Override
-	public void setCameraType(MyCameraType type) {
-		client.gameSettings.thirdPersonView = type.ordinal();
+	public void setCameraType(int type) {
+		client.gameSettings.thirdPersonView = type;
 	}
 	
 	@Override
-	public boolean debugScreenUp() {
+	public boolean f3ScreenUp() {
 		return client.gameSettings.showDebugInfo;
 	}
 	
