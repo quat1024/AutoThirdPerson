@@ -19,6 +19,7 @@ Make sure to add proper client-side-only markers on all forge versions (why is f
 |forge 1.4.7|watch every frame for player mounting things|
 |forge 1.7.10|watch every frame for player mounting things|
 |forge 1.12.2|`EntityMountEvent`, check the mounter == client.player|
+|forge 1.16.5|`EntityMountEvent`|
 |fabric 1.16.5|mixin to `LocalPlayer`, check startRiding/removeVehicle|
 |forge 1.17.1|`EntityMountEvent`|
 |fabric 1.17.1|mixin to `LocalPlayer`|
@@ -29,8 +30,6 @@ Make sure to add proper client-side-only markers on all forge versions (why is f
 |forge 1.19.4|`EntityMountEvent`|
 |fabric 1.19.4|mixin to `LocalPlayer`|
 
-mixin to `LocalPlayer` works on newer forge versions too, but the events are probably better
-
 # detecting manual F5 key presses
 
 |version||
@@ -38,6 +37,7 @@ mixin to `LocalPlayer` works on newer forge versions too, but the events are pro
 |forge 1.4.7|keep track of expected third-person state<br>assume current != expected -> manual press|
 |forge 1.7.10|`InputEvent.KeyInputEvent`|
 |forge 1.12.2|`InputEvent.KeyInputEvent`|
+|forge 1.16.5|`InputEvent.KeyInputEvent`|
 |fabric 1.16.5|mixin to `Minecraft`|
 |forge 1.17.1|`InputEvent.KeyInputEvent`|
 |fabric 1.17.1|mixin to `Minecraft`|
@@ -55,6 +55,7 @@ mixin to `LocalPlayer` works on newer forge versions too, but the events are pro
 |forge 1.4.7|ticker (`TickType.RENDER`)|
 |forge 1.7.10|ticker (`TickEvent.RenderTickEvent`)|
 |forge 1.12.2|ticker (`TickEvent.RenderTickEvent`)|
+|forge 1.16.5|ticker (`TickEvent.RenderTickEvent`)|
 |fabric 1.16.5|mixin to `GameRenderer`<br>available events in fabric-rendering-v1 are too late|
 |forge 1.17.1|ticker (`TickEvent.RenderTickEvent`)|
 |fabric 1.17.1|mixin to `GameRenderer`|
