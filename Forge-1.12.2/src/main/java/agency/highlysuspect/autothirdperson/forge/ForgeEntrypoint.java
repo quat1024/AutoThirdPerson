@@ -7,7 +7,10 @@ import net.minecraftforge.fml.relauncher.Side;
 @Mod(
 	modid = "auto_third_person",
 	useMetadata = true,
-	guiFactory = "agency.highlysuspect.autothirdperson.forge.GuiFactory" //Forge is so weird dude
+	guiFactory = "agency.highlysuspect.autothirdperson.forge.GuiFactory", //Forge is so weird dude
+	clientSideOnly = true,
+	acceptableRemoteVersions = "*",
+	acceptableSaveVersions = "*"
 )
 public class ForgeEntrypoint {
 	@Mod.EventHandler
