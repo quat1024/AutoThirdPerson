@@ -20,20 +20,17 @@ dependencies {
 	modImplementation fabricApi.module("fabric-command-api-v1", "0.42.0+1.16")
 	
 	//Xplat
-	implementation project(":Xplat-1.16.5")
 	implementation project(":CrummyConfig")
 	implementation project(":Core")
 }
 
 //fold in xplat resources and sources
 processResources {
-	from project(":Xplat-1.16.5").sourceSets.main.resources
 	from project(":CrummyConfig").sourceSets.main.resources
 	from project(":Core").sourceSets.main.resources
 }
 
 tasks.withType(JavaCompile) {
-	source(project(":Xplat-1.16.5").sourceSets.main.allSource)
 	source(project(":CrummyConfig").sourceSets.main.allSource)
 	source(project(":Core").sourceSets.main.allSource)
 }

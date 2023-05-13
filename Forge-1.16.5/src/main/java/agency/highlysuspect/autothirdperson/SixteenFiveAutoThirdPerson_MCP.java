@@ -2,21 +2,21 @@ package agency.highlysuspect.autothirdperson;
 
 import agency.highlysuspect.autothirdperson.wrap.MyLogger;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
-import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.Registry;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.client.settings.PointOfView;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.BoatEntity;
+import net.minecraft.entity.item.minecart.MinecartEntity;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 
-public abstract class SixteenFiveAutoThirdPerson extends AutoThirdPerson {
-	private final Minecraft client = Minecraft.getInstance();
+public abstract class SixteenFiveAutoThirdPerson_MCP extends AutoThirdPerson {
+	protected final Minecraft client = Minecraft.getInstance();
 	
 	@Override
 	public MyLogger makeLogger() {
@@ -52,12 +52,12 @@ public abstract class SixteenFiveAutoThirdPerson extends AutoThirdPerson {
 	
 	@Override
 	public void setCameraType(int type) {
-		client.options.setCameraType(CameraType.values()[type]);
+		client.options.setCameraType(PointOfView.values()[type]);
 	}
 	
 	@Override
 	public int numberOfCameraTypes() {
-		return CameraType.values().length;
+		return PointOfView.values().length;
 	}
 	
 	@Override
@@ -89,13 +89,14 @@ public abstract class SixteenFiveAutoThirdPerson extends AutoThirdPerson {
 	}
 	
 	public static class EntityVehicle implements Vehicle {
+		@SuppressWarnings("deprecation") //Vanilla registries are fine, Forge, shut up
 		public EntityVehicle(Entity ent) {
 			this.ent = new WeakReference<>(ent);
 			this.id = ent == null ? "<nothing>" : Registry.ENTITY_TYPE.getKey(ent.getType()).toString();
 			
-			if(ent instanceof Minecart) this.type = Classification.MINECART;
-			else if(ent instanceof Boat) this.type = Classification.BOAT;
-			else if(ent instanceof Animal) this.type = Classification.ANIMAL;
+			if(ent instanceof MinecartEntity) this.type = Classification.MINECART;
+			else if(ent instanceof BoatEntity) this.type = Classification.BOAT;
+			else if(ent instanceof AnimalEntity) this.type = Classification.ANIMAL;
 			else this.type = Classification.OTHER;
 		}
 		

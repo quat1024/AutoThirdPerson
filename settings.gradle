@@ -35,9 +35,9 @@ include(
 	"Fabric-1.17.1",
 	"Forge-1.17.1",
 	
-	"Xplat-1.16.5",
+	//"Xplat-1.16.5", //No xplat module because Forge 1.16.5 has fake official names
 	"Fabric-1.16.5",
-//	"Forge-1.16.5" //TODO, mappings funny moments
+	"Forge-1.16.5",
 	
 	"Forge-1.12.2",
 	
