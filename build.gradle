@@ -67,7 +67,7 @@ subprojects {
 	processResources {
 		inputs.property "version", project.version
 		
-		filesMatching(["**/fabric.mod.json", "**/mods.toml"]) {
+		filesMatching(["**/fabric.mod.json", "**/mods.toml", "**/version.properties"]) {
 			expand "version": project.version
 		}
 	}

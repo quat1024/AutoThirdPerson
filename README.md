@@ -4,16 +4,30 @@ Puts you in third person when you do certain things. This used to be a simple mo
 
 LGPL 3.0 or later.
 
+## Config notes
+
+The config file is loaded once at startup, then...
+
+|version||
+|---|---|
+|1.4.7 Forge|reloaded every time you load a world. (log out/log in to refresh it)|
+|1.7.10 Forge|reloaded when you open the controls screen, or that weird unfinished "Mod Options" screen|
+|1.12.2 Forge|it's plugged in to the standard Forge config GUI!|
+|1.17.1+ Forge|when you change the config file. (forge installs a file watcher)|
+|1.16.5+ Fabric|it's reloaded when you `F3+T`, or when you use the `/auto_third_person reload` client command|
+
+It's a mess out there! Different loaders provide different services for configuration files.
+
 ## Layout
 
-The core is `Core/.../AutoThirdPerson.java`, and is a singleton with a bunch of abstract methods. I generally use a pattern where I implement as much as possible without touching the modloader (in classes named like `OneSixteenFiveAutoThirdPerson`) in a still-abstract class, then finish the rest in a modloader-specific class. The core also contains some thin wrappers over bits shared across all Minecraft versions (like `MyCameraType`) just so i can refer to the from the core.
+The core is `Core/.../AutoThirdPerson.java`, and is a singleton with a bunch of abstract methods. I generally use a pattern where I implement as much as possible without touching the modloader (in classes named like `OneSixteenFiveAutoThirdPerson`) in a still-abstract class, then finish the rest in a modloader-specific class. The core also contains some thin wrappers over bits shared across all Minecraft versions (like `MyCameraType`) just so i can refer to them. It must remain compatible with Java 6, a couple of the old versions require it.
 
 * modern versions with official mappings (1.17, 1.18, 1.19, 1.19 again) - using [VanillaGradle](https://github.com/SpongePowered/VanillaGradle/) in the `xplat` modules to write code against vanilla minecraft using official names, then using the modloader-specific gradle plugins to complete the mod, also using official names
 * 1.16 - ForgeGradle's `"official"` mappings channel is a big fat lie and not actually official mappings... so right now the forge 1.16 one is broken
 * vintage Forge (1.7, 1.4) - [Voldeloom](https://github.com/CrackedPolishedBlackstoneBricksMC/voldeloom/) projects using MCP names
   * Feel free to request ports for Forge 1.3, 1.5, and 1.6 if you want em, voldeloom works on those too
 
-`CrummyConfig` is a lowest-common-denominator configuration loading system, used on Fabric which doesn't come with a config API
+`CrummyConfig` is a lowest-common-denominator configuration loading system, used on Fabric which doesn't come with a config API. Written against Java 8.
 
 ## Warnings
 

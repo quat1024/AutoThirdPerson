@@ -1,0 +1,62 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		maven { url = "https://maven.minecraftforge.net/" }
+	}
+	
+	dependencies {
+		classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "5.1.+"
+	}
+}
+
+///
+/// More information: https://github.com/quat1024/modern-forge-1.12-template
+///
+
+apply plugin: "java"
+apply plugin: "net.minecraftforge.gradle"
+
+archivesBaseName = "${rootProject.name}-forge-1.12.2"
+
+ext.gimmeJava(8)
+
+repositories {
+	maven {
+		url = "https://maven.minecraftforge.net/"
+	}
+}
+
+dependencies {
+	minecraft "net.minecraftforge:forge:1.12.2-14.23.5.2860"
+	
+	implementation project(":Core")
+}
+
+//fold in xplat resources and sources
+processResources {
+	from project(":Core").sourceSets.main.resources
+}
+
+tasks.withType(JavaCompile) {
+	source(project(":Core").sourceSets.main.allSource)
+}
+
+minecraft {
+	mappings channel: "stable", version: "39-1.12"
+	
+	runs {
+		"client" {
+			workingDirectory file("./run")
+			mods { "${project.name}" { source sourceSets.main } }
+		}
+		
+		"server" {
+			workingDirectory file("./run/server")
+			mods { "${project.name}" { source sourceSets.main } }
+		}
+	}
+}
+
+//When Forge 1.12 loads mods from a directory that's been put on the classpath, it expects to find resources in the same directory.
+//Default Gradle behavior puts resources in ./build/resources/main instead of ./build/classes/main/java. Let's change that.
+sourceSets.all { it.output.resourcesDir = it.output.classesDirs.getFiles().iterator().next() }
