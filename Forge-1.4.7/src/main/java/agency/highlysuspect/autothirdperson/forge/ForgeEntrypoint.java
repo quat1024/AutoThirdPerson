@@ -1,9 +1,7 @@
 package agency.highlysuspect.autothirdperson.forge;
 
-import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.relauncher.Side;
 
 @Mod(
@@ -16,11 +14,6 @@ public class ForgeEntrypoint {
 		if(e.getSide() == Side.CLIENT) {
 			NiceClientEntrypointDude.niceClientEntrypointDude(e);
 		}
-	}
-	
-	@Mod.ServerAboutToStart
-	public void serverBoutaStart(FMLServerAboutToStartEvent e) {
-		AutoThirdPerson.instance.logger.info("Hello server!!!");
 	}
 	
 	private static class NiceClientEntrypointDude {

@@ -1,8 +1,6 @@
 package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AtpSettings;
-import agency.highlysuspect.autothirdperson.forge.slf4j_borrowed.FormattingTuple;
-import agency.highlysuspect.autothirdperson.forge.slf4j_borrowed.MessageFormatter;
 import agency.highlysuspect.autothirdperson.wrap.MyCameraType;
 import agency.highlysuspect.autothirdperson.wrap.MyLogger;
 import cpw.mods.fml.common.FMLLog;
@@ -44,15 +42,13 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 		return new MyLogger() {
 			@Override
 			public void info(String msg, Object... args) {
-				//FMLLogFormatter doesn't support parameters. Manually format the message using a backport of some SLF4J stuff.
-				FormattingTuple fmt = MessageFormatter.format(msg, args);
-				log.log(Level.INFO, fmt.getMessage(), fmt.getThrowable());
+				//FMLLogFormatter doesn't support parameters, so manually format the message using a backport of some SLF4J stuff.
+				log.log(Level.INFO, SLF4J_MessageFormatter.format(msg, args), SLF4J_MessageFormatter.getThrowableCandidate(args));
 			}
 			
 			@Override
 			public void warn(String msg, Object... args) {
-				FormattingTuple fmt = MessageFormatter.format(msg, args);
-				log.log(Level.WARNING, fmt.getMessage(), fmt.getThrowable());
+				log.log(Level.WARNING, SLF4J_MessageFormatter.format(msg, args), SLF4J_MessageFormatter.getThrowableCandidate(args));
 			}
 			
 			@Override

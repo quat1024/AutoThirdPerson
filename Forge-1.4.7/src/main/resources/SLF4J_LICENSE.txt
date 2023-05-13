@@ -1,4 +1,5 @@
 Auto Third Person for 1.4.7 contains a cut-down version of a few slf4j classes.
+Derived code is located in "agency.highlysuspect.autothirdperson.forge.SLF4J_MessageFormatter".
 Its license is reproduced below:
 
 ---
