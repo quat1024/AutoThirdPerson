@@ -160,4 +160,9 @@ public class CookedForgeSettings implements AtpSettings {
 	public boolean fixHandGlitch() {
 		return false;
 	}
+	
+	@Override
+	public boolean sneakDismount() {
+		return false;
+	}
 }

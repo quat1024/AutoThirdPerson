@@ -186,4 +186,9 @@ public class VintageForgeSettings implements AtpSettings {
 	public boolean stickySwim() {
 		return false;
 	}
+	
+	@Override
+	public boolean sneakDismount() {
+		return false;
+	}
 }

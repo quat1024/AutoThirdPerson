@@ -6,26 +6,32 @@ import java.util.regex.Pattern;
 
 public class CookedCrummyConfig implements AtpSettings {
 	public CookedCrummyConfig(UncookedCrummyConfig raw) {
-		configVersion = raw.ints.get("configVersion");
-		boat = raw.bools.get("boat");
-		cart = raw.bools.get("cart");
-		animal = raw.bools.get("animal");
-		elytra = raw.bools.get("elytra");
-		swim = raw.bools.get("swim");
-		custom = raw.bools.get("custom");
-		useIgnore = raw.bools.get("useIgnore");
-		elytraDelay = raw.ints.get("elytraDelay");
-		swimmingDelayStart = raw.ints.get("swimmingDelayStart");
-		swimmingDelayEnd = raw.ints.get("swimmingDelayEnd");
-		stickySwim = raw.bools.get("stickySwim");
-		customPattern = raw.patterns.get("customPattern");
-		ignorePattern = raw.patterns.get("ignorePattern");
-		autoRestore = raw.bools.get("autoRestore");
-		cancelAutoRestore = raw.bools.get("cancelAutoRestore");
-		skipFrontView = raw.bools.get("skipFrontView");
-		logSpam = raw.bools.get("logSpam");
-		fixHandGlitch = raw.bools.get("fixHandGlitch");
+		//mainly using getOrDefault here to catch config options that don't *exist* on this version
+		//like fixHandGlitch on not-ancient versions
+		
+		configVersion = raw.ints.getOrDefault("configVersion", 0);
+		boat = raw.bools.getOrDefault("boat", false);
+		cart = raw.bools.getOrDefault("cart", false);
+		animal = raw.bools.getOrDefault("animal", false);
+		elytra = raw.bools.getOrDefault("elytra", false);
+		swim = raw.bools.getOrDefault("swim", false);
+		custom = raw.bools.getOrDefault("custom", false);
+		useIgnore = raw.bools.getOrDefault("useIgnore", false);
+		elytraDelay = raw.ints.getOrDefault("elytraDelay", 0);
+		swimmingDelayStart = raw.ints.getOrDefault("swimmingDelayStart", 0);
+		swimmingDelayEnd = raw.ints.getOrDefault("swimmingDelayEnd", 0);
+		stickySwim = raw.bools.getOrDefault("stickySwim", false);
+		customPattern = raw.patterns.getOrDefault("customPattern", DEFAULT_PATTERN);
+		ignorePattern = raw.patterns.getOrDefault("ignorePattern", DEFAULT_PATTERN);
+		autoRestore = raw.bools.getOrDefault("autoRestore", false);
+		cancelAutoRestore = raw.bools.getOrDefault("cancelAutoRestore", false);
+		skipFrontView = raw.bools.getOrDefault("skipFrontView", false);
+		logSpam = raw.bools.getOrDefault("logSpam", false);
+		fixHandGlitch = raw.bools.getOrDefault("fixHandGlitch", false);
+		sneakDismount = raw.bools.getOrDefault("sneakDismount", false);
 	}
+	
+	private static final Pattern DEFAULT_PATTERN = Pattern.compile("-empty pattern-");
 	
 	private final int configVersion;
 	private final boolean boat;
@@ -46,6 +52,7 @@ public class CookedCrummyConfig implements AtpSettings {
 	private final boolean skipFrontView;
 	private final boolean logSpam;
 	private final boolean fixHandGlitch;
+	private final boolean sneakDismount;
 	
 	@Override
 	public int configVersion() {
@@ -140,5 +147,10 @@ public class CookedCrummyConfig implements AtpSettings {
 	@Override
 	public boolean fixHandGlitch() {
 		return fixHandGlitch;
+	}
+	
+	@Override
+	public boolean sneakDismount() {
+		return sneakDismount;
 	}
 }

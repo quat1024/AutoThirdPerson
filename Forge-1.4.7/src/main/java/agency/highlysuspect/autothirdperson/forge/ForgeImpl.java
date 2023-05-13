@@ -118,7 +118,7 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 		}
 		
 		//Handle "sneak-to-dismount"
-		if(true && //TODO: add config option
+		if(settings().sneakDismount() &&
 			myState.wasSneaking &&
 			client.thePlayer.isSneaking() &&
 			currentVehicle != null &&
@@ -154,7 +154,7 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 	public void worldLoad(WorldEvent.Load e) {
 		if(System.currentTimeMillis() - lastConfigReloadTimeLol > 3000L) {
 			lastConfigReloadTimeLol = System.currentTimeMillis();
-			logger.info(NAME + ": hackily reloading config");
+			logger.info(NAME + ": reloading config");
 			settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
 		}
 	}

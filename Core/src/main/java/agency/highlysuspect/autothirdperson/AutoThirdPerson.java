@@ -346,6 +346,9 @@ public abstract class AutoThirdPerson {
 		if(version.hasHandGlitch) {
 			spec.bool("fixHandGlitch", "Fix the annoying 'weirdly rotated first-person hand' rendering error when you ride or look at someone riding a vehicle.", true);
 		}
+		if(version.noSneakDismount) {
+			spec.bool("sneakDismount", "Pressing sneak will remove you from the vehicle, instead of requiring a click on the vehicle, like in modern versions.", false);
+		}
 		
 		return spec;
 	}

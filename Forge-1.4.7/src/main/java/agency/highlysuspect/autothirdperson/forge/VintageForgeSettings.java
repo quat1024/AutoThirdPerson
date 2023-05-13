@@ -76,8 +76,7 @@ public class VintageForgeSettings implements AtpSettings {
 		skipFrontView = boolValues.get("skipFrontView");
 		logSpam = boolValues.get("logSpam");
 		fixHandGlitch = boolValues.get("fixHandGlitch");
-		//Pressing sneak will remove you from the vehicle, instead of having to click on it again, like modern versions.
-		//sneakDismount = boolValues.get("sneakDismount");
+		sneakDismount = boolValues.get("sneakDismount");
 	}
 	
 	private final int configVersion;
@@ -96,7 +95,7 @@ public class VintageForgeSettings implements AtpSettings {
 	private final boolean skipFrontView;
 	private final boolean logSpam;
 	private final boolean fixHandGlitch;
-	//private final boolean sneakDismount;
+	private final boolean sneakDismount;
 	
 	@Override
 	public int configVersion() {
@@ -178,8 +177,9 @@ public class VintageForgeSettings implements AtpSettings {
 		return fixHandGlitch;
 	}
 	
+	@Override
 	public boolean sneakDismount() {
-		return true;//return sneakDismount;
+		return sneakDismount;
 	}
 	
 	//Not supported
