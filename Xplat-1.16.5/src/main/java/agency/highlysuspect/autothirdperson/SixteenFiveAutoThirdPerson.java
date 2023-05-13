@@ -88,11 +88,7 @@ public abstract class SixteenFiveAutoThirdPerson extends AutoThirdPerson {
 		return client.player.isUnderWater();
 	}
 	
-	public Vehicle wrapVehicle(Entity ent) {
-		return new EntityVehicle(ent);
-	}
-	
-	private static class EntityVehicle implements Vehicle {
+	public static class EntityVehicle implements Vehicle {
 		public EntityVehicle(Entity ent) {
 			this.ent = new WeakReference<>(ent);
 			this.id = ent == null ? "<nothing>" : Registry.ENTITY_TYPE.getKey(ent.getType()).toString();

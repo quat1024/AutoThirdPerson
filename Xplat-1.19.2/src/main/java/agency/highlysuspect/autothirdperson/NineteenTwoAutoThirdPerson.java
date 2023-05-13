@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.ref.WeakReference;
 
 public abstract class NineteenTwoAutoThirdPerson extends AutoThirdPerson {
-	private final Minecraft client = Minecraft.getInstance();
+	protected final Minecraft client = Minecraft.getInstance();
 	
 	@Override
 	public MyLogger makeLogger() {
@@ -88,11 +88,7 @@ public abstract class NineteenTwoAutoThirdPerson extends AutoThirdPerson {
 		return client.player.isUnderWater();
 	}
 	
-	public Vehicle wrapVehicle(Entity ent) {
-		return new EntityVehicle(ent);
-	}
-	
-	private static class EntityVehicle implements Vehicle {
+	public static class EntityVehicle implements Vehicle {
 		public EntityVehicle(Entity ent) {
 			this.ent = new WeakReference<>(ent);
 			this.id = ent == null ? "<nothing>" : Registry.ENTITY_TYPE.getKey(ent.getType()).toString();

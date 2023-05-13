@@ -1,27 +1,18 @@
 buildscript {
 	repositories {
 		maven { url = 'https://maven.minecraftforge.net' }
-		maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
 		mavenCentral()
 	}
 	dependencies {
 		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-		classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
 	}
 }
 apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'org.spongepowered.mixin'
 
 ext.gimmeJava(17)
 
 archivesBaseName = "${rootProject.name}-forge-1.18.2"
-
-mixin {
-	add sourceSets.main, "${rootProject.name}.refmap.json"
-	
-	config "${rootProject.name}.mixins.json"
-}
 
 minecraft {
 	mappings channel: 'official', version: "1.18.2"
@@ -59,7 +50,6 @@ minecraft {
 
 dependencies {
 	minecraft "net.minecraftforge:forge:1.18.2-40.2.0"
-	annotationProcessor "org.spongepowered:mixin:0.8.4-SNAPSHOT:processor" //i imagine mixingradle does this but idk
 	
 	implementation project(":Xplat-1.18.2")
 	implementation project(":Core")

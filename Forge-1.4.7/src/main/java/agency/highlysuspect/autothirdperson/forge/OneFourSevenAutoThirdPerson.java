@@ -47,7 +47,7 @@ public abstract class OneFourSevenAutoThirdPerson extends AutoThirdPerson {
 		return safeToTick() && client.thePlayer.isInsideOfMaterial(Material.water);
 	}
 	
-	protected static class EntityVehicle implements Vehicle {
+	public static class EntityVehicle implements Vehicle {
 		public EntityVehicle(Entity ent) {
 			this.ent = new WeakReference<Entity>(ent);
 			this.id = ent == null ? "<nothing>" : EntityList.getEntityString(ent);

@@ -1,7 +1,7 @@
-package agency.highlysuspect.autothirdperson.mixin;
+package agency.highlysuspect.autothirdperson.fabric.mixin;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
-import agency.highlysuspect.autothirdperson.SixteenFiveAutoThirdPerson;
+import agency.highlysuspect.autothirdperson.NineteenTwoAutoThirdPerson;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,9 +17,9 @@ public class LocalPlayerMixin {
 		at = @At("TAIL")
 	)
 	private void autoThirdPerson$onStartRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
-		SixteenFiveAutoThirdPerson atp = (SixteenFiveAutoThirdPerson) AutoThirdPerson.instance;
+		AutoThirdPerson atp = AutoThirdPerson.instance;
 		
-		atp.mount(atp.wrapVehicle(vehicle));
+		atp.mount(new NineteenTwoAutoThirdPerson.EntityVehicle(vehicle));
 	}
 	
 	@Inject(
@@ -30,9 +30,9 @@ public class LocalPlayerMixin {
 		@SuppressWarnings("ConstantConditions")
 		Entity vehicle = ((Entity) (Object) this).getVehicle();
 		if(vehicle != null) {
-			SixteenFiveAutoThirdPerson atp = (SixteenFiveAutoThirdPerson) AutoThirdPerson.instance;
+			AutoThirdPerson atp = AutoThirdPerson.instance;
 			
-			atp.dismount(atp.wrapVehicle(vehicle));
+			atp.dismount(new NineteenTwoAutoThirdPerson.EntityVehicle(vehicle));
 		}
 	}
 }

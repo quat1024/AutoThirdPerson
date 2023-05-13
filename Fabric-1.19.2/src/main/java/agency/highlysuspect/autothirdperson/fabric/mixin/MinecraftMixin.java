@@ -1,4 +1,4 @@
-package agency.highlysuspect.autothirdperson.mixin;
+package agency.highlysuspect.autothirdperson.fabric.mixin;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 import net.minecraft.client.Minecraft;

@@ -14,23 +14,58 @@ Make sure to add proper client-side-only markers on all forge versions (why is f
 
 # tracking what the player is riding
 
-modern Forge versions (at least 1.12): have **events** that are fired when an entity is mounted or dismounted
+|version||
+|---|---|
+|forge 1.4.7|watch every frame for player mounting things|
+|forge 1.7.10|watch every frame for player mounting things|
+|forge 1.12.2|`EntityMountEvent`, check the mounter == client.player|
+|fabric 1.16.5|mixin to `LocalPlayer`, check startRiding/removeVehicle|
+|forge 1.17.1|`EntityMountEvent`|
+|fabric 1.17.1|mixin to `LocalPlayer`|
+|forge 1.18.2|`EntityMountEvent`|
+|fabric 1.18.2|mixin to `LocalPlayer`|
+|forge 1.19.2|`EntityMountEvent`|
+|fabric 1.19.2|mixin to `LocalPlayer`|
+|forge 1.19.4|`EntityMountEvent`|
+|fabric 1.19.4|mixin to `LocalPlayer`|
 
-modern Fabric versions: **don't have events** as far as i can tell, but easily implementable in mixin (done with `LocalPlayerMixin` here) 
+mixin to `LocalPlayer` works on newer forge versions too, but the events are probably better
 
-old Forge versions: **don't have events** and coremods/mixin are going to be ass to set up
+# detecting manual F5 key presses
 
-every version: possible to fall back to a **ticker-based approach**, only primitive this needs is a "get current vehicle"
+|version||
+|---|---|
+|forge 1.4.7|keep track of expected third-person state<br>assume current != expected -> manual press|
+|forge 1.7.10|`InputEvent.KeyInputEvent`|
+|forge 1.12.2|`InputEvent.KeyInputEvent`|
+|fabric 1.16.5|mixin to `Minecraft`|
+|forge 1.17.1|`InputEvent.KeyInputEvent`|
+|fabric 1.17.1|mixin to `Minecraft`|
+|forge 1.18.2|`InputEvent.KeyInputEvent`|
+|fabric 1.18.2|mixin to `Minecraft`|
+|forge 1.19.2|`InputEvent.Key`|
+|fabric 1.19.2|mixin to `Minecraft`|
+|forge 1.19.4|`InputEvent.Key`|
+|fabric 1.19.4|mixin to `Minecraft`|
 
-# camera type handling
+# skipping front-view
 
-modern versions: enum (0: FIRST_PERSON_BACK, 1: THIRD_PERSON_BACK, 2: THIRD_PERSON_FRONT)
+|version||
+|---|---|
+|forge 1.4.7|ticker (`TickType.RENDER`)|
+|forge 1.7.10|ticker (`TickEvent.RenderTickEvent`)|
+|forge 1.12.2|ticker (`TickEvent.RenderTickEvent`)|
+|fabric 1.16.5|mixin to `GameRenderer`<br>available events in fabric-rendering-v1 are too late|
+|forge 1.17.1|ticker (`TickEvent.RenderTickEvent`)|
+|fabric 1.17.1|mixin to `GameRenderer`|
+|forge 1.18.2|ticker (`TickEvent.RenderTickEvent`)|
+|fabric 1.18.2|mixin to `GameRenderer`|
+|forge 1.19.2|ticker (`TickEvent.RenderTickEvent`)|
+|fabric 1.19.2|mixin to `GameRenderer`|
+|forge 1.19.4|ticker (`TickEvent.RenderTickEvent`)|
+|fabric 1.19.4|mixin to `GameRenderer`|
 
-old versions: `int` with same values
-
-modern versions: cycle is modifiable with a mixin to `CameraType#cycle`
-
-every version: register a ticker (preferably as early as possible *before* camera setup) and set camera type to firstperson if it's thirdperson front
+Forge `CameraSetupEvent`/`ViewportEvent.ComputeCameraAngles` would be perfect but it's fired one line too late
 
 # architecture
 
