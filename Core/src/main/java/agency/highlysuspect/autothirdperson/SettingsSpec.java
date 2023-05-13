@@ -153,6 +153,13 @@ public class SettingsSpec implements Iterable<SettingsSpec.Entry> {
 		public int clamp(int value) {
 			return Math.min(Math.max(value, min), max);
 		}
+		
+		public static final MyConsumer<IntSetting> NON_NEGATIVE = new MyConsumer<IntSetting>() {
+			@Override
+			public void accept(IntSetting thing) {
+				thing.min = 0;
+			}
+		};
 	}
 	
 	public static class BoolSetting extends Setting<Boolean> {

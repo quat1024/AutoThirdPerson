@@ -291,6 +291,7 @@ public abstract class AutoThirdPerson {
 		});
 		
 		spec.section("Scenarios");
+		
 		spec.bool("boat", "Automatically go into third person when riding a boat?", true);
 		spec.bool("cart", "Automatically go into third person when riding a minecart?", true);
 		spec.bool("animal", "Automatically go into third person when riding an animal?", true);
@@ -305,19 +306,28 @@ public abstract class AutoThirdPerson {
 		spec.bool("custom", "If 'true', the customPattern will be used, and riding anything matching it will toggle third person.", false);
 		spec.bool("useIgnore", "If 'true', the ignorePattern will be used, and anything matching it will be ignored.", false);
 		
-		MyConsumer<SettingsSpec.IntSetting> nonNegative = new MyConsumer<SettingsSpec.IntSetting>() {
-			@Override
-			public void accept(SettingsSpec.IntSetting thing) {
-				thing.min = 0;
-			}
-		};
-		
 		spec.section("Scenario Options");
+		
 		if(version.hasElytra) {
-			spec.integer("elytraDelay", "Ticks of elytra flight required before the camera automatically toggles if the 'elytra' option is enabled.", 7, nonNegative);
+			spec.integer(
+				"elytraDelay",
+				"Ticks of elytra flight required before the camera automatically toggles if the 'elytra' option is enabled.",
+				7,
+				SettingsSpec.IntSetting.NON_NEGATIVE
+			);
 		}
-		spec.integer("swimmingDelayStart", "Ticks of swimming required before the camera automatically toggles if the 'swim' option is enabled.", 0, nonNegative);
-		spec.integer("swimmingDelayEnd", "Ticks of not swimming required before the camera restores if the 'swim' option is enabled.", 10, nonNegative);
+		spec.integer(
+			"swimmingDelayStart",
+			"Ticks of swimming required before the camera automatically toggles if the 'swim' option is enabled.",
+			version.hasSwimmingAnimation ? 0 : 10, //default value of 0 is too odd-looking without the swimming animation
+			SettingsSpec.IntSetting.NON_NEGATIVE
+		);
+		spec.integer(
+			"swimmingDelayEnd",
+			"Ticks of not swimming required before the camera restores if the 'swim' option is enabled.",
+			10,
+			SettingsSpec.IntSetting.NON_NEGATIVE
+		);
 		if(version.hasSwimmingAnimation) {
 			spec.bool("stickySwim", "If 'true', your head has to completely exit the water to count as 'not swimming anymore', for the purposes of restoring\nthe camera when you're done swimming. If 'false', you just have to stop doing the swimming animation.", true);
 		}
@@ -325,10 +335,12 @@ public abstract class AutoThirdPerson {
 		spec.pattern("ignorePattern", "Entity IDs that match this regular expression will be ignored if the 'useIgnore' option is enabled.", Pattern.compile("^examplemod:example$"));
 		
 		spec.section("Restoration");
+		
 		spec.bool("autoRestore", "When the situation that Auto Third Person put you into third person for is over,\nthe camera will be restored back to the way it was.", true);
 		spec.bool("cancelAutoRestore", "If 'true', pressing f5 after mounting something will prevent your camera\nfrom being automatically restored to first-person when you dismount.", true);
 		
 		spec.section("Extras");
+		
 		spec.bool("skipFrontView", "Skip the 'third-person front' camera mode when pressing F5.", false);
 		spec.bool("logSpam", "Dump a bunch of debug crap into the log.\nMight be handy!", false);
 		if(version.hasHandGlitch) {
