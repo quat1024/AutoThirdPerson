@@ -10,6 +10,10 @@ pluginManagement {
 			name = 'Spunchbob'
 			url = 'https://repo.spongepowered.org/repository/maven-public/'
 		}
+		maven {
+			name = "unascribed"
+			url = "https://repo.sleeping.town/"
+		}
 	}
 }
 

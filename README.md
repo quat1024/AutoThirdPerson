@@ -30,7 +30,8 @@ It's a mess out there! Different loaders provide different services for configur
 
 The core is `Core/.../AutoThirdPerson.java`, and is a singleton with a bunch of abstract methods. I generally use a pattern where I implement as much as possible without touching the modloader (in classes named like `OneSixteenFiveAutoThirdPerson`) in a still-abstract class, then finish the rest in a modloader-specific class. The core also contains some thin wrappers over bits shared across all Minecraft versions just so i can refer to them. It must remain compatible with Java 6.
 
-* modern versions with official mappings (1.17, 1.18, 1.19, 1.19 again) - using [VanillaGradle](https://github.com/SpongePowered/VanillaGradle/) in the `xplat` modules to write code against vanilla minecraft using official names, then using the modloader-specific gradle plugins to complete the mod, also using official names
+* modern versions with official mappings (1.17, 1.18, 1.19, 1.19 again) - using [minivan](https://github.com/CrackedPolishedBlackstoneBricksMC/minivan) in the `xplat` subprojects to write code against vanilla minecraft using official names, then using the modloader-specific gradle plugins to complete the mod, also using official names
+  * formerly [VanillaGradle](https://github.com/SpongePowered/VanillaGradle/) was used in xplat subprojects, but it has some [performance issues](https://github.com/SpongePowered/VanillaGradle/issues/102) when used in this scenario
 * 1.16 is an odd duck because it does have official mappings but ForgeGradle's `"official"` mappings channel is a big fat lie, so the mc-specific classes are moved into the main project
 * 1.12 is simply good old ForgeGradle, using MCP names
 * 1.7 and 1.4 ("vintage" Forge) use [Voldeloom](https://github.com/CrackedPolishedBlackstoneBricksMC/voldeloom/) projects and MCP names
