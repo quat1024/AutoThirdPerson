@@ -5,22 +5,32 @@ import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 import agency.highlysuspect.autothirdperson.EightteenTwoAutoThirdPerson;
 import agency.highlysuspect.crummyconfig.CookedCrummyConfig;
 import agency.highlysuspect.crummyconfig.UncookedCrummyConfig;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 
 public class FabricEntrypoint extends EightteenTwoAutoThirdPerson implements ClientModInitializer {
 	private UncookedCrummyConfig uncookedConfig;
 	private AtpSettings settings = AtpSettings.MISSING;
+	private final KeyMapping TOGGLE_MOD = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+		"autothirdperson.toggle",
+		InputConstants.Type.KEYSYM,
+		GLFW.GLFW_KEY_UNKNOWN,
+		"key.categories.misc"
+	));
 	
 	@Override
 	public void onInitializeClient() {
@@ -76,5 +86,10 @@ public class FabricEntrypoint extends EightteenTwoAutoThirdPerson implements Cli
 	@Override
 	public AtpSettings settings() {
 		return settings;
+	}
+	
+	@Override
+	public boolean modEnableToggleKeyPressed() {
+		return TOGGLE_MOD.isDown();
 	}
 }
