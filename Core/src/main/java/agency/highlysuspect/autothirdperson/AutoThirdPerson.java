@@ -65,13 +65,9 @@ public abstract class AutoThirdPerson {
 	/** Whether the player's head/camera/whatever is underwater, used for `stickySwim`, and for the swim setting on pre-1.13 */
 	public abstract boolean playerIsUnderwater();
 	
-	public boolean modEnableToggleKeyPressed() {
-		return false;
-	}
+	public abstract boolean modEnableToggleKeyPressed();
 	
-	public void sayEnabled(boolean enabled) {
-		//...
-	}
+	public abstract void sayEnabled(boolean enabled);
 	
 	/**
 	 * The current settings. If this loader can automatically reload settings, this should return the most up-to-date copy of them.
