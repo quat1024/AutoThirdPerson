@@ -2,17 +2,21 @@ package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AtpSettings;
 import agency.highlysuspect.autothirdperson.wrap.MyLogger;
+import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.Configuration;
@@ -28,6 +32,7 @@ import java.util.logging.Logger;
 public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 	private final Configuration forgeConfig;
 	private AtpSettings settings;
+	private final KeyBinding TOGGLE_MOD = new KeyBinding("autothirdperson.toggle", 0);
 	
 	public ForgeImpl(FMLPreInitializationEvent e) {
 		this.forgeConfig = new Configuration(e.getSuggestedConfigurationFile());
@@ -63,6 +68,11 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 	}
 	
 	@Override
+	public boolean modEnableToggleKeyPressed() {
+		return TOGGLE_MOD.pressed;
+	}
+	
+	@Override
 	public void init() {
 		super.init();
 		
@@ -72,6 +82,32 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 		
 		//The old ticking system is completely bizarre
 		TickRegistry.registerTickHandler(new WeirdTickerThing(), Side.CLIENT);
+		
+		LanguageRegistry.instance().loadLocalization("/assets/autothirdperson/lang/en_US.lang", "en_US", false);
+		
+		//This bizarre incantation is required to get the key onto the options screen without
+		//manually System.arraycopying stuff onto GameSettings.keyBindings[]
+		KeyBindingRegistry.registerKeyBinding(new KeyBindingRegistry.KeyHandler(new KeyBinding[] { TOGGLE_MOD }) {
+			@Override
+			public void keyDown(EnumSet<TickType> enumSet, KeyBinding keyBinding, boolean b, boolean b1) {
+				//Dont care
+			}
+			
+			@Override
+			public void keyUp(EnumSet<TickType> enumSet, KeyBinding keyBinding, boolean b) {
+				//Dont care
+			}
+			
+			@Override
+			public EnumSet<TickType> ticks() {
+				return EnumSet.noneOf(TickType.class);
+			}
+			
+			@Override
+			public String getLabel() {
+				return "auto third person key handler thing";
+			}
+		});
 	}
 	
 	@Override
@@ -143,14 +179,11 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 		//It will call setRotationAngles which will pick up on the now-false value of `isRiding`.
 	}
 	
-	//In 1.7 i cheat this with GuiOpenEvent but that doesn't exist on 1.4 actually lmao.
-	//This might be okay, it will catch logging out and back in
 	private Long lastConfigReloadTimeLol = System.currentTimeMillis();
 	@ForgeSubscribe
 	public void worldLoad(WorldEvent.Load e) {
 		if(System.currentTimeMillis() - lastConfigReloadTimeLol > 3000L) {
 			lastConfigReloadTimeLol = System.currentTimeMillis();
-			logger.info(NAME + ": reloading config");
 			settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
 		}
 	}

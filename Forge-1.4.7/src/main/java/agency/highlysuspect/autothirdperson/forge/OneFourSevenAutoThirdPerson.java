@@ -3,6 +3,7 @@ package agency.highlysuspect.autothirdperson.forge;
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
 import agency.highlysuspect.autothirdperson.VersionCapabilities;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -45,6 +46,17 @@ public abstract class OneFourSevenAutoThirdPerson extends AutoThirdPerson {
 	@Override
 	public boolean playerIsUnderwater() {
 		return safeToTick() && client.thePlayer.isInsideOfMaterial(Material.water);
+	}
+	
+	@Override
+	public void sayEnabled(boolean enabled) {
+		assert client.thePlayer != null;
+		
+		String s = String.format(LanguageRegistry.instance().getStringLocalization("autothirdperson.say_toggle"),
+			LanguageRegistry.instance().getStringLocalization(enabled ? "autothirdperson.enabled" : "autothirdperson.disabled"));
+		client.ingameGUI.getChatGUI().printChatMessage(s);
+		
+		//client.thePlayer.sendChatMessage(s);
 	}
 	
 	public static class EntityVehicle implements Vehicle {

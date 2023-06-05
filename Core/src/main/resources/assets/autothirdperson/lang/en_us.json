@@ -1,0 +1,7 @@
+{
+	"autothirdperson.toggle": "Toggle AutoThirdPerson",
+	
+	"autothirdperson.say_toggle": "Auto Third Person %s",
+	"autothirdperson.enabled": "ENABLED",
+	"autothirdperson.disabled": "DISABLED"
+}

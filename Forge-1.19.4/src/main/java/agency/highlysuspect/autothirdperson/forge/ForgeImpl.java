@@ -3,7 +3,11 @@ package agency.highlysuspect.autothirdperson.forge;
 import agency.highlysuspect.autothirdperson.AtpSettings;
 import agency.highlysuspect.autothirdperson.NineteenFourAutoThirdPerson;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityMountEvent;
@@ -15,6 +19,12 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public class ForgeImpl extends NineteenFourAutoThirdPerson {
 	private UncookedForgeSettings uncookedForgeSettings;
 	private AtpSettings cookedForgeSettings = AtpSettings.MISSING;
+	private final KeyMapping TOGGLE_MOD = new KeyMapping(
+		"autothirdperson.toggle",
+		KeyConflictContext.IN_GAME,
+		InputConstants.UNKNOWN,
+		"key.categories.misc"
+	);
 	
 	@Override
 	public void init() {
@@ -29,6 +39,13 @@ public class ForgeImpl extends NineteenFourAutoThirdPerson {
 		MinecraftForge.EVENT_BUS.addListener(this::onFrame);
 		MinecraftForge.EVENT_BUS.addListener(this::onKey);
 		MinecraftForge.EVENT_BUS.addListener(this::onMountOrDismount);
+		
+		FMLJavaModLoadingContext.get().getModEventBus().addListener((RegisterKeyMappingsEvent e) -> e.register(TOGGLE_MOD));
+	}
+	
+	@Override
+	public boolean modEnableToggleKeyPressed() {
+		return TOGGLE_MOD.isDown() && TOGGLE_MOD.getKeyModifier().isActive(KeyConflictContext.IN_GAME);
 	}
 	
 	@Override

@@ -65,6 +65,14 @@ public abstract class AutoThirdPerson {
 	/** Whether the player's head/camera/whatever is underwater, used for `stickySwim`, and for the swim setting on pre-1.13 */
 	public abstract boolean playerIsUnderwater();
 	
+	public boolean modEnableToggleKeyPressed() {
+		return false;
+	}
+	
+	public void sayEnabled(boolean enabled) {
+		//...
+	}
+	
 	/**
 	 * The current settings. If this loader can automatically reload settings, this should return the most up-to-date copy of them.
 	 * If it can't, this should return the most up-to-date copy after a manual reload step, or after game startup, or whatever.
@@ -82,27 +90,41 @@ public abstract class AutoThirdPerson {
 	
 	/// external api ///
 	
+	public void debugSpam(String msg, Object... args) {
+		if(f3ScreenUp() || settings().logSpam()) logger.info(msg, args);
+	}
+	
 	public void mount(Vehicle mounting) {
+		if(!state.modEnabled) return;
+		
 		mountOrDismount(mounting, true);
 	}
 	
 	public void dismount(Vehicle dismounting) {
+		if(!state.modEnabled) return;
+		
 		mountOrDismount(dismounting, false);
 	}
 	
 	public void manualPress() {
+		if(!state.modEnabled) return;
+		
 		if(settings().cancelAutoRestore() && state.isActive()) {
 			debugSpam("Cancelling auto-restore, if it was about to happen");
 			state.cancel();
 		}
 	}
 	
-	public void debugSpam(String msg, Object... args) {
-		if(f3ScreenUp() || settings().logSpam()) logger.info(msg, args);
-	}
-	
 	public void renderClient() {
-		if(!safeToTick()) return;
+		boolean modEnableToggleKeyPressed = modEnableToggleKeyPressed();
+		if(modEnableToggleKeyPressed && !state.modEnableToggleKeyWasPressed) {
+			state.modEnabled ^= true;
+			sayEnabled(state.modEnabled);
+			debugSpam("Auto Third Person is now " + (state.modEnabled ? "ENABLED" : "DISABLED"));
+		}
+		state.modEnableToggleKeyWasPressed = modEnableToggleKeyPressed;
+		
+		if(!safeToTick() || !state.modEnabled) return;
 		
 		if(settings().skipFrontView()) {
 			int currentCameraType = getCameraType();
@@ -114,28 +136,22 @@ public abstract class AutoThirdPerson {
 	}
 	
 	public void tickClient() {
-		if(!safeToTick()) return;
+		if(!state.modEnabled || !safeToTick()) return;
 		AtpSettings settings = settings();
 		
 		boolean isFlying = version.hasElytra && playerIsElytraFlying();
 		boolean isSwimming = version.hasSwimmingAnimation ? playerInSwimmingAnimation() : playerIsUnderwater();
 		
 		if(settings.elytra() && playerIsElytraFlying()) {
-			if(state.elytraFlyingTicks == settings.elytraDelay()) {
-				enterThirdPerson(new FlyingReason());
-			}
+			if(state.elytraFlyingTicks == settings.elytraDelay()) enterThirdPerson(new FlyingReason());
 			state.elytraFlyingTicks++;
 		} else {
-			if(state.elytraFlyingTicks != 0) {
-				exitThirdPerson(new FlyingReason());
-			}
+			if(state.elytraFlyingTicks != 0) exitThirdPerson(new FlyingReason());
 			state.elytraFlyingTicks = 0;
 		}
 		
 		if(settings.swim() && !(settings.elytra() && isFlying && isSwimming)) { //so swimming rules don't trigger when you dip underwater while flying with elytra
-			if(state.wasSwimming && settings.stickySwim()) {
-				isSwimming |= playerIsUnderwater();
-			}
+			if(state.wasSwimming && settings.stickySwim()) isSwimming |= playerIsUnderwater();
 			
 			if(state.wasSwimming != isSwimming) {
 				state.swimTicks = 0;
@@ -223,6 +239,9 @@ public abstract class AutoThirdPerson {
 	}
 	
 	public static class State {
+		public boolean modEnabled = true;
+		public boolean modEnableToggleKeyWasPressed = false;
+		
 		public int oldPerspective = FIRST_PERSON;
 		public @Nullable Reason reason;
 		

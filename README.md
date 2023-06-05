@@ -11,7 +11,7 @@ The config file is loaded once at startup, then...
 |version||
 |---|---|
 |1.4.7 Forge|reloaded every time you load a world. (log out/log in to refresh it)|
-|1.7.10 Forge|reloaded when you open the controls screen, or that weird unfinished "Mod Options" screen|
+|1.7.10 Forge|reloaded every time you load a world, when you open the controls screen, or that weird unfinished "Mod Options" screen|
 |1.12.2 Forge|it's plugged in to the standard Forge config GUI!|
 |1.16.5 Forge|automatically after you save the config file|
 |1.16.5 Fabric|reloaded when you `F3+T` or use the `/auto_third_person reload` client command|

@@ -2,10 +2,13 @@ package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AtpSettings;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
@@ -14,6 +17,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 public class ForgeImpl extends OneTwelveTwoAutoThirdPerson {
 	final Configuration forgeConfig; //public for the gui factory !
 	private VintageForgeSettings settings;
+	private final KeyBinding TOGGLE_MOD = new KeyBinding(
+		"autothirdperson.toggle",
+		KeyConflictContext.IN_GAME,
+		0,
+		"key.categories.misc"
+	);
 	
 	public ForgeImpl(FMLPreInitializationEvent e) {
 		this.forgeConfig = new Configuration(e.getSuggestedConfigurationFile());
@@ -24,11 +33,18 @@ public class ForgeImpl extends OneTwelveTwoAutoThirdPerson {
 		super.init();
 		MinecraftForge.EVENT_BUS.register(this);
 		settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
+		
+		ClientRegistry.registerKeyBinding(TOGGLE_MOD);
 	}
 	
 	@Override
 	public AtpSettings settings() {
 		return settings;
+	}
+	
+	@Override
+	public boolean modEnableToggleKeyPressed() {
+		return TOGGLE_MOD.isKeyDown();
 	}
 	
 	//frog events

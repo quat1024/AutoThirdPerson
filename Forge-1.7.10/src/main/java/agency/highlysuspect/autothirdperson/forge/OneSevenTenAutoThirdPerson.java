@@ -11,6 +11,9 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -71,6 +74,16 @@ public abstract class OneSevenTenAutoThirdPerson extends AutoThirdPerson {
 	@Override
 	public boolean playerIsUnderwater() {
 		return safeToTick() && client.thePlayer.isInsideOfMaterial(Material.water);
+	}
+	
+	@Override
+	public void sayEnabled(boolean enabled) {
+		assert client.thePlayer != null;
+		
+		client.thePlayer.addChatComponentMessage(new ChatComponentTranslation("autothirdperson.say_toggle", enabled ?
+			new ChatComponentTranslation("autothirdperson.enabled").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.GREEN)) :
+			new ChatComponentTranslation("autothirdperson.disabled").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED))
+		));
 	}
 	
 	public static class EntityVehicle implements Vehicle {

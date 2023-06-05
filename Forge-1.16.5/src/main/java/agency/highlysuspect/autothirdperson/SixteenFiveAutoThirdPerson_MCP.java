@@ -9,6 +9,8 @@ import net.minecraft.entity.item.BoatEntity;
 import net.minecraft.entity.item.minecart.MinecartEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -86,6 +88,16 @@ public abstract class SixteenFiveAutoThirdPerson_MCP extends AutoThirdPerson {
 	public boolean playerIsUnderwater() {
 		assert client.player != null;
 		return client.player.isUnderWater();
+	}
+	
+	@Override
+	public void sayEnabled(boolean enabled) {
+		assert client.player != null;
+		
+		client.player.displayClientMessage(new TranslationTextComponent("autothirdperson.say_toggle", enabled ?
+			new TranslationTextComponent("autothirdperson.enabled").withStyle(TextFormatting.GREEN) :
+			new TranslationTextComponent("autothirdperson.disabled").withStyle(TextFormatting.RED)
+		), true);
 	}
 	
 	public static class EntityVehicle implements Vehicle {

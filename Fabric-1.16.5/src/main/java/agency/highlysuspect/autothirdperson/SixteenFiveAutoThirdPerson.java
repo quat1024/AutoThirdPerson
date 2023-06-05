@@ -2,9 +2,11 @@ package agency.highlysuspect.autothirdperson;
 
 import agency.highlysuspect.autothirdperson.wrap.MyLogger;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.vehicle.Boat;
@@ -86,6 +88,16 @@ public abstract class SixteenFiveAutoThirdPerson extends AutoThirdPerson {
 	public boolean playerIsUnderwater() {
 		assert client.player != null;
 		return client.player.isUnderWater();
+	}
+	
+	@Override
+	public void sayEnabled(boolean enabled) {
+		assert client.player != null;
+		
+		client.player.displayClientMessage(new TranslatableComponent("autothirdperson.say_toggle", enabled ?
+			new TranslatableComponent("autothirdperson.enabled").withStyle(ChatFormatting.GREEN) :
+			new TranslatableComponent("autothirdperson.disabled").withStyle(ChatFormatting.RED)
+		), true);
 	}
 	
 	public static class EntityVehicle implements Vehicle {

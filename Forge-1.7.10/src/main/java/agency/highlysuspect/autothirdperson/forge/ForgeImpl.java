@@ -2,27 +2,36 @@ package agency.highlysuspect.autothirdperson.forge;
 
 import agency.highlysuspect.autothirdperson.AtpSettings;
 import cpw.mods.fml.client.GuiIngameModOptions;
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.client.gui.GuiControls;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.event.world.WorldEvent;
 
 import java.lang.ref.WeakReference;
 
 public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 	private final Configuration forgeConfig;
 	private VintageForgeSettings settings;
+	private final KeyBinding TOGGLE_MOD = new KeyBinding(
+		"autothirdperson.toggle",
+		0,
+		"key.categories.misc"
+	);
 	
 	public ForgeImpl(FMLPreInitializationEvent e) {
 		this.forgeConfig = new Configuration(e.getSuggestedConfigurationFile());
@@ -43,6 +52,8 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 		FMLCommonHandler.instance().bus().register(this);
 		
 		settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
+		
+		ClientRegistry.registerKeyBinding(TOGGLE_MOD);
 	}
 	
 	@Override
@@ -50,9 +61,24 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 		return settings;
 	}
 	
+	@Override
+	public boolean modEnableToggleKeyPressed() {
+		return TOGGLE_MOD.getIsKeyPressed();
+	}
+	
 	//frog events
 	
 	//tired: making a settings gui for your mod
+	//wired:
+	private Long lastConfigReloadTimeLol = System.currentTimeMillis();
+	@SubscribeEvent
+	public void loadWorld(WorldEvent.Load e) {
+		if(System.currentTimeMillis() - lastConfigReloadTimeLol > 3000L) {
+			lastConfigReloadTimeLol = System.currentTimeMillis();
+			settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
+		}
+	}
+	
 	//inspired:
 	@SubscribeEvent
 	public void openGui(GuiOpenEvent e) {
