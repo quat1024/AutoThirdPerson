@@ -44,7 +44,7 @@ public abstract class TwentyZeroAutoThirdPerson extends AutoThirdPerson {
 	
 	@Override
 	public VersionCapabilities.Builder caps(VersionCapabilities.Builder caps) {
-		return caps.hasElytra().hasSwimmingAnimation();
+		return caps.hasElytra().hasSwimmingAnimation().hasRafts();
 	}
 	
 	@Override

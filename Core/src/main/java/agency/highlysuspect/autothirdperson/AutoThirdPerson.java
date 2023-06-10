@@ -320,7 +320,9 @@ public abstract class AutoThirdPerson {
 		
 		spec.section("Scenarios");
 		
-		spec.bool("boat", "Automatically go into third person when riding a boat?", true);
+		spec.bool("boat", "Automatically go into third person when riding a boat" +
+			(version.hasRafts ? " or raft" : "") +
+			"?", true);
 		spec.bool("cart", "Automatically go into third person when riding a minecart?", true);
 		spec.bool("animal", "Automatically go into third person when riding an animal?", true);
 		if(version.hasElytra) {
