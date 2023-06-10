@@ -1,0 +1,21 @@
+plugins {
+	id "java"
+	id "agency.highlysuspect.minivan" version "0.1"
+}
+
+ext.gimmeJava(17)
+
+archivesBaseName = "${rootProject.name}-xplat-1.20.0"
+
+minivan {
+	version("1.20")
+}
+
+dependencies {
+	compileOnly "org.spongepowered:mixin:0.8.5"
+	implementation project(":Core")
+}
+
+tasks.withType(JavaCompile) {
+	source(project(":Core").sourceSets.main.allSource)
+}

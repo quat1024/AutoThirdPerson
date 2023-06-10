@@ -23,6 +23,10 @@ include(
 	"Core",
 	"CrummyConfig",
 	
+	"Xplat-1.20.0",
+	"Fabric-1.20.0",
+	"Forge-1.20.0",
+	
 	"Xplat-1.19.4",
 	"Fabric-1.19.4",
 	"Forge-1.19.4",

@@ -1,0 +1,64 @@
+plugins {
+	id "fabric-loom" version "1.1.9"
+}
+
+ext.gimmeJava(17)
+
+archivesBaseName = "${rootProject.name}-fabric-1.20.0"
+
+dependencies {
+	//Minecraft
+	minecraft "com.mojang:minecraft:1.20"
+	mappings loom.officialMojangMappings()
+	
+	//Fabric loader
+	modImplementation "net.fabricmc:fabric-loader:0.14.21"
+	
+	//Fabric API
+	modImplementation fabricApi.module("fabric-resource-loader-v0", "0.83.0+1.20")
+	modImplementation fabricApi.module("fabric-lifecycle-events-v1", "0.83.0+1.20")
+	modImplementation fabricApi.module("fabric-command-api-v2", "0.83.0+1.20")
+	modImplementation fabricApi.module("fabric-key-binding-api-v1", "0.83.0+1.20")
+	
+	//Xplat
+	implementation project(":Xplat-1.20.0")
+	implementation project(":CrummyConfig")
+	implementation project(":Core")
+}
+
+//fold in xplat resources and sources
+processResources {
+	from project(":Xplat-1.20.0").sourceSets.main.resources
+	from project(":CrummyConfig").sourceSets.main.resources
+	from project(":Core").sourceSets.main.resources
+}
+
+tasks.withType(JavaCompile) {
+	source(project(":Xplat-1.20.0").sourceSets.main.allSource)
+	source(project(":CrummyConfig").sourceSets.main.allSource)
+	source(project(":Core").sourceSets.main.allSource)
+}
+
+//loom doesn't generate run configs by default in subprojects
+loom {
+	runs {
+		client {
+			client()
+			setConfigName("Fabric 1.20.0 Client")
+			ideConfigGenerated(true)
+			runDir("./run")
+		}
+		server {
+			server()
+			setConfigName("Fabric 1.20.0 Server")
+			ideConfigGenerated(true)
+			runDir("./run")
+		}
+	}
+	
+	//nor can it figure out the refmap name in this situation
+	mixin {
+		//you must go through project.rootProject due to a goofy name conflict with LoomGradleExtensionImpl#isRootProject
+		defaultRefmapName = "${project.rootProject.name}.refmap.json"
+	}
+}
