@@ -4,6 +4,10 @@ Puts you in third person when you do certain things. This used to be a simple mo
 
 LGPL 3.0 or later.
 
+# big note
+
+The 1.4.7 (and maybe 1.7.10) builds are Broken. some mystery voldeloom mappings bug i will need to track down later.
+
 ## Config notes
 
 The config file is loaded once at startup, then...

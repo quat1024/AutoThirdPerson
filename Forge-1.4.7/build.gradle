@@ -5,7 +5,7 @@ buildscript {
 		maven { url "https://repo.sleeping.town" }
 	}
 	dependencies {
-		classpath "agency.highlysuspect:voldeloom:2.3"
+		classpath "agency.highlysuspect:voldeloom:2.4-SNAPSHOT"
 	}
 }
 
@@ -30,16 +30,7 @@ String forgeVersion = "1.4.7-6.6.2.534"
 dependencies {
 	minecraft "com.mojang:minecraft:${minecraftVersion}"
 	forge "net.minecraftforge:forge:${forgeVersion}:universal@zip"
-	//mappings "net.minecraftforge:forge:${forgeVersion}:src@zip"
-	
-	//VOLDELOOM BUG that I am very surprised with!!
-	//This class was showing up in net/minecraft/src/Block$1 which makes me think packaging xform wasn't working correctly
-	mappings volde.layered {
-		importBaseZip("net.minecraftforge:forge:${forgeVersion}:src@zip")
-		modify("kludge-fix", builder -> {
-			builder.joined.putClassMapping("amq\$1", "net/minecraft/block/Block\$1")
-		})
-	}
+	mappings "net.minecraftforge:forge:${forgeVersion}:src@zip" //TODO: runClient broken from amq$1 again
 	
 	implementation project(":Core")
 }
