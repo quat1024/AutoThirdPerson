@@ -5,9 +5,7 @@ buildscript {
 		maven { url "https://repo.sleeping.town" }
 	}
 	dependencies {
-		classpath ("agency.highlysuspect:voldeloom:2.4-SNAPSHOT") {
-			changing: true //TODO im fixing it
-		}
+		classpath "agency.highlysuspect:voldeloom:2.4"
 	}
 }
 

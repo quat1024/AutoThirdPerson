@@ -159,8 +159,8 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 			//Adding a clientside unmountEntity call makes it worse lol
 			(System.currentTimeMillis() - myState.lastSneakDismountTime > 750))
 		{
-			//b -> func_78768_b -> "interactEntity" or something. Sends a packet like you right clicked on the entity
-			Minecraft.getMinecraft().playerController.b(client.thePlayer, currentVehicle);
+			//func_78768_b -> "interactEntity" or something. Sends a packet like you right clicked on the entity
+			Minecraft.getMinecraft().playerController.func_78768_b(client.thePlayer, currentVehicle);
 			myState.lastSneakDismountTime = System.currentTimeMillis();
 		}
 		myState.wasSneaking = client.thePlayer.isSneaking();
