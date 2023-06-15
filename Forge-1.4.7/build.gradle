@@ -5,7 +5,9 @@ buildscript {
 		maven { url "https://repo.sleeping.town" }
 	}
 	dependencies {
-		classpath "agency.highlysuspect:voldeloom:2.4-SNAPSHOT"
+		classpath ("agency.highlysuspect:voldeloom:2.4-SNAPSHOT") {
+			changing: true //TODO im fixing it
+		}
 	}
 }
 
@@ -15,22 +17,13 @@ archivesBaseName = "${rootProject.name}-forge-1.4.7"
 
 ext.gimmeJava(6)
 
-volde {
-	runs {
-		client {
-			//TODO: voldeloom issue #1 (lmao)
-			runDir = "Forge-1.4.7/run"
-		}
-	}
-}
-
 String minecraftVersion = "1.4.7"
 String forgeVersion = "1.4.7-6.6.2.534"
 
 dependencies {
 	minecraft "com.mojang:minecraft:${minecraftVersion}"
 	forge "net.minecraftforge:forge:${forgeVersion}:universal@zip"
-	mappings "net.minecraftforge:forge:${forgeVersion}:src@zip" //TODO: runClient broken from amq$1 again
+	mappings "net.minecraftforge:forge:${forgeVersion}:src@zip"
 	
 	implementation project(":Core")
 }

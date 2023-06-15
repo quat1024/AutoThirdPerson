@@ -5,7 +5,7 @@ buildscript {
 		maven { url "https://repo.sleeping.town" }
 	}
 	dependencies {
-		classpath "agency.highlysuspect:voldeloom:2.3"
+		classpath "agency.highlysuspect:voldeloom:2.4-SNAPSHOT"
 	}
 }
 
@@ -23,9 +23,6 @@ volde {
 			programArg "--assetIndex=1.7.10"
 			programArg "--userProperties={}"
 			programArg "--accessToken=69"
-			
-			//TODO: voldeloom issue #1 (lmao)
-			runDir = "Forge-1.7.10/run"
 		}
 	}
 }
