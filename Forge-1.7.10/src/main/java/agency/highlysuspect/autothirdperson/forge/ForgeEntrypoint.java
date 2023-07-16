@@ -11,7 +11,7 @@ import java.util.Map;
 @Mod(
 	modid = AutoThirdPerson.MODID,
 	name = AutoThirdPerson.NAME,
-	version = "2.0.3", //TODO: subst this from gradle somehow (or manually). forge mentioned something about a version.properties file ?
+	version = "2.0.4", //TODO: subst this from gradle somehow (or manually). forge mentioned something about a version.properties file ?
 	useMetadata = true,
 	acceptableRemoteVersions = "*",
 	acceptableSaveVersions = "*"

@@ -4,7 +4,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+		classpath "net.minecraftforge.gradle:ForgeGradle:5.1.71"
 	}
 }
 apply plugin: 'java'
@@ -12,21 +12,21 @@ apply plugin: 'net.minecraftforge.gradle'
 
 ext.gimmeJava(17)
 
-archivesBaseName = "${rootProject.name}-forge-1.20.0"
+archivesBaseName = "${rootProject.name}-forge-1.20.1"
 
 minecraft {
-	mappings channel: 'official', version: "1.20"
+	mappings channel: 'official', version: "1.20.1"
 	
 	runs {
 		client {
 			workingDirectory file('./run')
 			property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
-			ideaModule "auto_third_person.Forge-1.20.0.main"
+			ideaModule "auto_third_person.Forge-1.20.1.main"
 			mods {
 				"${rootProject.name}" {
 					source sourceSets.main
-					source project(":Xplat-1.20.0").sourceSets.main
+					source project(":Xplat-1.20.1").sourceSets.main
 					source project(":Core").sourceSets.main
 				}
 			}
@@ -36,11 +36,11 @@ minecraft {
 			workingDirectory file('./run')
 			property 'forge.logging.console.level', 'debug'
 			property 'fml.earlyprogresswindow', 'false'
-			ideaModule "auto_third_person.Forge-1.20.0.main"
+			ideaModule "auto_third_person.Forge-1.20.1.main"
 			mods {
 				"${rootProject.name}" {
 					source sourceSets.main
-					source project(":Xplat-1.20.0").sourceSets.main
+					source project(":Xplat-1.20.1").sourceSets.main
 					source project(":Core").sourceSets.main
 				}
 			}
@@ -49,19 +49,19 @@ minecraft {
 }
 
 dependencies {
-	minecraft "net.minecraftforge:forge:1.20-46.0.10"
+	minecraft "net.minecraftforge:forge:1.20.1-47.1.0"
 	
-	implementation project(":Xplat-1.20.0")
+	implementation project(":Xplat-1.20.1")
 	implementation project(":Core")
 }
 
 //fold in xplat resources and sources
 processResources {
-	from project(":Xplat-1.20.0").sourceSets.main.resources
+	from project(":Xplat-1.20.1").sourceSets.main.resources
 	from project(":Core").sourceSets.main.resources
 }
 
 tasks.withType(JavaCompile) {
-	source(project(":Xplat-1.20.0").sourceSets.main.allSource)
+	source(project(":Xplat-1.20.1").sourceSets.main.allSource)
 	source(project(":Core").sourceSets.main.allSource)
 }

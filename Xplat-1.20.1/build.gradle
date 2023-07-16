@@ -5,10 +5,10 @@ plugins {
 
 ext.gimmeJava(17)
 
-archivesBaseName = "${rootProject.name}-xplat-1.20.0"
+archivesBaseName = "${rootProject.name}-xplat-1.20.1"
 
 minivan {
-	version("1.20")
+	version("1.20.1")
 }
 
 dependencies {
