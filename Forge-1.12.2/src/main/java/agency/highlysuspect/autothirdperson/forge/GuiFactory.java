@@ -9,12 +9,12 @@ import net.minecraftforge.fml.client.IModGuiFactory;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.IConfigElement;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public class GuiFactory implements IModGuiFactory {
 	@Override
 	public void initialize(Minecraft minecraftInstance) {
@@ -32,12 +32,10 @@ public class GuiFactory implements IModGuiFactory {
 		Configuration c = ((ForgeImpl) AutoThirdPerson.instance).forgeConfig;
 		List<IConfigElement> elements = c.getCategoryNames().stream()
 			.filter(name -> !c.getCategory(name).isChild())
-			.filter(name -> !"uncategorized".equals(name)) //Only the `configVersion` property is in there, which I do not want to expose
+			.filter(name -> !"uncategorized".equalsIgnoreCase(name)) //Only the `configVersion` property is in there, which I do not want to expose
 			.map(name -> new ConfigElement(c.getCategory(name)))
-			.collect(Collectors.toCollection(ArrayList::new)); //mutable please, for the next line
-		
-		//reverse-alphabetize (happens to be the ordering i want anyway)
-		elements.sort(Comparator.comparing(IConfigElement::getName).reversed());
+			.sorted(Comparator.comparing(IConfigElement::getName).reversed()) //reverse-alphabetize (happens to be the ordering i want anyway)
+			.collect(Collectors.toList());
 		
 		return new GuiConfig(parentScreen, elements, AutoThirdPerson.MODID, false, false, AutoThirdPerson.NAME + " Config!");
 	}

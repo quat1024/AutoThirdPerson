@@ -1,11 +1,11 @@
 package agency.highlysuspect.autothirdperson;
 
-import agency.highlysuspect.autothirdperson.consumer.MyConsumer;
+import agency.highlysuspect.autothirdperson.config.ConfigSchema;
+import agency.highlysuspect.autothirdperson.config.CookedConfig;
+import agency.highlysuspect.autothirdperson.config.StubConfig;
 import agency.highlysuspect.autothirdperson.wrap.MyLogger;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.regex.Pattern;
 
 public abstract class AutoThirdPerson {
 	public static final String MODID = "auto_third_person";
@@ -15,6 +15,11 @@ public abstract class AutoThirdPerson {
 	
 	public final MyLogger logger;
 	public final VersionCapabilities version = caps(new VersionCapabilities.Builder()).build();
+	
+	//config
+	public final AtpOpts opts = new AtpOpts(version);
+	public CookedConfig config = new StubConfig();
+	
 	public final State state;
 	
 	//Well-known camera types.
@@ -39,6 +44,8 @@ public abstract class AutoThirdPerson {
 	
 	public abstract VersionCapabilities.Builder caps(VersionCapabilities.Builder builder);
 	public abstract MyLogger makeLogger();
+	public State makeState() { return new State(); }
+	public abstract CookedConfig makeConfig(ConfigSchema s);
 	
 	public abstract int getCameraType();
 	public abstract void setCameraType(int type);
@@ -51,43 +58,37 @@ public abstract class AutoThirdPerson {
 	}
 	
 	public abstract boolean f3ScreenUp();
-	
 	/** Player exists, level exists, game is not paused, etc */
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public abstract boolean safeToTick();
-	
 	/** or `false` if this game doesn't have an elytra */
 	public abstract boolean playerIsElytraFlying();
-	
 	/** or `false` if this game doesn't have the swimming animation */
 	public abstract boolean playerInSwimmingAnimation();
-	
 	/** Whether the player's head/camera/whatever is underwater, used for `stickySwim`, and for the swim setting on pre-1.13 */
 	public abstract boolean playerIsUnderwater();
-	
 	public abstract boolean modEnableToggleKeyPressed();
-	
 	public abstract void sayEnabled(boolean enabled);
-	
-	/**
-	 * The current settings. If this loader can automatically reload settings, this should return the most up-to-date copy of them.
-	 * If it can't, this should return the most up-to-date copy after a manual reload step, or after game startup, or whatever.
-	 * Don't return `null`; there's a default setting object in AtpSettings.
-	 */
-	public abstract AtpSettings settings();
-	
-	public State makeState() {
-		return new State();
-	}
 	
 	public void init() {
 		logger.info(NAME + " initializing...");
+		
+		config = makeConfig(opts.makeSchema());
+		refreshConfig();
+	}
+	
+	public void refreshConfig() {
+		try {
+			config.refresh();
+		} catch (Exception e) {
+			logger.error("Problem with " + NAME + " config load", e);
+		}
 	}
 	
 	/// external api ///
 	
 	public void debugSpam(String msg, Object... args) {
-		if(f3ScreenUp() || settings().logSpam()) logger.info(msg, args);
+		if(f3ScreenUp() || config.get(opts.LOG_SPAM)) logger.info(msg, args);
 	}
 	
 	public void mount(Vehicle mounting) {
@@ -105,7 +106,7 @@ public abstract class AutoThirdPerson {
 	public void manualPress() {
 		if(!state.modEnabled) return;
 		
-		if(settings().cancelAutoRestore() && state.isActive()) {
+		if(config.get(opts.CANCEL_AUTO_RESTORE) && state.isActive()) {
 			debugSpam("Cancelling auto-restore, if it was about to happen");
 			state.cancel();
 		}
@@ -122,7 +123,7 @@ public abstract class AutoThirdPerson {
 		
 		if(!safeToTick() || !state.modEnabled) return;
 		
-		if(settings().skipFrontView()) {
+		if(config.get(opts.SKIP_FRONT_VIEW)) {
 			int currentCameraType = getCameraType();
 			if(currentCameraType == THIRD_PERSON_REVERSED) {
 				debugSpam("Skipping third-person reversed view");
@@ -133,29 +134,36 @@ public abstract class AutoThirdPerson {
 	
 	public void tickClient() {
 		if(!state.modEnabled || !safeToTick()) return;
-		AtpSettings settings = settings();
+		
+		boolean elytraEnabled = config.getOr(opts.ELYTRA, false);
+		int elytraDelay = config.getOr(opts.ELYTRA_DELAY, 10);
+		boolean swimEnabled = config.get(opts.SWIM);
 		
 		boolean isFlying = version.hasElytra && playerIsElytraFlying();
 		boolean isSwimming = version.hasSwimmingAnimation ? playerInSwimmingAnimation() : playerIsUnderwater();
 		
-		if(settings.elytra() && playerIsElytraFlying()) {
-			if(state.elytraFlyingTicks == settings.elytraDelay()) enterThirdPerson(new FlyingReason());
+		if(elytraEnabled && isFlying) {
+			if(state.elytraFlyingTicks == elytraDelay) enterThirdPerson(new FlyingReason());
 			state.elytraFlyingTicks++;
 		} else {
 			if(state.elytraFlyingTicks != 0) exitThirdPerson(new FlyingReason());
 			state.elytraFlyingTicks = 0;
 		}
 		
-		if(settings.swim() && !(settings.elytra() && isFlying && isSwimming)) { //so swimming rules don't trigger when you dip underwater while flying with elytra
-			if(state.wasSwimming && settings.stickySwim()) isSwimming |= playerIsUnderwater();
+		if(swimEnabled && !(elytraEnabled && isFlying && isSwimming)) { //so swimming rules don't trigger when you dip underwater while flying with elytra
+			boolean stickySwim = config.getOr(opts.STICKY_SWIM, false);
+			int swimmingDelayStart = config.get(opts.SWIMMING_DELAY_START);
+			int swimmingDelayEnd = config.get(opts.SWIMMING_DELAY_END);
+			
+			if(state.wasSwimming && stickySwim) isSwimming |= playerIsUnderwater();
 			
 			if(state.wasSwimming != isSwimming) {
 				state.swimTicks = 0;
 				state.wasSwimming = isSwimming;
 			}
 			
-			if(isSwimming && state.swimTicks == settings.swimmingDelayStart()) enterThirdPerson(new SwimmingReason());
-			if(!isSwimming && state.swimTicks == settings.swimmingDelayEnd()) exitThirdPerson(new SwimmingReason());
+			if(isSwimming && state.swimTicks == swimmingDelayStart) enterThirdPerson(new SwimmingReason());
+			if(!isSwimming && state.swimTicks == swimmingDelayEnd) exitThirdPerson(new SwimmingReason());
 			
 			state.swimTicks++;
 		}
@@ -165,33 +173,32 @@ public abstract class AutoThirdPerson {
 	
 	private void mountOrDismount(Vehicle vehicle, boolean mounting) {
 		if(!safeToTick()) return;
-		AtpSettings settings = settings();
 		
 		debugSpam((mounting ? "Mounting " : "Dismounting ") + vehicle.id());
 		
-		if(settings.useIgnore() && settings.ignorePattern().matcher(vehicle.id()).matches()) {
-			debugSpam("Ignoring, since it matches the ignore pattern '{}'.", settings.ignorePattern());
+		if(config.get(opts.USEIGNORE) && config.get(opts.IGNORE_PATTERN).matcher(vehicle.id()).matches()) {
+			debugSpam("Ignoring, since it matches the ignore pattern '{}'.", config.get(opts.IGNORE_PATTERN));
 			return;
 		}
 		
 		boolean doIt = false;
-		if(settings.boat() && vehicle.classification() == Vehicle.Classification.BOAT) {
+		if(config.get(opts.BOAT) && vehicle.classification() == Vehicle.Classification.BOAT) {
 			debugSpam("This is a boat!");
 			doIt = true;
 		}
 		
-		if(settings.cart() && vehicle.classification() == Vehicle.Classification.MINECART) {
+		if(config.get(opts.CART) && vehicle.classification() == Vehicle.Classification.MINECART) {
 			debugSpam("This is a minecart!");
 			doIt = true;
 		}
 		
-		if(settings.animal() && vehicle.classification() == Vehicle.Classification.ANIMAL) {
+		if(config.get(opts.ANIMAL) && vehicle.classification() == Vehicle.Classification.ANIMAL) {
 			debugSpam("This is an animal!");
 			doIt = true;
 		}
 		
-		if(settings.custom() && settings.customPattern().matcher(vehicle.id()).matches()) {
-			debugSpam("This matches the pattern '{}'!", settings.customPattern());
+		if(config.get(opts.CUSTOM) && config.get(opts.CUSTOM_PATTERN).matcher(vehicle.id()).matches()) {
+			debugSpam("This matches the pattern '{}'!", config.get(opts.CUSTOM_PATTERN));
 			doIt = true;
 		}
 		
@@ -214,7 +221,7 @@ public abstract class AutoThirdPerson {
 	}
 	
 	private void exitThirdPerson(Reason reason) {
-		if(!settings().autoRestore()) {
+		if(!config.get(opts.AUTO_RESTORE)) {
 			debugSpam("Not automatically leaving third person due to {} ending - auto restore is turned off", reason);
 			return;
 		}
@@ -304,82 +311,5 @@ public abstract class AutoThirdPerson {
 		public String toString() {
 			return "riding " + vehicle.id();
 		}
-	}
-	
-	/// settings ///
-	
-	public SettingsSpec buildSettingsSpec() {
-		SettingsSpec spec = new SettingsSpec();
-		
-		spec.integer("configVersion", null, 6, new MyConsumer<SettingsSpec.IntSetting>() {
-			@Override
-			public void accept(SettingsSpec.IntSetting thing) {
-				thing.writeDefaultComment = false;
-			}
-		});
-		
-		spec.section("Scenarios");
-		
-		spec.bool("boat", "Automatically go into third person when riding a boat" +
-			(version.hasRafts ? " or raft" : "") +
-			"?", true);
-		spec.bool("cart", "Automatically go into third person when riding a minecart?", true);
-		spec.bool("animal", "Automatically go into third person when riding an animal?", true);
-		if(version.hasElytra) {
-			spec.bool("elytra", "Automatically go into third person when flying an elytra?", true);
-		}
-		spec.bool("swim", version.hasSwimmingAnimation ?
-			"Automatically go into third person when doing the swimming animation?" :
-			"Automatically go into third person when underwater?",
-			false
-		);
-		spec.bool("custom", "If 'true', the customPattern will be used, and riding anything matching it will toggle third person.", false);
-		spec.bool("useIgnore", "If 'true', the ignorePattern will be used, and anything matching it will be ignored.", false);
-		
-		spec.section("Scenario Options");
-		
-		if(version.hasElytra) {
-			spec.integer(
-				"elytraDelay",
-				"Ticks of elytra flight required before the camera automatically toggles if the 'elytra' option is enabled.",
-				7,
-				SettingsSpec.IntSetting.NON_NEGATIVE
-			);
-		}
-		spec.integer(
-			"swimmingDelayStart",
-			"Ticks of swimming required before the camera automatically toggles if the 'swim' option is enabled.",
-			version.hasSwimmingAnimation ? 0 : 10, //default value of 0 is too odd-looking without the swimming animation
-			SettingsSpec.IntSetting.NON_NEGATIVE
-		);
-		spec.integer(
-			"swimmingDelayEnd",
-			"Ticks of not swimming required before the camera restores if the 'swim' option is enabled.",
-			10,
-			SettingsSpec.IntSetting.NON_NEGATIVE
-		);
-		if(version.hasSwimmingAnimation) {
-			spec.bool("stickySwim", "If 'true', your head has to completely exit the water to count as 'not swimming anymore', for the purposes of restoring\nthe camera when you're done swimming. If 'false', you just have to stop doing the swimming animation.", true);
-		}
-		spec.pattern("customPattern", "Entity IDs that match this regular expression will be considered if the 'custom' option is enabled.", Pattern.compile("^minecraft:(cow|chicken)$"));
-		spec.pattern("ignorePattern", "Entity IDs that match this regular expression will be ignored if the 'useIgnore' option is enabled.", Pattern.compile("^examplemod:example$"));
-		
-		spec.section("Restoration");
-		
-		spec.bool("autoRestore", "When the situation that Auto Third Person put you into third person for is over,\nthe camera will be restored back to the way it was.", true);
-		spec.bool("cancelAutoRestore", "If 'true', pressing f5 after mounting something will prevent your camera\nfrom being automatically restored to first-person when you dismount.", true);
-		
-		spec.section("Extras");
-		
-		spec.bool("skipFrontView", "Skip the 'third-person front' camera mode when pressing F5.", false);
-		spec.bool("logSpam", "Dump a bunch of debug crap into the log.\nMight be handy!", false);
-		if(version.hasHandGlitch) {
-			spec.bool("fixHandGlitch", "Fix the annoying 'weirdly rotated first-person hand' rendering error when you ride or look at someone riding a vehicle.", true);
-		}
-		if(version.noSneakDismount) {
-			spec.bool("sneakDismount", "Pressing sneak will remove you from the vehicle, instead of requiring a click on the vehicle, like in modern versions.", false);
-		}
-		
-		return spec;
 	}
 }

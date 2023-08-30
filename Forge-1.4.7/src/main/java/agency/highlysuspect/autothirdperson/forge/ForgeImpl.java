@@ -1,8 +1,8 @@
 package agency.highlysuspect.autothirdperson.forge;
 
-import agency.highlysuspect.autothirdperson.AtpSettings;
+import agency.highlysuspect.autothirdperson.config.ConfigSchema;
+import agency.highlysuspect.autothirdperson.config.CookedConfig;
 import agency.highlysuspect.autothirdperson.wrap.MyLogger;
-import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ITickHandler;
@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 	private final Configuration forgeConfig;
-	private AtpSettings settings;
 	private final KeyBinding TOGGLE_MOD = new KeyBinding("autothirdperson.toggle", 0);
 	
 	public ForgeImpl(FMLPreInitializationEvent e) {
@@ -68,6 +67,11 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 	}
 	
 	@Override
+	public CookedConfig makeConfig(ConfigSchema s) {
+		return new VintageForgeCookedConfig(s, forgeConfig);
+	}
+	
+	@Override
 	public boolean modEnableToggleKeyPressed() {
 		return TOGGLE_MOD.pressed;
 	}
@@ -77,8 +81,6 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 		super.init();
 		
 		MinecraftForge.EVENT_BUS.register(this);
-		
-		settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
 		
 		//The old ticking system is completely bizarre
 		TickRegistry.registerTickHandler(new WeirdTickerThing(), Side.CLIENT);
@@ -108,11 +110,6 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 				return "auto third person key handler thing";
 			}
 		});
-	}
-	
-	@Override
-	public AtpSettings settings() {
-		return settings;
 	}
 	
 	//frog events
@@ -150,7 +147,7 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 		}
 		
 		//Handle "sneak-to-dismount"
-		if(settings().sneakDismount() &&
+		if(config.get(opts.SNEAK_DISMOUNT_BACKPORT) &&
 			myState.wasSneaking &&
 			client.thePlayer.isSneaking() &&
 			currentVehicle != null &&
@@ -168,7 +165,7 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 	
 	@ForgeSubscribe
 	public void renderLast(RenderWorldLastEvent e) {
-		if(!settings().fixHandGlitch() || client.thePlayer == null) return;
+		if(!config.get(opts.FIX_HAND_GLITCH) || client.thePlayer == null) return;
 		
 		//Fired immediately before hand rendering. Search `dispatchRenderLast` in EntityRenderer (took me like
 		//5 years to find for some reason). This is our chance to make a move, soooo lucky about this event firing time
@@ -184,7 +181,7 @@ public class ForgeImpl extends OneFourSevenAutoThirdPerson {
 	public void worldLoad(WorldEvent.Load e) {
 		if(System.currentTimeMillis() - lastConfigReloadTimeLol > 3000L) {
 			lastConfigReloadTimeLol = System.currentTimeMillis();
-			settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
+			refreshConfig();
 		}
 	}
 	

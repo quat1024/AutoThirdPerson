@@ -1,7 +1,8 @@
 package agency.highlysuspect.autothirdperson.forge;
 
-import agency.highlysuspect.autothirdperson.AtpSettings;
 import agency.highlysuspect.autothirdperson.SixteenFiveAutoThirdPerson_MCP;
+import agency.highlysuspect.autothirdperson.config.ConfigSchema;
+import agency.highlysuspect.autothirdperson.config.CookedConfig;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
@@ -15,8 +16,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class ForgeImpl extends SixteenFiveAutoThirdPerson_MCP {
-	private UncookedForgeSettings uncookedForgeSettings;
-	private AtpSettings cookedForgeSettings = AtpSettings.MISSING;
 	private final KeyBinding TOGGLE_MOD = new KeyBinding(
 		"autothirdperson.toggle",
 		KeyConflictContext.IN_GAME,
@@ -29,10 +28,6 @@ public class ForgeImpl extends SixteenFiveAutoThirdPerson_MCP {
 	public void init() {
 		super.init();
 		
-		uncookedForgeSettings = new UncookedForgeSettings(instance.buildSettingsSpec());
-		
-		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, uncookedForgeSettings.forgeSpec);
-		
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::configLoad);
 		MinecraftForge.EVENT_BUS.addListener(this::onTick);
 		MinecraftForge.EVENT_BUS.addListener(this::onFrame);
@@ -41,20 +36,22 @@ public class ForgeImpl extends SixteenFiveAutoThirdPerson_MCP {
 	}
 	
 	@Override
+	public CookedConfig makeConfig(ConfigSchema s) {
+		ForgeCookedConfig f = new ForgeCookedConfig(s);
+		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, f.forgeSpec);
+		return f;
+	}
+	
+	@Override
 	public boolean modEnableToggleKeyPressed() {
 		return TOGGLE_MOD.isDown() && TOGGLE_MOD.getKeyModifier().isActive(KeyConflictContext.IN_GAME);
 	}
 	
-	@Override
-	public AtpSettings settings() {
-		return cookedForgeSettings;
-	}
-	
 	public void configLoad(ModConfig.ModConfigEvent e) {
 		if(e.getConfig().getModId().equals(MODID)) {
-			instance.logger.info("Cooking Auto Third Person config...");
-			cookedForgeSettings = new CookedForgeSettings(uncookedForgeSettings);
-			instance.logger.info("...done.");
+			logger.info("Cooking Auto Third Person config...");
+			refreshConfig();
+			logger.info("...done.");
 		}
 	}
 	

@@ -1,4 +1,4 @@
-package agency.highlysuspect.autothirdperson.consumer;
+package agency.highlysuspect.autothirdperson.backport;
 
 /**
  * Exactly the same as Java 8's Consumer, but Java 6 compatible.

@@ -1,14 +1,11 @@
-package agency.highlysuspect.autothirdperson.consumer;
+package agency.highlysuspect.autothirdperson.backport;
 
 /**
  * Static methods in interfaces are also not supported yet :cry:
  */
-public class MyConsumerUtil {
+public class MyConsumers {
 	private static final MyConsumer<Object> DOES_NOTHING = new MyConsumer<Object>() {
-		@Override
-		public void accept(Object thing) {
-			
-		}
+		@Override public void accept(Object thing) {}
 	};
 	
 	@SuppressWarnings("unchecked")

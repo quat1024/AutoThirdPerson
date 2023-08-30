@@ -1,6 +1,7 @@
 package agency.highlysuspect.autothirdperson.forge;
 
-import agency.highlysuspect.autothirdperson.AtpSettings;
+import agency.highlysuspect.autothirdperson.config.ConfigSchema;
+import agency.highlysuspect.autothirdperson.config.CookedConfig;
 import cpw.mods.fml.client.GuiIngameModOptions;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -8,7 +9,6 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.client.gui.GuiControls;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.Render;
@@ -26,7 +26,6 @@ import java.lang.ref.WeakReference;
 
 public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 	private final Configuration forgeConfig;
-	private VintageForgeSettings settings;
 	private final KeyBinding TOGGLE_MOD = new KeyBinding(
 		"autothirdperson.toggle",
 		0,
@@ -43,6 +42,11 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 	}
 	
 	@Override
+	public CookedConfig makeConfig(ConfigSchema s) {
+		return new VintageForgeCookedConfig(s, forgeConfig);
+	}
+	
+	@Override
 	public void init() {
 		super.init();
 		
@@ -51,14 +55,7 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 		MinecraftForge.EVENT_BUS.register(this);
 		FMLCommonHandler.instance().bus().register(this);
 		
-		settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
-		
 		ClientRegistry.registerKeyBinding(TOGGLE_MOD);
-	}
-	
-	@Override
-	public AtpSettings settings() {
-		return settings;
 	}
 	
 	@Override
@@ -75,7 +72,7 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 	public void loadWorld(WorldEvent.Load e) {
 		if(System.currentTimeMillis() - lastConfigReloadTimeLol > 3000L) {
 			lastConfigReloadTimeLol = System.currentTimeMillis();
-			settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
+			refreshConfig();
 		}
 	}
 	
@@ -84,7 +81,7 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 	public void openGui(GuiOpenEvent e) {
 		if(e.gui instanceof GuiIngameModOptions || e.gui instanceof GuiControls) {
 			try {
-				settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
+				refreshConfig();
 			} catch (Exception mmm) { mmm.printStackTrace(); }
 		}
 	}
@@ -135,7 +132,7 @@ public class ForgeImpl extends OneSevenTenAutoThirdPerson {
 	
 	@SubscribeEvent
 	public void onRenderHand(RenderHandEvent e) {
-		if(client.thePlayer == null || !settings.fixHandGlitch()) return;
+		if(client.thePlayer == null || !config.get(opts.FIX_HAND_GLITCH)) return;
 		
 		Render entityRenderer = RenderManager.instance.getEntityRenderObject(client.thePlayer);
 		if(entityRenderer instanceof RenderPlayer) {

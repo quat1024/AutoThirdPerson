@@ -1,9 +1,9 @@
 package agency.highlysuspect.autothirdperson.fabric;
 
-import agency.highlysuspect.autothirdperson.AtpSettings;
 import agency.highlysuspect.autothirdperson.NineteenFourAutoThirdPerson;
-import agency.highlysuspect.crummyconfig.CookedCrummyConfig;
-import agency.highlysuspect.crummyconfig.UncookedCrummyConfig;
+import agency.highlysuspect.autothirdperson.config.ConfigSchema;
+import agency.highlysuspect.autothirdperson.config.CookedConfig;
+import agency.highlysuspect.crummyconfig.CrummyConfig2;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -20,11 +20,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.lwjgl.glfw.GLFW;
 
-import java.io.IOException;
-
 public class FabricEntrypoint extends NineteenFourAutoThirdPerson implements ClientModInitializer {
-	private UncookedCrummyConfig uncookedConfig;
-	private AtpSettings settings = AtpSettings.MISSING;
 	private final KeyMapping TOGGLE_MOD = KeyBindingHelper.registerKeyBinding(new KeyMapping(
 		"autothirdperson.toggle",
 		InputConstants.Type.KEYSYM,
@@ -43,14 +39,6 @@ public class FabricEntrypoint extends NineteenFourAutoThirdPerson implements Cli
 		
 		ClientTickEvents.START_CLIENT_TICK.register(__ -> tickClient());
 		
-		uncookedConfig = new UncookedCrummyConfig(
-			FabricLoader.getInstance().getConfigDir().resolve(MODID + ".cfg"),
-			buildSettingsSpec()
-		);
-		
-		//Load it once now
-		loadConfig();
-		
 		//Load it on F3+T
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
@@ -60,7 +48,7 @@ public class FabricEntrypoint extends NineteenFourAutoThirdPerson implements Cli
 			
 			@Override
 			public void onResourceManagerReload(ResourceManager resourceManager) {
-				loadConfig();
+				refreshConfig();
 			}
 		});
 		
@@ -69,25 +57,15 @@ public class FabricEntrypoint extends NineteenFourAutoThirdPerson implements Cli
 			dispatcher.register(
 				ClientCommandManager.literal(MODID).then(
 					ClientCommandManager.literal("reload").executes(s -> {
-						loadConfig();
+						refreshConfig();
 						s.getSource().sendFeedback(Component.literal(NAME + " settings reloaded"));
 						return 0;
 					}))));
 	}
 	
-	private void loadConfig() {
-		try {
-			uncookedConfig.load();
-		} catch (IOException e) {
-			throw new RuntimeException("IOException loading " + NAME + " config", e);
-		}
-		
-		settings = new CookedCrummyConfig(uncookedConfig);
-	}
-	
 	@Override
-	public AtpSettings settings() {
-		return settings;
+	public CookedConfig makeConfig(ConfigSchema s) {
+		return new CrummyConfig2(s, FabricLoader.getInstance().getConfigDir().resolve(MODID + ".cfg"));
 	}
 	
 	@Override

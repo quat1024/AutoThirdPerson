@@ -1,6 +1,7 @@
 package agency.highlysuspect.autothirdperson.forge;
 
-import agency.highlysuspect.autothirdperson.AtpSettings;
+import agency.highlysuspect.autothirdperson.config.ConfigSchema;
+import agency.highlysuspect.autothirdperson.config.CookedConfig;
 import agency.highlysuspect.autothirdperson.wrap.Vehicle;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.settings.KeyConflictContext;
@@ -15,8 +16,8 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class ForgeImpl extends OneTwelveTwoAutoThirdPerson {
-	final Configuration forgeConfig; //public for the gui factory !
-	private VintageForgeSettings settings;
+	public Configuration forgeConfig; //public for the gui factory !
+	
 	private final KeyBinding TOGGLE_MOD = new KeyBinding(
 		"autothirdperson.toggle",
 		KeyConflictContext.IN_GAME,
@@ -32,14 +33,13 @@ public class ForgeImpl extends OneTwelveTwoAutoThirdPerson {
 	public void init() {
 		super.init();
 		MinecraftForge.EVENT_BUS.register(this);
-		settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
 		
 		ClientRegistry.registerKeyBinding(TOGGLE_MOD);
 	}
 	
 	@Override
-	public AtpSettings settings() {
-		return settings;
+	public CookedConfig makeConfig(ConfigSchema s) {
+		return new VintageForgeCookedConfig(s, forgeConfig);
 	}
 	
 	@Override
@@ -53,12 +53,7 @@ public class ForgeImpl extends OneTwelveTwoAutoThirdPerson {
 	@SubscribeEvent
 	public void onConfigChange(ConfigChangedEvent e) {
 		if(e.getModID().equals(MODID)) {
-			//bit of a sloppy call?
-			//This event is fired after changing the config in-memory, but before writing it back to disk.
-			//VintageForgeSettings constructor then calls config.load(), stomping over all the user's changes.
-			//So uh, I can... simply save the file so the subsequent load works? lol
-			forgeConfig.save();
-			settings = new VintageForgeSettings(forgeConfig, buildSettingsSpec());
+			refreshConfig();
 		}
 	}
 	
