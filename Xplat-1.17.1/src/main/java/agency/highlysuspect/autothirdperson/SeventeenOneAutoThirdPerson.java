@@ -138,7 +138,7 @@ public abstract class SeventeenOneAutoThirdPerson extends AutoThirdPerson {
 			if(!(other instanceof EntityVehicle)) return false;
 			Entity myEntity = ent.get();
 			Entity otherEntity = ((EntityVehicle) other).ent.get();
-			return myEntity != null && myEntity.isAlive() && myEntity == otherEntity;
+			return myEntity != null && myEntity == otherEntity;
 		}
 	}
 }
