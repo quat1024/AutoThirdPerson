@@ -4,7 +4,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+		classpath "net.minecraftforge.gradle:ForgeGradle:5.1.71"
 	}
 }
 apply plugin: 'java'
