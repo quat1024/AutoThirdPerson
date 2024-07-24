@@ -47,7 +47,7 @@ public abstract class OneTwelveTwoAutoThirdPerson extends AutoThirdPerson {
 	
 	@Override
 	public VersionCapabilities.Builder caps(VersionCapabilities.Builder builder) {
-		return builder;
+		return builder.hasElytra();
 	}
 	
 	@Override
@@ -68,6 +68,11 @@ public abstract class OneTwelveTwoAutoThirdPerson extends AutoThirdPerson {
 	@Override
 	public boolean safeToTick() {
 		return client.player != null && client.world != null && !client.isGamePaused();
+	}
+	
+	@Override
+	public boolean playerIsElytraFlying() {
+		return client.player.isElytraFlying();
 	}
 	
 	@Override
@@ -126,11 +131,6 @@ public abstract class OneTwelveTwoAutoThirdPerson extends AutoThirdPerson {
 	}
 	
 	//unsupported things
-	
-	@Override
-	public boolean playerIsElytraFlying() {
-		return false;
-	}
 	
 	@Override
 	public boolean playerInSwimmingAnimation() {
