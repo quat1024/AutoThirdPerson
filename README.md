@@ -4,6 +4,8 @@ Puts you in third person when you do certain things. This used to be a simple mo
 
 LGPL 3.0 or later.
 
+n.b. Support for 1.17.1 and 1.19.4 has been dropped due to very low adoption of these versions in the modded community. The old jars are still on modrinth, but no issues will be fixed.
+
 ## Config notes
 
 The config file is loaded once at startup, then...
