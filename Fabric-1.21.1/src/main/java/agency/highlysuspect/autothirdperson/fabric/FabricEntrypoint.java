@@ -1,6 +1,6 @@
 package agency.highlysuspect.autothirdperson.fabric;
 
-import agency.highlysuspect.autothirdperson.TwentyZeroAutoThirdPerson;
+import agency.highlysuspect.autothirdperson.TwentyOneOneAutoThirdPerson;
 import agency.highlysuspect.autothirdperson.config.ConfigSchema;
 import agency.highlysuspect.autothirdperson.config.CookedConfig;
 import agency.highlysuspect.crummyconfig.CrummyConfig2;
@@ -20,7 +20,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.lwjgl.glfw.GLFW;
 
-public class FabricEntrypoint extends TwentyZeroAutoThirdPerson implements ClientModInitializer {
+public class FabricEntrypoint extends TwentyOneOneAutoThirdPerson implements ClientModInitializer {
 	private final KeyMapping TOGGLE_MOD = KeyBindingHelper.registerKeyBinding(new KeyMapping(
 		"autothirdperson.toggle",
 		InputConstants.Type.KEYSYM,
@@ -43,7 +43,7 @@ public class FabricEntrypoint extends TwentyZeroAutoThirdPerson implements Clien
 		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
 			@Override
 			public ResourceLocation getFabricId() {
-				return new ResourceLocation(MODID, "settings_reloader");
+				return ResourceLocation.tryBuild(MODID, "settings_reloader");
 			}
 			
 			@Override

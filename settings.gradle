@@ -17,6 +17,12 @@ pluginManagement {
 	}
 }
 
+//welcome to gradle 8 can i take your order
+//yeah i'd like uhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh java
+plugins {
+	id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
+}
+
 rootProject.name = name
 
 include(
@@ -24,7 +30,7 @@ include(
 	"CrummyConfig",
 	
 	"Xplat-1.21.1",
-	//"Fabric-1.21.1",
+	"Fabric-1.21.1",
 	//"Neo-1.21.1", //TODO
 	
 	"Xplat-1.20.1",

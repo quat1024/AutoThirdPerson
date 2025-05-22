@@ -1,7 +1,7 @@
 package agency.highlysuspect.autothirdperson.fabric.mixin;
 
 import agency.highlysuspect.autothirdperson.AutoThirdPerson;
-import agency.highlysuspect.autothirdperson.TwentyZeroAutoThirdPerson;
+import agency.highlysuspect.autothirdperson.TwentyOneOneAutoThirdPerson;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +19,7 @@ public class LocalPlayerMixin {
 	private void autoThirdPerson$onStartRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> cir) {
 		AutoThirdPerson atp = AutoThirdPerson.instance;
 		
-		atp.mount(new TwentyZeroAutoThirdPerson.EntityVehicle(vehicle));
+		atp.mount(new TwentyOneOneAutoThirdPerson.EntityVehicle(vehicle));
 	}
 	
 	@Inject(
@@ -32,7 +32,7 @@ public class LocalPlayerMixin {
 		if(vehicle != null) {
 			AutoThirdPerson atp = AutoThirdPerson.instance;
 			
-			atp.dismount(new TwentyZeroAutoThirdPerson.EntityVehicle(vehicle));
+			atp.dismount(new TwentyOneOneAutoThirdPerson.EntityVehicle(vehicle));
 		}
 	}
 }
