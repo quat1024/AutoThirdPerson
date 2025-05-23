@@ -29,6 +29,10 @@ include(
 	"Core",
 	"CrummyConfig",
 	
+	"Xplat-1.21.5",
+	"Fabric-1.21.5",
+	"Neo-1.21.5",
+	
 	"Xplat-1.21.1",
 	"Fabric-1.21.1",
 	"Neo-1.21.1",

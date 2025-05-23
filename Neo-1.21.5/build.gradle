@@ -1,0 +1,55 @@
+plugins {
+	id "java"
+	id "net.neoforged.moddev" version "2.0.88" // https://projects.neoforged.net/neoforged/ModDevGradle
+}
+
+ext.gimmeJava(21)
+
+archivesBaseName = "${rootProject.name}-neo-1.21.5"
+
+neoForge {
+	version "21.5.67-beta" // https://projects.neoforged.net/neoforged/neoforge
+	
+	runs {
+		client {
+			client()
+		}
+	}
+	
+	mods {
+		auto_third_person {
+			sourceSet sourceSets.main
+			sourceSet project(":Xplat-1.21.5").sourceSets.main
+			sourceSet project(":Core").sourceSets.main
+		}
+	}
+}
+
+dependencies {
+	implementation project(":Xplat-1.21.5")
+	implementation project(":Core")
+}
+
+//fold in xplat resources and sources
+processResources {
+	from project(":Xplat-1.21.5").sourceSets.main.resources
+	from project(":Core").sourceSets.main.resources
+	
+	//REPLAEC THE FUCKING VARIABLE  PLAESE
+	inputs.property "cachebust", "kajsdksakdjaskdskadkasjdlkasldkjsakld"
+	inputs.property "version", project.version
+	
+	filesMatching(["**/neoforge.mods.toml"]) {
+		expand "version": project.version
+	}
+}
+
+tasks.withType(JavaCompile) {
+	source(project(":Xplat-1.21.5").sourceSets.main.allSource)
+	source(project(":Core").sourceSets.main.allSource)
+}
+
+// ??????
+tasks.named("compileTestJava").configure {
+	it.enabled = false
+}
