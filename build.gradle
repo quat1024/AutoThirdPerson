@@ -1,5 +1,7 @@
 //this block is executed for each subproject, as if it was copied and pasted into the buildscript
 subprojects {
+	apply plugin: "java"
+	
 	//defines a function available through ext.gimmeJava (basically, a crude form of gradle plugin)
 	//this configures a project-specific gradle toolchain
 	project.ext.gimmeJava = (int ver) -> {
