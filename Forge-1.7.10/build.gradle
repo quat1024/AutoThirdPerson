@@ -9,6 +9,7 @@ buildscript {
 	}
 }
 
+apply plugin: "java"
 apply plugin: "agency.highlysuspect.voldeloom"
 
 archivesBaseName = "${rootProject.name}-forge-1.7.10"

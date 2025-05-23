@@ -1,4 +1,5 @@
 plugins {
+	id "java"
 	id "net.neoforged.moddev" version "2.0.82" // https://projects.neoforged.net/neoforged/ModDevGradle
 }
 
