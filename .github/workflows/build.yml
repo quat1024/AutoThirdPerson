@@ -10,7 +10,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: "temurin"
-          java-version: "17"
+          java-version: "21"
       - uses: gradle/actions/wrapper-validation@v3
       - uses: gradle/actions/setup-gradle@v3.4.2
       - run: ./gradlew clean build --info --stacktrace
