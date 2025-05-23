@@ -1,16 +1,3 @@
-//beware that IDEA uses the term "project" to refer to the top-level thing, and "module" to refer to children,
-//but Gradle would call those the "root project" and "projects"/"subprojects" respectively
-//with that said:
-//set the *default* (project-wide, not module-wide) IDEA language level to 17
-//the default language level is sometimes used for things like determining which JDK to run Gradle with.
-//this project mixes java versions across the modules, and IDEA seems to be a bit unpredictable about
-//which one it decides to use as the default.
-//TODO: doesn't seem to work? it's still picking java 6
-apply plugin: "idea"
-idea.project {
-	languageLevel("JDK_17")
-}
-
 //this block is executed for each subproject, as if it was copied and pasted into the buildscript
 subprojects {
 	apply plugin: "java"
@@ -67,7 +54,7 @@ subprojects {
 	processResources {
 		inputs.property "version", project.version
 		
-		filesMatching(["**/fabric.mod.json", "**/mods.toml", "**/version.properties", "**/mcmod.info"]) {
+		filesMatching(["**/fabric.mod.json", "**/mods.toml", "**/version.properties", "**/mcmod.info", "**/neoforge.mods.toml"]) {
 			expand "version": project.version
 		}
 	}

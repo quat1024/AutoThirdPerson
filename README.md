@@ -6,6 +6,8 @@ LGPL 3.0 or later.
 
 n.b. Support for 1.17.1 and 1.19.4 has been dropped due to very low adoption of these versions in the modded community. The old jars are still on modrinth, but no issues will be fixed.
 
+n.b. Support for non-Voldeloom Forge projects is currently commented out, due to them using ForgeGradle 5 which is broken by Gradle 8. (And Gradle 8 is necessary to support Java 21, which is necessary to support 1.21.1.)
+
 ## Config notes
 
 The config file is loaded once at startup, then...
