@@ -8,6 +8,17 @@ n.b. Support for 1.17.1 and 1.19.4 has been dropped due to very low adoption of 
 
 n.b. Support for non-Voldeloom Forge projects is currently commented out, due to them using ForgeGradle 5 which is broken by Gradle 8. (And Gradle 8 is necessary to support Java 21, which is necessary to support 1.21.1.)
 
+n.b. Support for old Fabric projects is *also* commented out due to God fucking knows what:
+
+```
+Execution failed for task ':Fabric-1.16.5:remapJar'.
+> Error while evaluating property 'tinyRemapperServiceOptions' of task ':Fabric-1.16.5:remapJar'.
+   > Failed to query the value of task ':Fabric-1.16.5:remapJar' property 'tinyRemapperServiceOptions'.
+      > class net.fabricmc.loom.extension.LoomGradleExtensionImpl_Decorated cannot be cast to class net.fabricmc.loom.LoomGradleExtension (net.fabricmc.loom.extension.LoomGradleExtensionImpl_Decorated is in unnamed module of loader org.gradle.internal.classloader.VisitableURLClassLoader$InstrumentingVisitableURLClassLoader @42c778b5; net.fabricmc.loom.LoomGradleExtension is in unnamed module of loader org.gradle.internal.classloader.VisitableURLClassLoader$InstrumentingVisitableURLClassLoader @762cfd6e)
+```
+
+?????????????????????????
+
 ## Config notes
 
 The config file is loaded once at startup, then...

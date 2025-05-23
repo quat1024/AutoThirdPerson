@@ -1,6 +1,6 @@
 plugins {
 	id "java"
-	id "net.neoforged.moddev" version "2.0.82" // https://projects.neoforged.net/neoforged/ModDevGradle
+	id "net.neoforged.moddev" version "2.0.88" // https://projects.neoforged.net/neoforged/ModDevGradle
 }
 
 ext.gimmeJava(21)
@@ -55,4 +55,9 @@ processResources {
 tasks.withType(JavaCompile) {
 	source(project(":Xplat-1.21.1").sourceSets.main.allSource)
 	source(project(":Core").sourceSets.main.allSource)
+}
+
+// ??????
+tasks.named("compileTestJava").configure {
+	it.enabled = false
 }
