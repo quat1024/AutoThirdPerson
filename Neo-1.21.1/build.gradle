@@ -5,6 +5,8 @@ plugins {
 
 ext.gimmeJava(21)
 
+archivesBaseName = "${rootProject.name}-neo-1.21.1"
+
 neoForge {
 	version "21.1.169" // https://projects.neoforged.net/neoforged/neoforge
 	
