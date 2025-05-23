@@ -5,7 +5,7 @@ plugins {
 
 ext.gimmeJava(21)
 
-archivesBaseName = "${rootProject.name}-fabric-1.21.1"
+archivesBaseName = "${rootProject.name}-fabric-1.21.5"
 
 dependencies {
 	//Minecraft
