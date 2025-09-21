@@ -29,13 +29,13 @@ include(
 	"Core",
 	"CrummyConfig",
 	
-	"Xplat-1.21.5",
-	"Fabric-1.21.5",
-	"Neo-1.21.5",
+	//"Xplat-1.21.5",
+	//"Fabric-1.21.5",
+	//"Neo-1.21.5",
 	
-	"Xplat-1.21.1",
-	"Fabric-1.21.1",
-	"Neo-1.21.1",
+	//"Xplat-1.21.1",
+	//"Fabric-1.21.1",
+	//"Neo-1.21.1",
 	
 //	"Xplat-1.20.1",
 //	"Fabric-1.20.1",
@@ -53,9 +53,9 @@ include(
 //	"Fabric-1.16.5",
 	//"Forge-1.16.5",
 	
-	//"Forge-1.12.2",
+	"Forge-1.12.2",
 	
-	"Forge-1.7.10",
+//	"Forge-1.7.10",
 	
-	"Forge-1.4.7"
+//	"Forge-1.4.7"
 )
