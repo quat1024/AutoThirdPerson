@@ -1,5 +1,4 @@
 #!/bin/bash
-shopt -s failglob
 
 alias rm="rm -v"
 alias mkdir="mkdir -v"
