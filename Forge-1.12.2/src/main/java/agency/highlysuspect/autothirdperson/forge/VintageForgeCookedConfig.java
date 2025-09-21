@@ -46,6 +46,11 @@ public class VintageForgeCookedConfig implements CookedConfig {
 	
 	@Override
 	public void refresh() throws Exception {
+		parsedValues.clear();
+		
+		//pressing "save" in the in-game config GUI *doesn't* actually save the config file
+		forge.save();
+		
 		forge.load();
 		
 		schema.accept(new ConfigSchema.Visitor() {
