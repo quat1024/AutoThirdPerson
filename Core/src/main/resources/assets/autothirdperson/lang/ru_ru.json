@@ -1,0 +1,7 @@
+{
+	"autothirdperson.toggle": "Включить автоматическое 3-е лицо",
+	
+	"autothirdperson.say_toggle": "Автоматическое 3-е лицо %s",
+	"autothirdperson.enabled": "§2включено",
+	"autothirdperson.disabled": "§4отключено"
+}
