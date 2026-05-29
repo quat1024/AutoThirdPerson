@@ -1,0 +1,21 @@
+plugins {
+	id "java"
+	id "net.fabricmc.fabric-loom" version "1.16-SNAPSHOT"
+}
+
+ext.gimmeJava(25)
+
+base {
+	archivesName = "${rootProject.name}-xplat-26.1.2"
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:26.1.2"
+	
+	compileOnly "org.spongepowered:mixin:0.8.5"
+	implementation project(":Core")
+}
+
+tasks.withType(JavaCompile) {
+	source(project(":Core").sourceSets.main.allSource)
+}

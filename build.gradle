@@ -16,8 +16,8 @@ subprojects {
 			
 			String compat = "1." + ver
 			//i forgor if setting these on project scope does anything but it can't hurt..?????
-			it.sourceCompatibility = compat
-			it.targetCompatibility = compat
+			//it.sourceCompatibility = compat
+			//it.targetCompatibility = compat
 			tasks.withType(JavaCompile).configureEach {
 				project.logger.lifecycle("{}: setting source/target compatibility to {} on task {}", project.displayName, compat, it.name)
 				sourceCompatibility = compat

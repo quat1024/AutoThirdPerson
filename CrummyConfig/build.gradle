@@ -4,7 +4,9 @@ plugins {
 
 ext.gimmeJava(8)
 
-archivesBaseName = "${rootProject.name}-crummyconfig"
+base {
+	archivesName = "${rootProject.name}-crummyconfig"
+}
 
 dependencies {
 	implementation project(":Core")

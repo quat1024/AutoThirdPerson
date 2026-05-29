@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "agency.highlysuspect.autothirdperson.fabric.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+	],
+	"client": ["GameRendererMixin", "LocalPlayerMixin", "MinecraftMixin"],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"refmap": "auto_third_person.refmap.json"
+}

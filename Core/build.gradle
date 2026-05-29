@@ -4,4 +4,6 @@ plugins {
 
 ext.gimmeJava(6)
 
-archivesBaseName = "${rootProject.name}-core"
+base {
+	archivesName = "${rootProject.name}-core"
+}

@@ -20,7 +20,7 @@ pluginManagement {
 //welcome to gradle 8 can i take your order
 //yeah i'd like uhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh java
 plugins {
-	id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
+	id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 rootProject.name = name
@@ -28,6 +28,8 @@ rootProject.name = name
 include(
 	"Core",
 	"CrummyConfig",
+	"Xplat-26.1.2",
+	"Fabric-26.1.2",
 	
 	//"Xplat-1.21.5",
 	//"Fabric-1.21.5",
@@ -53,9 +55,11 @@ include(
 //	"Fabric-1.16.5",
 	//"Forge-1.16.5",
 	
-	"Forge-1.12.2",
-	
 //	"Forge-1.7.10",
 	
 //	"Forge-1.4.7"
 )
+
+if (org.gradle.util.GradleVersion.current() < org.gradle.util.GradleVersion.version("8.0")) {
+	include("Forge-1.12.2")
+}
